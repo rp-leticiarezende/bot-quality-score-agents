@@ -11,14 +11,14 @@ description: |
   - Responder perguntas sobre a arquitetura geral do bot
   Trigger: qualquer pergunta sobre o chatbot RecargaPay, Botmaker CX, fluxo do bot, diagramas, roteamento, NLU, stages, transbordos, auto-resolução.
 tools:
-  - mcp__c8a2c8c5-9b6b-4f0c-aa90-f6906988b2a2__getConfluencePage
-  - mcp__c8a2c8c5-9b6b-4f0c-aa90-f6906988b2a2__searchConfluenceUsingCql
-  - mcp__c8a2c8c5-9b6b-4f0c-aa90-f6906988b2a2__getConfluenceSpaces
-  - mcp__9843fe2d-b5f6-4cd9-97c5-d588aa4dccbe__slack_search_public_and_private
-  - mcp__9843fe2d-b5f6-4cd9-97c5-d588aa4dccbe__slack_read_channel
-  - mcp__70538b79-c525-4c92-b65c-ff27ebfc4dc1__get_amplitude_context
-  - mcp__70538b79-c525-4c92-b65c-ff27ebfc4dc1__query_charts
-  - mcp__70538b79-c525-4c92-b65c-ff27ebfc4dc1__get_events
+  - mcp__Atlassian__getConfluencePage
+  - mcp__Atlassian__searchConfluenceUsingCql
+  - mcp__Atlassian__getConfluenceSpaces
+  - mcp__Slack__slack_search_public_and_private
+  - mcp__Slack__slack_read_channel
+  - mcp__Amplitude__get_amplitude_context
+  - mcp__Amplitude__get_amplitude_charts
+  - mcp__Amplitude__query_amplitude_data
   - WebFetch
   - WebSearch
 ---
@@ -431,14 +431,19 @@ ANÁLISE DE FLUXO — [fluxo] — [data de referência]
 Volume analisado: N conversas
 
 FALHAS DE FLUXO:
-  #1 [stage/bloco] — [descrição da falha] — N ocorrências — tickets: [IDs]
+  #1 [stage/bloco] — [descrição da falha] — N ocorrências
+     Exemplo real: ticket [ticket_id] — "[trecho do summary ou diagnostics.description do ticket]"
+     Tickets: [todos os IDs afetados]
   #2 ...
 
 FALHAS DE INTERPRETAÇÃO (NLU):
   #1 [intent_detected] — score_understanding médio: X — N ocorrências
+     Exemplo real: ticket [ticket_id] — "[trecho do summary mostrando o que o cliente disse e o que o bot entendeu]"
 
 LOOPS IDENTIFICADOS:
-  [stage] — N conversas com retention_type = loop — tickets: [IDs]
+  [stage] — N conversas com retention_type = loop
+     Exemplo real: ticket [ticket_id] — "[trecho do summary descrevendo o loop]"
+     Tickets: [IDs]
 
 RECOMENDAÇÕES DE FLUXO:
   → [ação específica: ajuste no CX_CA, novo nó, roteamento] — dono: Time de bot
@@ -446,6 +451,7 @@ RECOMENDAÇÕES DE FLUXO:
 
 ### Regras no modo curadoria
 
+- **Exemplo real obrigatório:** cada falha identificada deve incluir ao menos um `ticket_id` + um trecho do `summary` ou `diagnostics.description` mostrando o que aconteceu. Sem exemplo concreto, a falha não entra no output.
 - **Não consulte Confluence, Slack ou Amplitude** — todos os dados necessários vêm do payload recebido
 - `diagnostics.category = 'limitacao_estrutural'` → registrar volume, não gerar recomendação de fluxo
 - Loops em fluxos estáticos conhecidos (ex: Carteira Bloqueada, CC Error) têm causa diferente de loops em fluxos generativos — diferenciar no output
