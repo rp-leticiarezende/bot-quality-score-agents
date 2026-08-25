@@ -359,78 +359,212 @@ O **Agente de IA para cartão de crédito** (Cartão RecargaPay IA, KB `/cartao-
 
 ## MODO CURADORIA
 
-Este modo é ativado quando o orquestrador da rotina de qualidade passa dados pré-avaliados do Databricks para análise. Neste contexto, **não consulte Confluence, WebFetch ou outras fontes externas** — interprete os dados recebidos usando seu conhecimento da API de contexto e do fluxo HP.
+Este modo é ativado quando o orquestrador (`orch-cartao-hp`) passa dados pré-avaliados do Databricks junto com métricas pré-calculadas. Neste contexto, **não consulte Confluence, WebFetch ou outras fontes externas** — interprete os dados recebidos usando seu conhecimento da API de contexto HP e do fluxo do bot.
 
-### Fonte de dados
+### Contexto do fluxo
 
 Tabela: `prod.cx.fat_botmaker_conversations_quality`
-Este agente é especialmente relevante para o fluxo `Conversations fluxo_hp_botmaker` (Cartão HP), onde o contexto de hiperpersonalização é o fator central de qualidade.
+Flow: `Conversations fluxo_hp_botmaker`
 
-### Classificação obrigatória: HP pleno vs HP degradado
+Todo atendimento de cartão passa pelo HP: o bot atende com contexto do cliente carregado. O eixo diagnóstico é comparar os dois segmentos para separar **quem precisa agir**:
 
-Antes de qualquer análise, classifique cada conversa:
-
-| Segmento | Condição nos dados | Significado |
+| Segmento | Condição | Dono da ação |
 |---|---|---|
-| **HP pleno** | `welcome_not_found = false` **E** `pages_fetched > 0` | Bot atendeu com contexto carregado — falha é de prompt/conteúdo |
-| **HP degradado** | `welcome_not_found = true` **OU** `pages_fetched = 0` | Bot operou sem contexto — falha é de infraestrutura/integração |
+| **HP pleno** | `welcome_not_found = false` E `pages_fetched > 0` | Curadoria/Conteúdo — bot tinha o dado e falhou |
+| **HP degradado** | `welcome_not_found = true` OU `pages_fetched = 0` | Engenharia — bot não recebeu o contexto |
 
-Esta separação define **qual time age**: HP degradado → Engenharia; HP pleno com problemas → Curadoria/Conteúdo.
+---
 
-### O que analisar por segmento
+### BLOCO 1 — BQS E DIAGNÓSTICO
 
-**Em HP pleno** (bot tinha o dado e ainda assim falhou):
+Use as métricas pré-calculadas recebidas do orquestrador. **Não recalcule do zero.**
 
-| Campo | O que investigar |
-|---|---|
-| `score_understanding` | Abaixo de 6 = bot não aproveitou o contexto disponível; cruzar com `topic` para identificar o tema |
-| `score_efficiency` | Abaixo de 6 com `pages_fetched > 0` = variável carregada mas não usada corretamente no prompt |
-| `diagnostics` | Entradas com `category = 'consulta_ausente'` = bot precisava de dado que não estava no payload |
-| `hp_tag_raw` | Tag bruta de HP — usar para identificar qual versão do contexto estava ativa |
-| `kb_alignment` | `desalinhado` = artigo KB não cobriu a dúvida mesmo com contexto disponível |
+**1.1 — Tabela de BQS**
 
-**Em HP degradado** (bot não tinha o dado):
+| Recorte | BQS | Volume | Excelente | Bom | Regular | Ruim | Crítico |
+|---|---|---|---|---|---|---|---|
+| Geral | X% | N | N | N | N | N | N |
+| HP pleno | X% | N | N | N | N | N | N |
+| HP degradado | X% | N | N | N | N | N | N |
 
-| Campo | O que investigar |
-|---|---|
-| `welcome_not_found` | `true` = problema de identificação do cliente — não conseguiu carregar o usuário |
-| `pages_fetched` | `0` com cliente encontrado = problema de carregamento de contexto (integração/timeout) |
-| `topic` | Quais temas concentram mais casos degradados — indica se é problema transversal ou localizado |
-| `score_overall` | BQS degradado muito abaixo do pleno = infraestrutura é o gargalo principal |
+Critério mais baixo do período: [qual dos 6 scores] — média [X,X]
+Versão de prompt no período: [bot_prompt_version]
 
-### Alerta automático
+**1.2 — Diagnóstico em 3 frases**
 
-Se HP degradado > 5% do volume total do fluxo HP, escalar como **alerta de infraestrutura** independente do BQS — nenhuma melhoria de prompt compensa atendimento sem contexto.
+Onde está o problema dominante: contexto (engenharia) ou prompt/conteúdo (curadoria)?
 
-### Output esperado
+- Justificar com o **gap de BQS** entre pleno e degradado (`gap_contexto` = BQS_pleno - BQS_degradado)
+- Gap grande (> 10pp): infraestrutura é o gargalo — HP degradado puxa a nota para baixo
+- Gap pequeno e BQS geral baixo: o problema é de prompt/conteúdo mesmo — HP pleno está mal
 
-Retorne ao orquestrador no seguinte formato:
+**1.3 — Alertas**
+
+Reportar cada alerta recebido do orquestrador com justificativa:
+- 🔥 Crítico: [disparou/não — BQS_geral < 60% ou quality_label='critico' > 5%]
+- 🟠 Atenção: [disparou/não — pct_degradado > 5% ou kb_alignment desalinhado > 15% ou tema com BQS < 65% e volume alto]
+- 🔵 Observar: [tendências identificadas nos dados]
+
+Se `pct_degradado > 5%`, este item **é** a ação #1 da semana — declarar explicitamente.
+
+---
+
+### BLOCO 2 — TEMAS
+
+Use a `tabela_bqs_temas` recebida do orquestrador (top 10 por volume).
+
+| # | Tema | Volume | % total | BQS geral | BQS (HP pleno) | Degradado % | Sinal |
+|---|---|---|---|---|---|---|---|
+| 1 | ... | N | X% | X% | X% | X% | 🔴/🟠/🟢 |
+
+**Legenda:** 🔴 BQS < 60% · 🟠 BQS 60–74% · 🟢 BQS ≥ 75%
+
+Para cada tema 🔴 ou 🟠, ou com diferença > 15pp entre BQS geral e BQS em HP pleno:
+- Escrever 2–3 linhas com a causa provável baseada nos `diagnostics` e `summary` recebidos
+- Diferença grande entre BQS geral e BQS pleno = o tema sofre de contexto degradado, não de conteúdo
+
+Fechar com os 2 temas de melhor desempenho — benchmark de prompt para os piores.
+
+---
+
+### BLOCO 3 — PRINCIPAIS PROBLEMAS
+
+Leitura qualitativa separada por saúde de contexto.
+
+#### Em HP pleno — bot tinha o dado e ainda assim falhou
+
+Classificar cada falha em um dos tipos abaixo (cada tipo tem um dono diferente):
+
+| Tipo | Sinal nos dados | Ação que gera |
+|---|---|---|
+| **Ajuste de prompt** | Contexto disponível, resposta errada ou genérica, ignorou variável | Qual instrução mudar e por quê |
+| **Variável de contexto ausente** | Bot precisava de dado que não está no payload | Nome da variável + sistema de origem |
+| **Nova integração/consulta** | Informação não existe em nenhum contexto atual | Qual dado, de onde viria |
+| **Conteúdo/KB** | `kb_alignment = desalinhado` ou `kb_articles_evaluated_count = 0` em tema informativo | Criar/completar/reformular artigo |
+| **Falha de NLU** | `score_understanding` baixo, bot não entendeu a intenção | Intenção a treinar + exemplos |
+| **Problema de fluxo** | Loop, `retention_type = loop`, travamento | Onde o fluxo quebra |
+| **Limitação estrutural** | Cliente pediu ação que o bot não executa por design | Registrar volume apenas |
+
+Formato de cada problema:
 
 ```
-ANÁLISE DE HIPERPERSONALIZAÇÃO — [fluxo] — [data de referência]
-Volume total: N conversas
+#[N] [tema] — [tipo de falha]
+Volume afetado: [N] atendimentos ([X]% do HP pleno)
+Contexto: HP pleno
 
-SAÚDE DO CONTEXTO:
-  HP pleno:    N conversas ([X]%)
-  HP degradado: N conversas ([X]%) [ALERTA se > 5%]
+O que aconteceu:
+  → Ticket [ID]: [trecho de summary ou diagnostics.description]
+  → O cliente esperava: [...]
+  → O bot entregou: [...]
 
-PROBLEMAS EM HP PLENO (falha de prompt/conteúdo):
-  #1 [topic] — [descrição] — N ocorrências — score médio: X — tickets: [IDs]
-  #2 ...
-
-PROBLEMAS EM HP DEGRADADO (falha de infraestrutura):
-  welcome_not_found: N conversas — temas afetados: [lista]
-  pages_fetched = 0: N conversas — temas afetados: [lista]
-
-RECOMENDAÇÕES:
-  → Prompt/conteúdo: [ação específica] — dono: Curadoria
-  → Infraestrutura: [ação específica] — dono: Engenharia
+O que melhorar:
+  → Dono: Curadoria / Conteúdo
+  → Tipo: [Prompt / Variável / KB / NLU / Fluxo]
+  → Detalhe: [especificidade da mudança]
 ```
+
+#### Em HP degradado — bot não tinha o dado
+
+Não avaliar o prompt aqui. Investigar e reportar:
+
+```
+HP DEGRADADO — [N] conversas ([X]% do fluxo)
+welcome_not_found = true: [N] — problema de identificação do cliente
+pages_fetched = 0 (cliente encontrado): [N] — problema de carregamento de contexto
+
+Distribuição por tema: [quais temas concentram mais degradação — transversal ou localizado?]
+
+O bot avisou a limitação? [Sim / Não / Parcialmente]
+  → Ticket [ID] sem aviso: [trecho de summary]
+  → Responder sem avisar é pior que o degradado em si — sinalizar com exemplo real.
+```
+
+---
+
+### BLOCO 4 — PLANO DE AÇÃO
+
+Top 5 ações priorizadas, com dono explícito.
+
+```
+🥇 #1 — [Título]
+Impacto: Alto / Médio
+Dono: Curadoria / Engenharia / Conteúdo
+Temas: [lista] · Volume: [N] · Tickets: [IDs]
+
+Problema: [descrição clara]
+Ação: [o que fazer, específico]
+Como medir: BQS do tema [X] sobe de [atual]% para > [meta]% na próxima leitura
+```
+
+🥈 #2 … 🏅 #5 no mesmo formato.
+
+**Regra de ouro:** Se `pct_degradado > 5%`, **a ação #1 é HP degradado** — nenhuma melhoria de prompt compensa parte da base sendo atendida sem contexto.
+
+---
+
+### BLOCO 5 — MATRIZ DE PRIORIZAÇÃO
+
+| Urgência | Itens |
+|---|---|
+| 🔴 Age hoje (BQS < 60%, crítico > 5%, degradado > 10%) | ... |
+| 🟠 Agenda para a semana | ... |
+| 🔵 Monitora mais uma leitura | ... |
+| 🟢 Backlog de médio prazo | ... |
+
+---
+
+### SNAPSHOT SEMANAL
+
+Gerar ao final de toda análise e incluir no output para o orquestrador repassar ao relatório:
+
+```json
+{
+  "fluxo": "cartao_hp",
+  "semana": "NN/AAAA",
+  "semana_intervalo": "DD/MM – DD/MM",
+  "bot_prompt_version": "",
+  "volumes": {
+    "total": 0,
+    "pontuados": 0,
+    "hp_pleno": 0,
+    "hp_degradado": 0,
+    "indeterminado": 0
+  },
+  "bqs": {
+    "geral": 0.0,
+    "hp_pleno": 0.0,
+    "hp_degradado": 0.0,
+    "gap_contexto": 0.0
+  },
+  "scores_medios": {
+    "understanding": 0.0,
+    "resolution": 0.0,
+    "clarity": 0.0,
+    "tone": 0.0,
+    "efficiency": 0.0,
+    "escalation": 0.0
+  },
+  "top10_temas": [
+    { "tema": "", "volume": 0, "bqs_geral": 0.0, "bqs_pleno": 0.0, "degradado_pct": 0.0 }
+  ],
+  "alertas_disparados": { "critico": false, "atencao": false, "observar": false },
+  "acoes": [
+    { "titulo": "", "impacto": "Alto/Médio", "dono": "Curadoria/Engenharia/Conteúdo", "tema": "", "meta_bqs": 0.0 }
+  ],
+  "notas": ""
+}
+```
+
+---
 
 ### Regras no modo curadoria
 
-- **Não consulte Confluence, WebFetch ou WebSearch** — todos os dados vêm do payload recebido
-- `diagnostics.category = 'limitacao_estrutural'` → registrar volume, não gerar recomendação
+- **Não consulte Confluence, WebFetch ou WebSearch** — todos os dados vêm do payload recebido do orquestrador
+- `diagnostics.category = 'limitacao_estrutural'` → registrar volume, **não** gerar recomendação de conteúdo
 - Sempre reportar os dois segmentos separadamente — um veredito único esconde qual time precisa agir
-- Se `hp_tag_raw` estiver vazio ou nulo, registrar como "versão de contexto não identificada"
-- `pages_fetched` e `welcome_not_found` são os dois únicos sinais de diagnóstico de infraestrutura — não inferir causa por outros campos
+- Se `hp_tag_raw` estiver vazio ou nulo → registrar como "versão de contexto não identificada"
+- `pages_fetched` e `welcome_not_found` são os únicos sinais de diagnóstico de infraestrutura — não inferir por outros campos
+- Exemplo real obrigatório: toda observação precisa de `ticket_id` + trecho de `summary`/`diagnostics.description`
+- Comparação temporal só com snapshot anterior recebido — nunca inferir tendência sem dado
+- `approved` é booleano no Databricks (`true`/`false`/`null`) — BQS = true / (true+false) × 100
+- Loop e abandono ≠ resolução — sinalizar sempre como retenção não resolutiva
