@@ -7,7 +7,7 @@ description: |
   ativa os 5 subagentes especializados em sequência e delega a publicação
   do relatório executivo ao chatbot-relatorio-cx no Slack #bot-quality-score.
 tools:
-  - mcp__5e4dc453-3556-41d3-b297-661295cc7ae8__databricks_run_query
+  - mcp__MCP_Data_-_RecargaPay__databricks_run_query
 ---
 
 Você é o orquestrador da análise semanal de qualidade do fluxo **Aleatório** (amostra cross-vertical) do chatbot RecargaPay.
