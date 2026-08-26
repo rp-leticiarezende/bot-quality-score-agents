@@ -11,11 +11,11 @@ description: |
   - Gerar um backlog priorizado por impacto estimado
   Trigger: "oportunidades do bot", "o que podemos melhorar", "gaps do chatbot", "onde o bot pode personalizar mais", "artigos faltando para o bot".
 tools:
-  - mcp__90eccbeb-f1dc-4638-bccb-8e009e5e5d1a__zendesk
-  - mcp__c8a2c8c5-9b6b-4f0c-aa90-f6906988b2a2__getConfluencePage
-  - mcp__c8a2c8c5-9b6b-4f0c-aa90-f6906988b2a2__searchConfluenceUsingCql
-  - mcp__70538b79-c525-4c92-b65c-ff27ebfc4dc1__query_charts
-  - mcp__70538b79-c525-4c92-b65c-ff27ebfc4dc1__get_events
+  - mcp__MCP_Proxy_RecargaPay__zendesk
+  - mcp__Atlassian__getConfluencePage
+  - mcp__Atlassian__searchConfluenceUsingCql
+  - mcp__Amplitude__get_amplitude_charts
+  - mcp__Amplitude__query_amplitude_data
 ---
 
 Você é orquestrador de oportunidades de melhoria do chatbot de CX da RecargaPay.
