@@ -453,128 +453,145 @@ O prompt incluirá:
 
 6. **output_propostas** — propostas de ajuste (do chatbot-proposta-ajustes)
 
+### Mapeamento de times (owner de cada ação)
+
+Toda ação identificada deve ter um owner explícito. Use **exatamente** esses nomes:
+
+| Tipo de ação | Owner |
+|---|---|
+| Mudança de variável HP, criação ou ajuste de fluxo/nó no Botmaker, roteamento, prompt, NLU | **Produto CX** |
+| Criar ou atualizar artigo no Guide / Help Center | **Help Design** |
+| Problema de infraestrutura, integração, welcome_not_found, bug de API | **Engenharia** |
+
+Nunca use "Time de bot", "Time de conteúdo", "Curadoria" ou qualquer outro nome de time — esses três são os únicos válidos.
+
+---
+
 ### Como montar o relatório no MODO CURADORIA
 
-**Adapte a estrutura ao tipo de rotina:**
-
-#### Para Cartão HP (semanal)
-```
-📊 *RELATÓRIO SEMANAL — CARTÃO HP*
-Período: [DD/MM] a [DD/MM/AAAA]
-Total de conversas: [N_total] | Pontuadas: [N_pontuados]
-
-🔵 *BOT QUALITY SCORE*
-BQS geral: [X]% | HP pleno: [X]% | HP degradado: [X]%
-HP pleno: [N_pleno] ([X]%) | HP degradado: [N_degradado] ([X]%)
-
-Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
-Retention: Resolutiva [N] · Loop [N] · Abandono [N] · Transbordo [N]
-
-📋 *ANÁLISE DE FLUXO*
-[output_fluxo — resumo dos padrões identificados]
-
-🏥 *ANÁLISE HP*
-[output_hp — resumo de pleno vs degradado]
-
-📚 *ANÁLISE DE KB*
-[output_kb — resumo de alinhamento]
-
-🎯 *TOP OPORTUNIDADES*
-[output_oportunidades — listar OPOs Alta e Média prioridade com evidências]
-
-🔧 *PROPOSTAS DE AJUSTE*
-[output_propostas — plano de ação consolidado com owners e prazos]
+O relatório é composto por **3 mensagens separadas**, postadas em sequência no canal. A separação divide a atenção: quem precisa da visão executiva lê a 1ª, quem precisa agir vai à 2ª, quem quer entender o porquê vai à 3ª.
 
 ---
-_Relatório gerado automaticamente · Cartão HP · Bot: RecargaBot_
-```
 
-#### Para Aleatório (semanal)
+#### MENSAGEM 1 — Resumo executivo (big numbers + pontos de atenção)
+
+Responde a: *"como está o bot esta semana/dia?"*
+
 ```
-📊 *RELATÓRIO SEMANAL — FLUXO ALEATÓRIO (cross-vertical)*
-Período: [DD/MM] a [DD/MM/AAAA]
-Total de conversas: [N_total] | Pontuadas: [N_pontuados]
-Verticais cobertas: [lista]
+[emoji rotina] *[TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS]*
+[DD/MM] a [DD/MM/AAAA] | [N_total] conversas | Critério mais fraco: [score_xxx] ([X,X])
 
 🔵 *BOT QUALITY SCORE*
-BQS geral: [X]%
+BQS: *[X]%* ([+/-]Xpp vs período anterior)
+[Somente Cartão HP:] HP pleno: [X]% · HP degradado: *[X]%* (limite: 5%)
 Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
-Retention: Resolutiva [N] · Loop [N] · Abandono [N] · Transbordo [N]
+Retention: Resolutiva [N] · Abandono [N] · Transbordo [N] · Loop [N]
 
-BQS por vertical (pior → melhor):
-[lista de verticais com BQS — incluir TODAS as verticais presentes]
+⚠️ *PONTOS DE ATENÇÃO*
+[Para cada alerta disparado — máximo 4 bullets:]
+• 🔴 [descrição do alerta + métrica que disparou]
+• 🟠 [descrição]
 
-📋 *ANÁLISE DE FLUXO*
-[output_fluxo — padrões cross-vertical identificados]
+_Plano de ação e detalhamento técnico nas mensagens abaixo ↓_
+_Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
+```
 
-📚 *ANÁLISE DE KB*
-[output_kb — verticais com problema de alinhamento]
-
-🎯 *TOP OPORTUNIDADES*
-[output_oportunidades — OPOs priorizadas com evidências]
-
-🔧 *PROPOSTAS DE AJUSTE*
-[output_propostas — plano consolidado]
+**Regras:**
+- Não misturar ações aqui — só métricas e alertas
+- Variação vs período anterior obrigatória no BQS (omitir só se não houver dado anterior)
+- Para Casos Críticos: não abrir com "BQS baixo é crítico" — é esperado. Destacar o padrão de falha mais recorrente nos pontos de atenção
+- Se não houver nenhum alerta: escrever `✅ Nenhum alerta disparado`
 
 ---
-_Relatório gerado automaticamente · Fluxo Aleatório · Bot: RecargaBot_
+
+#### MENSAGEM 2 — Plano de ação (agrupado por time responsável)
+
+Responde a: *"o que cada time precisa fazer?"*
+
+```
+🎯 *PLANO DE AÇÃO — [N] itens · [rotina] · [período]*
+
+[Se houver item de compliance ou risco financeiro:]
+🚨 *URGENTE — COMPLIANCE*
+• [OPO-XXX] [descrição em 1 linha] | Prazo: Imediato
+  → [ação específica]
+
+🔵 *PRODUTO CX* ([N] ações)
+[Todos os OPOs cujo owner é Produto CX, ordenados por prioridade:]
+🔴 [OPO-XXX] [título] | Prazo: [Imediato/Sprint]
+   → [ação em 1 linha]
+🟠 [OPO-XXX] [título] | Prazo: [Sprint/Backlog]
+   → [ação em 1 linha]
+
+📗 *HELP DESIGN* ([N] ações)
+[Todos os OPOs cujo owner é Help Design:]
+🔴 [OPO-XXX] Criar: "[Título exato do artigo]" — Seção: [seção no Guide]
+   → [o que o artigo deve cobrir em 1 linha]
+🟠 [OPO-XXX] Atualizar: "[Título exato do artigo]" — URL: [url se disponível]
+   → [o que adicionar/corrigir]
+
+⚙️ *ENGENHARIA* ([N] ações)
+[Todos os OPOs cujo owner é Engenharia:]
+🔴 [OPO-XXX] [título] | Prazo: [Imediato/Sprint]
+   → [ação em 1 linha]
 ```
 
-#### Para Casos Críticos (diário)
-```
-🔴 *RELATÓRIO DIÁRIO — CASOS CRÍTICOS (CSAT 1 e 2)*
-Data de referência: [DD/MM/AAAA]
-Total de conversas: [N_total] | Pontuadas: [N_pontuados]
-
-🔵 *BOT QUALITY SCORE*
-BQS do dia: [X]% _(esperado baixo — são os piores atendimentos)_
-Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
-Retention: Resolutiva [N] · Loop [N] · Abandono [N] · Transbordo [N]
-
-BQS por produto (pior → melhor):
-[lista com BQS por product]
-
-📋 *ANÁLISE DE FLUXO*
-[output_fluxo — falhas identificadas com exemplos]
-
-📚 *ANÁLISE DE KB*
-[output_kb — gaps de conteúdo nos casos críticos]
-
-🎯 *OPORTUNIDADES — FOCO EM IMPACTO IMEDIATO*
-[output_oportunidades — priorizar ações sem dependências longas]
-
-🔧 *AÇÕES IMEDIATAS*
-[output_propostas — apenas as de prazo "Imediato" ou "Sprint atual"]
+**Regras:**
+- Cada time vê apenas o que é dele — não misturar owners numa seção
+- Compliance/urgente sempre aparece antes de qualquer time, como bloco separado
+- Para Help Design: usar título exato do artigo (do output_kb), nunca nome genérico do tema
+- Omitir a seção de um time se ele não tiver nenhuma ação neste ciclo
 
 ---
-_Relatório gerado automaticamente · Casos Críticos (CSAT 1e2) · Bot: RecargaBot_
+
+#### MENSAGEM 3 — Detalhamento técnico (por bloco de achados)
+
+Responde a: *"por que chegamos a esse plano de ação?"*
+
 ```
+🔍 *DETALHAMENTO TÉCNICO — [rotina] · [período]*
+
+📋 *FLUXO DO BOT*
+[output_fluxo — cada falha com: descrição, N ocorrências, tickets de exemplo]
+
+[Somente Cartão HP:]
+🏥 *HP PLENO vs DEGRADADO*
+[output_hp — gap de contexto, diagnóstico, o que fazer com cada segmento]
+
+📚 *BASE DE CONHECIMENTO (KB)*
+[output_kb — cada artigo individualmente: título exato, situação (existe/não existe), URL se existir, tickets de referência]
+```
+
+**Regras:**
+- Tickets obrigatórios em cada falha de fluxo e em cada item de KB
+- Para KB: cada artigo em seu próprio bullet — nunca agrupar em "criar 4 artigos"
+- Se um domínio não tiver achados relevantes: escrever `✅ Sem ocorrências relevantes neste ciclo`
+
+---
 
 ### Como postar no Slack
 
-Use `slack_send_message` com:
+1. Poste a mensagem principal com `slack_send_message` no canal `#bot-quality-score` (channel_id: `C0BP08WPMLP`)
+2. Capture o `ts` (timestamp) retornado
+3. Poste cada reply da thread com `slack_send_message` usando `thread_ts: [ts capturado]`
 
-```
-channel: #bot-quality-score
-text: [relatório formatado acima]
-```
-
-Se o canal não for encontrado, use `slack_search_channels` com query `bot-quality-score` para localizar o ID correto.
+Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `bot-quality-score`.
 
 **Regras de formatação Slack:**
 - Negrito: `*texto*`
 - Itálico: `_texto_`
 - Código: `` `texto` ``
-- Separador de seção: `---`
-- Tabelas: use texto formatado com pipes `|` (Slack não renderiza markdown de tabelas — use lista com traço)
+- Tabelas: use lista com traço (Slack não renderiza markdown de tabelas)
+
+---
 
 ### Regras no MODO CURADORIA
 
 - Não invente dados — use apenas o que foi fornecido pelo orquestrador
-- Se um output de agente especialista vier vazio ou com erro: incluir nota "⚠️ Análise de [domínio] indisponível neste ciclo" e continuar
-- Para Casos Críticos: BQS baixo é esperado — não tratar como anomalia, mas sim analisar padrões
-- **Tickets obrigatórios:** ao mencionar qualquer problema no relatório, incluir os ticket IDs do output_fluxo ou output_kb correspondentes — nunca apenas a contagem ("3 casos")
-- **Artigos específicos obrigatórios:** ao incluir recomendações de KB (ANÁLISE DE KB ou ações do backlog), copiar o nome exato do artigo do output_kb — nunca resumir em "criar/revisar X artigos sobre [tema]". Cada artigo tem sua própria linha com título e URL (quando disponível)
-- **Nunca agrupe artigos distintos em um único item** do backlog — cada artigo a criar ou atualizar deve ser um OPO separado (ou sub-item explicitamente listado com título próprio)
-- Para Aleatório: cobrir TODAS as verticais no BQS por vertical — não omitir as saudáveis
+- Se um output de agente especialista vier vazio ou com erro: incluir nota "⚠️ Análise de [domínio] indisponível neste ciclo" e continuar com os demais
+- **Owner obrigatório:** toda ação deve ter owner de um dos três times — Produto CX, Help Design ou Engenharia. Nunca deixar owner em branco ou usar nome de time diferente
+- **Tickets obrigatórios na thread:** ao mencionar qualquer problema no Reply 1 ou Reply 3, incluir os ticket IDs correspondentes — nunca apenas a contagem ("3 casos")
+- **Artigos específicos obrigatórios no Reply 2:** copiar o título exato do artigo do output_kb — nunca "criar/revisar X artigos sobre [tema]". Cada artigo tem sua própria linha
+- **Nunca agrupe artigos distintos em um único item** — cada artigo a criar ou atualizar é um OPO separado
+- **Compliance primeiro:** se houver conteúdo contraditório, risco financeiro ou risco regulatório, ele é sempre o primeiro item — independente de volume ou BQS
 - Após postar com sucesso: confirme a URL/timestamp da mensagem postada
