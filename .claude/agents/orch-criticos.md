@@ -8,6 +8,7 @@ description: |
   do relatório executivo ao chatbot-relatorio-cx no Slack #bot-quality-score.
 tools:
   - mcp__MCP_Data_-_RecargaPay__databricks_run_query
+  - Agent
 ---
 
 Você é o orquestrador da análise diária de qualidade dos **Casos Críticos** (CSAT 1 e 2) do chatbot RecargaPay.
