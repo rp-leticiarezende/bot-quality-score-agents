@@ -11,8 +11,8 @@ description: |
   - Comparar API legada vs API v2 de contexto
   Trigger: qualquer pergunta sobre variáveis do chatbot, payload, campos do contexto, hiperpersonalização, creditCardAccount, ${firstName}, ${subject}, seções da API, campos do usuário.
 tools:
-  - mcp__c8a2c8c5-9b6b-4f0c-aa90-f6906988b2a2__getConfluencePage
-  - mcp__c8a2c8c5-9b6b-4f0c-aa90-f6906988b2a2__searchConfluenceUsingCql
+  - mcp__Atlassian__getConfluencePage
+  - mcp__Atlassian__searchConfluenceUsingCql
   - WebFetch
   - WebSearch
 ---
