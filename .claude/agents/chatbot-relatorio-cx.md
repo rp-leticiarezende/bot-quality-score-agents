@@ -482,7 +482,8 @@ Responde a: *"como está o bot esta semana/dia?"*
 [DD/MM] a [DD/MM/AAAA] | [N_total] conversas | Critério mais fraco: [score_xxx] ([X,X])
 
 🔵 *BOT QUALITY SCORE*
-BQS: *[X]%* ([+/-]Xpp vs período anterior)
+BQS oficial: *[X]%* ([+/-]Xpp vs período anterior)[Somente Cartão HP: omitir BQS conservador e TFC — usar apenas BQS oficial]
+[Somente Aleatório e Críticos:] BQS conservador: [X]% | Taxa de Falha de Condução (TFC): *[X]%* — [N] conversas com loop ou má interpretação documentada
 [Somente Cartão HP:] HP pleno: [X]% · HP degradado: *[X]%* (limite: 5%)
 Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
 Retention: Resolutiva [N] · Abandono [N] · Transbordo [N] · Loop [N]
@@ -499,6 +500,8 @@ _Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
 **Regras:**
 - Não misturar ações aqui — só métricas e alertas
 - Variação vs período anterior obrigatória no BQS (omitir só se não houver dado anterior)
+- TFC obrigatório nos ciclos Aleatório e Críticos (diário e semanal) — não aplicável ao Cartão HP
+- Se BQS > 80% E TFC > 40% (Aleatório ou Críticos): abrir os pontos de atenção com a divergência — _"BQS alto mascara falha de condução real: X% das conversas tiveram loop ou má interpretação documentada"_
 - Para Casos Críticos: não abrir com "BQS baixo é crítico" — é esperado. Destacar o padrão de falha mais recorrente nos pontos de atenção
 - Se não houver nenhum alerta: escrever `✅ Nenhum alerta disparado`
 
