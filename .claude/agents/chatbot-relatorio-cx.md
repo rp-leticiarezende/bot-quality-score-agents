@@ -469,7 +469,7 @@ Nunca use "Time de bot", "Time de conteúdo", "Curadoria" ou qualquer outro nome
 
 ### Como montar o relatório no MODO CURADORIA
 
-O relatório é composto por **3 mensagens separadas**, postadas em sequência no canal. A separação divide a atenção: quem precisa da visão executiva lê a 1ª, quem precisa agir vai à 2ª, quem quer entender o porquê vai à 3ª.
+O relatório é composto por **2 mensagens separadas**, postadas em sequência no canal. A separação divide a atenção: quem precisa da visão executiva lê a 1ª, quem precisa agir vai à 2ª.
 
 ---
 
@@ -490,7 +490,7 @@ Retention: Resolutiva [N] · Abandono [N] · Transbordo [N] · Loop [N]
 • [insight 2]
 • [insight 3]
 
-_Plano de ação e detalhamento técnico nas mensagens abaixo ↓_
+_Plano de ação na mensagem abaixo ↓_
 _Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
 ```
 
@@ -530,13 +530,12 @@ Responde a: *"o que cada time precisa fazer?"*
 • Criar: "[Título exato do artigo]" — Seção: [seção] | Referência: [OPO-XXX], nó [X] ([contexto])
 • Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Referência: [OPO-XXX]
 
-[Se houver artigos além do TOP 3:]
-_Artigos restantes detalhados na Mensagem 3._
+[Se houver artigos além do TOP 3: omitir — apenas os 3 mais prioritários são enviados]
 ```
 
 **Regras:**
-- **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas × severidade. Os demais itens vão para a Mensagem 3, não são omitidos
-- **Help Design: máximo 3 artigos.** Priorizar lacunas totais (artigo inexistente) antes de atualizações. Os artigos restantes vão para a Mensagem 3 (seção KB), não são omitidos
+- **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas × severidade. Os demais itens são omitidos — não há Mensagem 3
+- **Help Design: máximo 3 artigos.** Priorizar lacunas totais (artigo inexistente) antes de atualizações. Os artigos restantes são omitidos — não há Mensagem 3
 - **Não existe seção Engenharia.** Produto CX e Engenharia são o mesmo time — ações de infra, bug ou integração entram no bloco Produto CX
 - Não agrupar por nível (Crítico/Alto/Médio) dentro das seções — listar bullets diretos, ordenados por impacto
 - Compliance/urgente sempre aparece antes de qualquer time, como bloco separado
