@@ -19,6 +19,8 @@ tools:
   - mcp__Amplitude__get_amplitude_context
   - mcp__Slack__slack_send_message
   - mcp__Slack__slack_search_channels
+  - mcp__Google_Drive__download_file_content
+  - mcp__Google_Drive__update_file
 ---
 
 Você é o orquestrador principal do ciclo de análise e melhoria do chatbot CX RecargaPay.
@@ -513,42 +515,41 @@ Responde a: *"o que cada time precisa fazer?"*
 
 ```
 🎯 *PLANO DE AÇÃO — [rotina] · [período]*
-
-[Se houver item de compliance ou risco financeiro:]
-🚨 *URGENTE — COMPLIANCE*
-• [OPO-XXX] [descrição em 1 linha] | Prazo: Imediato
-  → [ação específica]
+_Ordenado por prioridade de impacto_
 
 🔵 *PRODUTO CX — TOP 3*
-• [OPO-XXX] [título] ([nó]): [descrição do problema] | Referência: nó [X], tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
+• 🚨 1. [título] ([nó]): [descrição — risco regulatório/compliance] | Prazo: Imediato
   → [ação concreta em 1 linha]
-• [OPO-XXX] [título] ([nó]): [descrição] | Referência: nó [X], tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
+• 2. [título] ([nó]): [descrição do problema] | Referência: tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
+  → [ação concreta em 1 linha]
+• 3. [título] ([nó]): [descrição] | Referência: tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
   → [ação concreta em 1 linha]
 
 📗 *HELP DESIGN — TOP 3*
-• Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Referência: [OPO-XXX], nó [X] ([contexto])
-• Criar: "[Título exato do artigo]" — Seção: [seção] | Referência: [OPO-XXX], nó [X] ([contexto])
-• Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Referência: [OPO-XXX]
+• 1. Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Tickets: [IDs]
+• 2. Criar: "[Título exato do artigo]" — Seção: [seção] | Tickets: [IDs]
+• 3. Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Tickets: [IDs]
 
-[Se houver artigos além do TOP 3: omitir — apenas os 3 mais prioritários são enviados]
+_Propostas detalhadas (o que e onde mudar): https://docs.google.com/document/d/19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0/edit_
 ```
 
 **Regras:**
 - **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas × severidade. Os demais itens são omitidos — não há Mensagem 3
 - **Help Design: máximo 3 artigos.** Priorizar lacunas totais (artigo inexistente) antes de atualizações. Os artigos restantes são omitidos — não há Mensagem 3
 - **Não existe seção Engenharia.** Produto CX e Engenharia são o mesmo time — ações de infra, bug ou integração entram no bloco Produto CX
+- **Compliance e risco regulatório:** itens urgentes entram no bloco Produto CX como o primeiro bullet, marcados com 🚨 e "Prazo: Imediato". Não existe bloco separado de Compliance — o time responsável (Produto CX ou Help Design) é sempre explícito
 - Não agrupar por nível (Crítico/Alto/Médio) dentro das seções — listar bullets diretos, ordenados por impacto
-- Compliance/urgente sempre aparece antes de qualquer time, como bloco separado
 - Para Help Design: usar título exato do artigo (do output_kb), nunca nome genérico do tema
 - Omitir a seção de um time se ele não tiver nenhuma ação neste ciclo
 
 ---
 
-### Como postar no Slack
+### Como publicar
 
-1. Poste a mensagem principal com `slack_send_message` no canal `#bot-quality-score` (channel_id: `C0BP08WPMLP`)
+**Passo 1 — Slack**
+1. Poste a Mensagem 1 com `slack_send_message` no canal `#bot-quality-score` (channel_id: `C0BP08WPMLP`)
 2. Capture o `ts` (timestamp) retornado
-3. Poste cada reply da thread com `slack_send_message` usando `thread_ts: [ts capturado]`
+3. Poste a Mensagem 2 como reply da thread com `slack_send_message` usando `thread_ts: [ts capturado]`
 
 Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `bot-quality-score`.
 
@@ -557,6 +558,48 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 - Itálico: `_texto_`
 - Código: `` `texto` ``
 - Tabelas: use lista com traço (Slack não renderiza markdown de tabelas)
+
+**Passo 2 — Google Doc de análise (ID: 19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0)**
+
+Após postar no Slack, atualizar o documento de análise acumulado:
+
+1. Baixar o conteúdo atual com `download_file_content`:
+   ```
+   fileId: "19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0"
+   exportMimeType: "text/plain"
+   ```
+2. Decodificar base64 e ler o conteúdo atual
+3. Montar a nova seção (ver formato abaixo) e **adicionar NO TOPO** do conteúdo existente
+4. Atualizar o arquivo com `update_file`:
+   ```
+   fileId: "19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0"
+   content: [nova seção + "\n\n---\n\n" + conteúdo anterior]
+   mimeType: "text/plain"
+   ```
+
+**Formato da seção do Google Doc:**
+
+```
+[ROTINA] · [DD/MM/AAAA] · [período analisado]
+=======================================================
+
+RESUMO
+BQS: X% | TFC: X% | N: [total] conversas
+
+ANÁLISE DE FLUXO
+[output_fluxo completo — falhas identificadas, padrões, tickets]
+
+BASE DE CONHECIMENTO
+[output_kb completo — artigos a criar/atualizar, com título exato e seção]
+
+PROPOSTAS DE AJUSTE (o que e onde mudar)
+[output_propostas completo — para cada item: nó específico, texto a alterar, instrução exata]
+
+OPORTUNIDADES COMPLETAS
+[output_oportunidades com todos os itens — não apenas o top 3]
+
+=======================================================
+```
 
 ---
 
@@ -567,7 +610,7 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 - **Owner obrigatório:** toda ação deve ter owner de um dos três times — Produto CX, Help Design ou Engenharia. Nunca deixar owner em branco ou usar nome de time diferente
 - **Tickets obrigatórios:** ao mencionar qualquer problema na Mensagem 1 ou 2, incluir os ticket IDs correspondentes — nunca apenas a contagem ("3 casos")
 - **Artigos específicos obrigatórios na Mensagem 2:** copiar o título exato do artigo do output_kb — nunca "criar/revisar X artigos sobre [tema]". Cada artigo tem sua própria linha
-- **Nunca agrupe artigos distintos em um único item** — cada artigo a criar ou atualizar é um OPO separado
-- **Compliance primeiro:** se houver conteúdo contraditório, risco financeiro ou risco regulatório, ele é sempre o primeiro item — independente de volume ou BQS
+- **Nunca agrupe artigos distintos em um único item** — cada artigo a criar ou atualizar é um item separado com sua própria linha
+- **Compliance primeiro:** se houver conteúdo contraditório, risco financeiro ou risco regulatório, ele é sempre o item 1 dentro do bloco Produto CX, marcado com 🚨 — não vai para bloco separado
 - **`customer_requested_transfer = true`** → a ação de transferir foi correta (`score_escalation ≥ 7`), mas isso **não isenta a qualidade das respostas do bot antes da transferência**. Se `diagnostics` contém `resposta_incorreta`, `falha_de_interpretacao` ou qualquer outro diagnóstico negativo, esses devem ser reportados normalmente nos PONTOS DE ATENÇÃO e contados no TFC. Não usar "limitação operacional" para omitir ou atenuar falhas de resposta — essa label se aplica apenas à decisão de transferir, nunca ao conteúdo do que o bot respondeu
 - Após postar com sucesso: confirme a URL/timestamp da mensagem postada
