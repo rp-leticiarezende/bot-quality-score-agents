@@ -509,36 +509,46 @@ _Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
 Responde a: *"o que cada time precisa fazer?"*
 
 ```
-🎯 *PLANO DE AÇÃO — [N] itens · [rotina] · [período]*
+🎯 *PLANO DE AÇÃO — [rotina] · [período]*
 
 [Se houver item de compliance ou risco financeiro:]
 🚨 *URGENTE — COMPLIANCE*
-• [OPO-XXX] [descrição em 1 linha] | Prazo: Imediato
+• [OPO-XXX] [descrição em 1 linha] | Tickets: [IDs] | Prazo: Imediato
   → [ação específica]
 
-🔵 *PRODUTO CX* ([N] ações)
-[Todos os OPOs cujo owner é Produto CX, ordenados por prioridade:]
-🔴 [OPO-XXX] [título] | Prazo: [Imediato/Sprint]
-   → [ação em 1 linha]
-🟠 [OPO-XXX] [título] | Prazo: [Sprint/Backlog]
-   → [ação em 1 linha]
+🔵 *PRODUTO CX — TOP 3*
+Crítico 🔴
+• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: [Imediato/Sprint]
+  → [ação em 1 linha]
+Alto 🟠
+• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: Sprint
+  → [ação em 1 linha]
+• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: Sprint
+  → [ação em 1 linha]
 
-📗 *HELP DESIGN* ([N] ações)
-[Todos os OPOs cujo owner é Help Design:]
-🔴 [OPO-XXX] Criar: "[Título exato do artigo]" — Seção: [seção no Guide]
-   → [o que o artigo deve cobrir em 1 linha]
-🟠 [OPO-XXX] Atualizar: "[Título exato do artigo]" — URL: [url se disponível]
-   → [o que adicionar/corrigir]
+📗 *HELP DESIGN — TOP 3*
+Crítico 🔴
+• Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Tickets: [IDs]
+Alto 🟠
+• Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Tickets: [IDs]
+• Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Tickets: [IDs]
 
 ⚙️ *ENGENHARIA* ([N] ações)
-[Todos os OPOs cujo owner é Engenharia:]
-🔴 [OPO-XXX] [título] | Prazo: [Imediato/Sprint]
-   → [ação em 1 linha]
+Crítico 🔴
+• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: [Imediato/Sprint]
+  → [ação em 1 linha]
+Alto 🟠
+• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: Sprint
+  → [ação em 1 linha]
 ```
 
 **Regras:**
+- **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas + severidade (Crítico > Alto > Médio). Os demais itens vão para a Mensagem 3 (Detalhamento Técnico), não são omitidos
+- **Help Design: máximo 3 artigos.** Priorizar lacunas totais (artigo inexistente) antes de atualizações. Os artigos restantes vão para a Mensagem 3 (seção KB), não são omitidos
+- **Engenharia: sem limite fixo** — o volume costuma ser pequeno por natureza
 - Cada time vê apenas o que é dele — não misturar owners numa seção
 - Compliance/urgente sempre aparece antes de qualquer time, como bloco separado
+- Agrupar itens por nível dentro de cada seção: `Crítico 🔴` / `Alto 🟠` / `Médio 🟡` — nunca usar emoji de prioridade diretamente na frente do bullet
 - Para Help Design: usar título exato do artigo (do output_kb), nunca nome genérico do tema
 - Omitir a seção de um time se ele não tiver nenhuma ação neste ciclo
 
