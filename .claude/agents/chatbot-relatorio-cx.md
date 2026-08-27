@@ -479,19 +479,16 @@ Responde a: *"como está o bot esta semana/dia?"*
 
 ```
 [emoji rotina] *[TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS]*
-[DD/MM] a [DD/MM/AAAA] | [N_total] conversas | Critério mais fraco: [score_xxx] ([X,X])
-
-🔵 *BOT QUALITY SCORE*
-BQS oficial: *[X]%* ([+/-]Xpp vs período anterior)[Somente Cartão HP: omitir BQS conservador e TFC — usar apenas BQS oficial]
-[Somente Aleatório e Críticos:] BQS conservador: [X]% | Taxa de Falha de Condução (TFC): *[X]%* — [N] conversas com loop ou má interpretação documentada
+[DD/MM] a [DD/MM/AAAA] | [N_total] conversas
+BQS: *[X]%* ([N_aprovados]/[N_total]) — [+/-]Xpp vs semana anterior ([X]%)[Somente Cartão HP: usar N_pontuados no denominador — BQS: *[X]%* ([N_aprovados]/[N_pontuados])]
 [Somente Cartão HP:] HP pleno: [X]% · HP degradado: *[X]%* (limite: 5%)
 Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
 Retention: Resolutiva [N] · Abandono [N] · Transbordo [N] · Loop [N]
 
 ⚠️ *PONTOS DE ATENÇÃO*
-[Para cada alerta disparado — máximo 4 bullets:]
-• 🔴 [descrição do alerta + métrica que disparou]
-• 🟠 [descrição]
+• [insight 1 — incluir BQS e TFC inline quando relevante, ex: "tópico X (BQS 48,4% · TFC 88,6%): descrição do problema"]
+• [insight 2]
+• [insight 3]
 
 _Plano de ação e detalhamento técnico nas mensagens abaixo ↓_
 _Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
@@ -499,11 +496,14 @@ _Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
 
 **Regras:**
 - Não misturar ações aqui — só métricas e alertas
+- **BQS Aleatório e Críticos**: usar BQS conservador — denominador é N_total (approved=NULL conta como reprovação). Formato: `BQS: *X%* (N_aprovados/N_total)`
+- **BQS Cartão HP**: usar BQS geral — denominador é N_pontuados (exclui NULLs). Formato: `BQS: *X%* (N_aprovados/N_pontuados)`
 - Variação vs período anterior obrigatória no BQS (omitir só se não houver dado anterior)
-- TFC obrigatório nos ciclos Aleatório e Críticos (diário e semanal) — não aplicável ao Cartão HP
-- Se BQS > 80% E TFC > 40% (Aleatório ou Críticos): abrir os pontos de atenção com a divergência — _"BQS alto mascara falha de condução real: X% das conversas tiveram loop ou má interpretação documentada"_
-- Para Casos Críticos: não abrir com "BQS baixo é crítico" — é esperado. Destacar o padrão de falha mais recorrente nos pontos de atenção
-- Se não houver nenhum alerta: escrever `✅ Nenhum alerta disparado`
+- TFC não aparece como linha separada — surfaçar inline nos bullets de PONTOS DE ATENÇÃO quando explica o problema (ex: "BQS X% · TFC Y%")
+- Se BQS > 80% E TFC > 40% (Aleatório ou Críticos): o primeiro bullet deve ser — _"BQS alto mascara falha de condução real: X% das conversas tiveram loop ou má interpretação documentada"_
+- Para Casos Críticos: não abrir com "BQS baixo é crítico" — é esperado. Destacar o padrão de falha mais recorrente
+- Se não houver nenhum alerta: escrever `✅ Nenhum ponto de atenção disparado`
+- Máximo 4 bullets nos PONTOS DE ATENÇÃO
 
 ---
 
@@ -516,42 +516,30 @@ Responde a: *"o que cada time precisa fazer?"*
 
 [Se houver item de compliance ou risco financeiro:]
 🚨 *URGENTE — COMPLIANCE*
-• [OPO-XXX] [descrição em 1 linha] | Tickets: [IDs] | Prazo: Imediato
+• [OPO-XXX] [descrição em 1 linha] | Prazo: Imediato
   → [ação específica]
 
 🔵 *PRODUTO CX — TOP 3*
-Crítico 🔴
-• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: [Imediato/Sprint]
-  → [ação em 1 linha]
-Alto 🟠
-• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: Sprint
-  → [ação em 1 linha]
-• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: Sprint
-  → [ação em 1 linha]
+• [OPO-XXX] [título] ([nó]): [descrição do problema] | Referência: nó [X], tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
+  → [ação concreta em 1 linha]
+• [OPO-XXX] [título] ([nó]): [descrição] | Referência: nó [X], tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
+  → [ação concreta em 1 linha]
 
 📗 *HELP DESIGN — TOP 3*
-Crítico 🔴
-• Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Tickets: [IDs]
-Alto 🟠
-• Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Tickets: [IDs]
-• Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Tickets: [IDs]
+• Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Referência: [OPO-XXX], nó [X] ([contexto])
+• Criar: "[Título exato do artigo]" — Seção: [seção] | Referência: [OPO-XXX], nó [X] ([contexto])
+• Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Referência: [OPO-XXX]
 
-⚙️ *ENGENHARIA* ([N] ações)
-Crítico 🔴
-• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: [Imediato/Sprint]
-  → [ação em 1 linha]
-Alto 🟠
-• [OPO-XXX] [título] | Tickets: [IDs] | Prazo: Sprint
-  → [ação em 1 linha]
+[Se houver artigos além do TOP 3:]
+_Artigos restantes detalhados na Mensagem 3._
 ```
 
 **Regras:**
-- **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas + severidade (Crítico > Alto > Médio). Os demais itens vão para a Mensagem 3 (Detalhamento Técnico), não são omitidos
+- **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas × severidade. Os demais itens vão para a Mensagem 3, não são omitidos
 - **Help Design: máximo 3 artigos.** Priorizar lacunas totais (artigo inexistente) antes de atualizações. Os artigos restantes vão para a Mensagem 3 (seção KB), não são omitidos
-- **Engenharia: sem limite fixo** — o volume costuma ser pequeno por natureza
-- Cada time vê apenas o que é dele — não misturar owners numa seção
+- **Não existe seção Engenharia.** Produto CX e Engenharia são o mesmo time — ações de infra, bug ou integração entram no bloco Produto CX
+- Não agrupar por nível (Crítico/Alto/Médio) dentro das seções — listar bullets diretos, ordenados por impacto
 - Compliance/urgente sempre aparece antes de qualquer time, como bloco separado
-- Agrupar itens por nível dentro de cada seção: `Crítico 🔴` / `Alto 🟠` / `Médio 🟡` — nunca usar emoji de prioridade diretamente na frente do bullet
 - Para Help Design: usar título exato do artigo (do output_kb), nunca nome genérico do tema
 - Omitir a seção de um time se ele não tiver nenhuma ação neste ciclo
 
