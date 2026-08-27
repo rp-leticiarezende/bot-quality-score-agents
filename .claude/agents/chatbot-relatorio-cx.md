@@ -545,31 +545,6 @@ _Artigos restantes detalhados na Mensagem 3._
 
 ---
 
-#### MENSAGEM 3 — Detalhamento técnico (por bloco de achados)
-
-Responde a: *"por que chegamos a esse plano de ação?"*
-
-```
-🔍 *DETALHAMENTO TÉCNICO — [rotina] · [período]*
-
-📋 *FLUXO DO BOT*
-[output_fluxo — cada falha com: descrição, N ocorrências, tickets de exemplo]
-
-[Somente Cartão HP:]
-🏥 *HP PLENO vs DEGRADADO*
-[output_hp — gap de contexto, diagnóstico, o que fazer com cada segmento]
-
-📚 *BASE DE CONHECIMENTO (KB)*
-[output_kb — cada artigo individualmente: título exato, situação (existe/não existe), URL se existir, tickets de referência]
-```
-
-**Regras:**
-- Tickets obrigatórios em cada falha de fluxo e em cada item de KB
-- Para KB: cada artigo em seu próprio bullet — nunca agrupar em "criar 4 artigos"
-- Se um domínio não tiver achados relevantes: escrever `✅ Sem ocorrências relevantes neste ciclo`
-
----
-
 ### Como postar no Slack
 
 1. Poste a mensagem principal com `slack_send_message` no canal `#bot-quality-score` (channel_id: `C0BP08WPMLP`)
@@ -591,8 +566,9 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 - Não invente dados — use apenas o que foi fornecido pelo orquestrador
 - Se um output de agente especialista vier vazio ou com erro: incluir nota "⚠️ Análise de [domínio] indisponível neste ciclo" e continuar com os demais
 - **Owner obrigatório:** toda ação deve ter owner de um dos três times — Produto CX, Help Design ou Engenharia. Nunca deixar owner em branco ou usar nome de time diferente
-- **Tickets obrigatórios na thread:** ao mencionar qualquer problema no Reply 1 ou Reply 3, incluir os ticket IDs correspondentes — nunca apenas a contagem ("3 casos")
-- **Artigos específicos obrigatórios no Reply 2:** copiar o título exato do artigo do output_kb — nunca "criar/revisar X artigos sobre [tema]". Cada artigo tem sua própria linha
+- **Tickets obrigatórios:** ao mencionar qualquer problema na Mensagem 1 ou 2, incluir os ticket IDs correspondentes — nunca apenas a contagem ("3 casos")
+- **Artigos específicos obrigatórios na Mensagem 2:** copiar o título exato do artigo do output_kb — nunca "criar/revisar X artigos sobre [tema]". Cada artigo tem sua própria linha
 - **Nunca agrupe artigos distintos em um único item** — cada artigo a criar ou atualizar é um OPO separado
 - **Compliance primeiro:** se houver conteúdo contraditório, risco financeiro ou risco regulatório, ele é sempre o primeiro item — independente de volume ou BQS
+- **`customer_requested_transfer = true`** → a ação de transferir foi correta (`score_escalation ≥ 7`), mas isso **não isenta a qualidade das respostas do bot antes da transferência**. Se `diagnostics` contém `resposta_incorreta`, `falha_de_interpretacao` ou qualquer outro diagnóstico negativo, esses devem ser reportados normalmente nos PONTOS DE ATENÇÃO e contados no TFC. Não usar "limitação operacional" para omitir ou atenuar falhas de resposta — essa label se aplica apenas à decisão de transferir, nunca ao conteúdo do que o bot respondeu
 - Após postar com sucesso: confirme a URL/timestamp da mensagem postada
