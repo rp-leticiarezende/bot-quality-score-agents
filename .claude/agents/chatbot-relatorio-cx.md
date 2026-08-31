@@ -530,7 +530,7 @@ _Ordenado por prioridade de impacto_
 • 2. Criar: "[Título exato do artigo]" — Seção: [seção] | Tickets: [IDs]
 • 3. Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Tickets: [IDs]
 
-_Propostas detalhadas (o que e onde mudar): https://docs.google.com/document/d/19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0/edit_
+_Propostas detalhadas (o que e onde mudar): [LINK_DOC_ANALISE]_
 ```
 
 **Regras:**
@@ -546,6 +546,8 @@ _Propostas detalhadas (o que e onde mudar): https://docs.google.com/document/d/1
 
 ### Como publicar
 
+> **Ordem obrigatória:** 1) criar o Google Doc (Passo 2) → capturar o link → 2) postar no Slack (Passo 1) com o link já preenchido em `[LINK_DOC_ANALISE]` na Mensagem 2.
+
 **Passo 1 — Slack**
 1. Poste a Mensagem 1 com `slack_send_message` no canal `#bot-quality-score` (channel_id: `C0BP08WPMLP`)
 2. Capture o `ts` (timestamp) retornado
@@ -559,23 +561,23 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 - Código: `` `texto` ``
 - Tabelas: use lista com traço (Slack não renderiza markdown de tabelas)
 
-**Passo 2 — Google Doc de análise (ID: 19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0)**
+**Passo 2 — Google Doc de análise (criar por run)**
 
-Após postar no Slack, atualizar o documento de análise acumulado:
+Após postar no Slack, criar um Google Doc com o conteúdo completo desta execução:
 
-1. Baixar o conteúdo atual com `download_file_content`:
+1. Montar o conteúdo da seção (ver formato abaixo)
+2. Criar o documento com `create_file`:
    ```
-   fileId: "19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0"
-   exportMimeType: "text/plain"
+   title: "[ROTINA] · [DD/MM/AAAA] · [período analisado]"
+   textContent: [conteúdo da seção — ver formato abaixo]
+   contentMimeType: "text/plain"
+   parentId: "19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0_parent"
    ```
-2. Decodificar base64 e ler o conteúdo atual
-3. Montar a nova seção (ver formato abaixo) e **adicionar NO TOPO** do conteúdo existente
-4. Atualizar o arquivo com `update_file`:
-   ```
-   fileId: "19LFJJTrqXGMzhYXprlRgNVeFAdCZi4Na-M0SOTXJD_0"
-   content: [nova seção + "\n\n---\n\n" + conteúdo anterior]
-   mimeType: "text/plain"
-   ```
+   > ⚠️ Não usar `parentId` se não souber o ID da pasta — omitir e o doc vai para o root do Drive.
+3. Capturar o `id` retornado e montar a URL: `https://docs.google.com/document/d/[id]/edit`
+4. **Editar a Mensagem 2 do Slack** para substituir o link fixo pelo link do doc recém-criado — use `slack_send_message` com `thread_ts` para atualizar ou poste o link como reply na thread
+
+> ⚠️ **Por que não `update_file`?** O MCP Google Drive exposto neste ambiente suporta apenas atualização de metadados (`title`, `parentId`) via `update_file` — não há suporte a atualização de conteúdo. Por isso criamos um doc novo a cada run. O histórico acumulado fica preservado no Drive por título/data.
 
 **Formato da seção do Google Doc:**
 
