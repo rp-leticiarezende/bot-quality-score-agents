@@ -53,7 +53,13 @@ SELECT
   ticket_id,
   approved,
   quality_label,
-  diagnostics,
+  issues,
+  improvement_suggestions,
+  customer_sentiment,
+  kb_matched_article_title,
+  kb_matched_article_url,
+  kb_discrepancies,
+  botmaker_link_chatbot,
   summary,
   score_understanding,
   score_resolution,
@@ -168,8 +174,8 @@ Registre quais alertas disparam:
 
 ### Pacote A — Fluxo do bot
 **Destinatário:** `chatbot-cx-botmaker`
-**Filtro:** linhas onde `retention_type = 'loop'` OU `diagnostics` contém item com `category` em `['falha_de_fluxo', 'falha_de_interpretacao']`
-**Campos:** `ticket_id`, `topic`, `retention_type`, `botmaker_stage`, `score_understanding`, `score_efficiency`, `intent_detected`, `diagnostics`, `summary`
+**Filtro:** linhas onde `retention_type IN ('loop', 'transbordo')` OU (`issues IS NOT NULL` E `issues != ''`)
+**Campos:** `ticket_id`, `topic`, `retention_type`, `botmaker_stage`, `score_understanding`, `score_efficiency`, `intent_detected`, `issues`, `improvement_suggestions`, `summary`, `botmaker_link_chatbot`
 
 ### Pacote B — Hiperpersonalização
 **Destinatário:** `chatbot-hp-variaveis`
@@ -186,8 +192,8 @@ Registre quais alertas disparam:
 
 ### Pacote C — Base de conhecimento
 **Destinatário:** `zendesk-guide-expert`
-**Filtro:** linhas onde `kb_alignment = 'desalinhado'` OU `kb_articles_evaluated_count = 0` OU `diagnostics` contém item com `category = 'conteudo_inexistente'`
-**Campos:** `ticket_id`, `topic`, `effective_vertical`, `kb_alignment`, `kb_articles_evaluated_count`, `diagnostics`, `summary`
+**Filtro:** linhas onde `kb_alignment = 'desalinhado'` OU `kb_articles_evaluated_count = 0` OU (`kb_discrepancies IS NOT NULL` E `kb_discrepancies != ''`)
+**Campos:** `ticket_id`, `topic`, `effective_vertical`, `kb_alignment`, `kb_articles_evaluated_count`, `kb_matched_article_title`, `kb_matched_article_url`, `kb_discrepancies`, `issues`, `improvement_suggestions`, `summary`
 
 ---
 
