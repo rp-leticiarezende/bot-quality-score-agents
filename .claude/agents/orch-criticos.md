@@ -37,7 +37,13 @@ SELECT
   ticket_id,
   approved,
   quality_label,
-  diagnostics,
+  issues,
+  improvement_suggestions,
+  customer_sentiment,
+  kb_matched_article_title,
+  kb_matched_article_url,
+  kb_discrepancies,
+  botmaker_link_chatbot,
   summary,
   score_understanding,
   score_resolution,
@@ -83,15 +89,15 @@ N_pontuados    = linhas com approved IS NOT NULL (true ou false)
 BQS_geral       = COUNT(approved = true) / N_pontuados * 100    [arredondar para 1 casa]
 BQS_conservador = COUNT(approved = true) / N_total * 100        [trata approved=NULL como reprovação]
 
-N_com_falha_conducao = COUNT(linhas onde diagnostics contém ao menos 1 item com category IN ['falha_de_fluxo', 'falha_de_interpretacao'])
-TFC             = N_com_falha_conducao / N_total * 100          [Taxa de Falha de Condução — independente do desfecho final]
+N_com_falha_conducao = COUNT(linhas onde retention_type IN ('transbordo','abandono','loop') E customer_requested_transfer = false)
+TFC             = N_com_falha_conducao / N_total * 100          [Taxa de Falha de Condução — exclui transbordos solicitados pelo cliente]
 
 Por quality_label: conte excelente, bom, regular, ruim, critico, sem_dados
 Por retention_type: conte resolutiva, loop, abandono, transbordo
 Por product: agrupe volume, BQS e TFC de cada produto (ordenar por TFC — pior condução primeiro)
 ```
 
-> TFC é a métrica que melhor reflete se o bot conduziu bem a conversa, independente de como o caso terminou. BQS alto com TFC alto indica que o avaliador está aprovando conversas com falha documentada.
+> TFC usa `retention_type` e `customer_requested_transfer` — campos estruturados e confiáveis. `diagnostics` é texto de debug do pipeline, não deve ser usado para cálculo de métricas.
 
 > `approved` é booleano no Databricks (`true` / `false` / `null`). Não tratar como numérico.
 > Casos Críticos = CSAT 1 e 2 — são os piores atendimentos do dia. BQS aqui tende a ser mais baixo que nos outros fluxos. Tratar como censo completo, não amostra.
@@ -102,13 +108,13 @@ Por product: agrupe volume, BQS e TFC de cada produto (ordenar por TFC — pior 
 
 ### Pacote A — Fluxo do bot
 **Destinatário:** `chatbot-cx-botmaker`
-**Filtro:** linhas onde `retention_type = 'loop'` OU `diagnostics` contém algum item com `category` em `['falha_de_fluxo', 'falha_de_interpretacao']`
-**Campos:** `ticket_id`, `topic`, `effective_vertical`, `retention_type`, `botmaker_stage`, `score_understanding`, `score_efficiency`, `intent_detected`, `diagnostics`, `summary`
+**Filtro:** linhas onde `retention_type IN ('loop', 'transbordo')` OU (`issues IS NOT NULL` E `issues != ''`)
+**Campos:** `ticket_id`, `topic`, `effective_vertical`, `retention_type`, `botmaker_stage`, `score_understanding`, `score_efficiency`, `intent_detected`, `issues`, `improvement_suggestions`, `summary`, `botmaker_link_chatbot`
 
 ### Pacote B — Base de conhecimento
 **Destinatário:** `zendesk-guide-expert`
-**Filtro:** linhas onde `kb_alignment = 'desalinhado'` OU `kb_articles_evaluated_count = 0` OU `diagnostics` contém algum item com `category = 'conteudo_inexistente'`
-**Campos:** `ticket_id`, `topic`, `effective_vertical`, `kb_alignment`, `kb_articles_evaluated_count`, `diagnostics`, `summary`
+**Filtro:** linhas onde `kb_alignment = 'desalinhado'` OU `kb_articles_evaluated_count = 0` OU (`kb_discrepancies IS NOT NULL` E `kb_discrepancies != ''`)
+**Campos:** `ticket_id`, `topic`, `effective_vertical`, `kb_alignment`, `kb_articles_evaluated_count`, `kb_matched_article_title`, `kb_matched_article_url`, `kb_discrepancies`, `issues`, `improvement_suggestions`, `summary`
 
 ---
 
