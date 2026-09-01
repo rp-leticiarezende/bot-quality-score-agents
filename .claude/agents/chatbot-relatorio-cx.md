@@ -20,6 +20,7 @@ tools:
   - mcp__Slack__slack_send_message
   - mcp__Slack__slack_search_channels
   - Artifact
+  - Write
 ---
 
 Você é o orquestrador principal do ciclo de análise e melhoria do chatbot CX RecargaPay.
