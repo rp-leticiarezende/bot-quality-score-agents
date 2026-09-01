@@ -38,12 +38,8 @@ SELECT
   ticket_id,
   approved,
   quality_label,
-  issues,
-  improvement_suggestions,
+  diagnostics,
   customer_sentiment,
-  kb_matched_article_title,
-  kb_matched_article_url,
-  kb_discrepancies,
   botmaker_link_chatbot,
   summary,
   score_understanding,
@@ -62,7 +58,6 @@ SELECT
   topic,
   topic_root,
   effective_vertical,
-  kb_alignment,
   kb_articles_evaluated_count,
   bot_prompt_version,
   intent_detected,
@@ -101,8 +96,8 @@ Por topic: agrupe volume e TFC (top 10 por volume — ordenar por TFC desc, depo
 ```
 
 > `approved` é booleano no Databricks (`true` / `false` / `null`). Não tratar como numérico.
-> TFC usa `retention_type` e `customer_requested_transfer` — campos estruturados e confiáveis. `diagnostics` é texto de debug do pipeline, não deve ser usado para cálculo de métricas.
-> Este fluxo é amostra cross-vertical — cobrir todas as verticais presentes na amostra.
+> TFC usa `retention_type` e `customer_requested_transfer` — campos estruturados e confiáveis.
+> `diagnostics` é um JSON string com array de objetos `{category, description, suggested_action}`. Categorias válidas: `resposta_generica`, `resposta_incorreta`, `consulta_ausente`, `conteudo_inexistente`, `falha_de_interpretacao`, `falha_de_fluxo`, `limitacao_estrutural`. Os campos `issues`, `improvement_suggestions`, `kb_alignment`, `kb_matched_article_title`, `kb_matched_article_url`, `kb_discrepancies` não existem mais no pipeline — estão sempre NULL, não usar.
 
 ---
 
@@ -110,13 +105,13 @@ Por topic: agrupe volume e TFC (top 10 por volume — ordenar por TFC desc, depo
 
 ### Pacote A — Fluxo do bot
 **Destinatário:** `chatbot-cx-botmaker`
-**Filtro:** linhas onde `retention_type IN ('loop', 'transbordo')` OU (`issues IS NOT NULL` E `issues != ''`)
-**Campos:** `ticket_id`, `topic`, `effective_vertical`, `retention_type`, `botmaker_stage`, `score_understanding`, `score_efficiency`, `intent_detected`, `issues`, `improvement_suggestions`, `summary`, `botmaker_link_chatbot`
+**Filtro:** linhas onde `retention_type IN ('loop', 'transbordo')` OU (`diagnostics NOT IN ('', '[]')` E (`diagnostics LIKE '%falha_de_fluxo%'` OU `diagnostics LIKE '%falha_de_interpretacao%'` OU `diagnostics LIKE '%resposta_generica%'` OU `diagnostics LIKE '%resposta_incorreta%'`))
+**Campos:** `ticket_id`, `topic`, `effective_vertical`, `retention_type`, `botmaker_stage`, `score_understanding`, `score_efficiency`, `intent_detected`, `diagnostics`, `summary`, `botmaker_link_chatbot`
 
 ### Pacote B — Base de conhecimento
 **Destinatário:** `zendesk-guide-expert`
-**Filtro:** linhas onde `kb_alignment = 'desalinhado'` OU `kb_articles_evaluated_count = 0` OU (`kb_discrepancies IS NOT NULL` E `kb_discrepancies != ''`)
-**Campos:** `ticket_id`, `topic`, `effective_vertical`, `kb_alignment`, `kb_articles_evaluated_count`, `kb_matched_article_title`, `kb_matched_article_url`, `kb_discrepancies`, `issues`, `improvement_suggestions`, `summary`
+**Filtro:** linhas onde `diagnostics LIKE '%conteudo_inexistente%'` OU `kb_articles_evaluated_count = 0`
+**Campos:** `ticket_id`, `topic`, `effective_vertical`, `kb_articles_evaluated_count`, `diagnostics`, `summary`
 
 ---
 
@@ -250,3 +245,4 @@ prompt: |
 - Timezone dos dados: UTC. Converter para BRT (UTC-3) apenas nas datas exibidas nos outputs.
 - Este fluxo NÃO tem HP — não incluir análise de `welcome_not_found` / `pages_fetched`.
 - Cobrir todas as verticais presentes — não focar só nas piores.
+- `diagnostics` é JSON string — ao repassar para subagentes, incluir o conteúdo desserializado (array de objetos) para facilitar leitura.
