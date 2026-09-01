@@ -20,6 +20,7 @@ tools:
   - mcp__Slack__slack_send_message
   - mcp__Slack__slack_search_channels
   - mcp__Google_Drive__download_file_content
+  - mcp__Google_Drive__create_file
   - mcp__Google_Drive__update_file
 ---
 
