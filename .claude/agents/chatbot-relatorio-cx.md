@@ -561,79 +561,203 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 - Código: `` `texto` ``
 - Tabelas: use lista com traço (Slack não renderiza markdown de tabelas)
 
-**Passo 2 — Artefato de análise (publicar por run)**
+**Passo 2 — Artefato de análise (URL fixa por rotina, histórico persistente)**
 
-Após postar no Slack, criar e publicar um artefato HTML com o conteúdo completo desta execução:
+Cada rotina tem uma URL fixa de artefato. Use a tabela abaixo para saber se esta é uma primeira execução ou uma atualização:
 
-1. Use a ferramenta `Write` para criar o arquivo `./relatorio-analise.html` com o HTML abaixo preenchido
+| Rotina | URL do artefato |
+|--------|----------------|
+| Aleatório (semanal) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
+| Críticos (diário) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
+| Críticos (semanal) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
+| Cartão HP (semanal) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
+
+**Instruções:**
+
+1. Use a ferramenta `Write` para criar o arquivo `./relatorio-analise.html` com o HTML abaixo preenchido com os dados desta execução
 2. Publique via ferramenta `Artifact`:
    - `file_path`: `./relatorio-analise.html`
    - `favicon`: `🤖`
    - `description`: "[ROTINA] · [período] · BQS [X]%"
-3. Capture a URL retornada e use no lugar de `[LINK_DOC_ANALISE]` na Mensagem 2
+   - `capabilities`: `{"db": {}}`
+   - **Se a URL desta rotina já constar na tabela acima:** adicionar `url: "[URL_DA_ROTINA]"` para atualizar o artefato existente
+   - **Se for primeira execução (URL ausente):** publicar sem `url`; capturar a URL retornada e postá-la no Slack como mensagem adicional: _"📌 URL do painel desta rotina: [URL] — salvar para execuções futuras"_
+3. Use a URL do artefato no lugar de `[LINK_DOC_ANALISE]` na Mensagem 2
 
 > ⚠️ O arquivo HTML não deve ter tags `<!DOCTYPE>`, `<html>`, `<head>` nem `<body>` — o Artifact as adiciona automaticamente.
-> ⚠️ **VERBATIM obrigatório**: inclua cada output de subagente na íntegra dentro da `<div class="body">` correspondente — não resuma, não condense. O valor do artefato é ter o máximo de detalhe para consulta posterior.
+> ⚠️ **VERBATIM obrigatório**: inclua cada output de subagente na íntegra dentro da `<div class="section-body">` correspondente — não resuma, não condense.
 
 **Formato do HTML:**
 
 ```html
 <title>[ROTINA] · [DD/MM/AAAA]</title>
 <style>
-:root{--bg:#fff;--fg:#1a1a1a;--border:#e5e7eb;--sec:#f9fafb;--acc:#2563eb}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f172a;--fg:#e2e8f0;--border:#1e293b;--sec:#1e293b;--acc:#60a5fa}}
-:root[data-theme="dark"]{--bg:#0f172a;--fg:#e2e8f0;--border:#1e293b;--sec:#1e293b;--acc:#60a5fa}
-body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:960px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6}
-h1{font-size:1.4rem;margin:0 0 .2rem}
-.meta{color:#6b7280;font-size:.9rem;margin-bottom:1.5rem}
-.kpis{display:flex;flex-wrap:wrap;gap:1rem;padding:1rem;background:var(--sec);border-radius:8px;margin-bottom:1.5rem;border:1px solid var(--border)}
-.kpi{display:flex;flex-direction:column;min-width:90px}
-.kpi-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
-.kpi-value{font-size:1.5rem;font-weight:700;color:var(--acc)}
-details{border:1px solid var(--border);border-radius:8px;margin-bottom:.75rem;overflow:hidden}
-summary{cursor:pointer;padding:.85rem 1.1rem;font-weight:600;background:var(--sec);display:flex;align-items:center;gap:.5rem;list-style:none}
+:root{--bg:#f5f7fa;--surface:#fff;--fg:#1a2035;--border:#e2e8f0;--muted:#64748b;--acc:#00cc52;--acc-h:#00a843;--warn:#f59e0b;--danger:#ef4444;--r:10px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1628;--surface:#0f1f3a;--fg:#e2e8f0;--border:#1e3a5f;--muted:#94a3b8;--acc:#00cc52;--acc-h:#00e85c}}
+:root[data-theme="dark"]{--bg:#0a1628;--surface:#0f1f3a;--fg:#e2e8f0;--border:#1e3a5f;--muted:#94a3b8;--acc:#00cc52;--acc-h:#00e85c}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:980px;margin:0 auto;padding:0 0 3rem;line-height:1.6}
+.brand{background:var(--acc);padding:.45rem 1.5rem;font-size:.75rem;font-weight:700;letter-spacing:.08em;color:#000;display:flex;align-items:center;gap:.5rem}
+.brand-logo{font-size:1rem}
+.inner{padding:1.5rem 1.5rem 0}
+h1{font-size:1.35rem;margin:0 0 .2rem;font-weight:700}
+.meta{color:var(--muted);font-size:.88rem;margin-bottom:1.4rem}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.85rem;margin-bottom:1.5rem}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;display:flex;flex-direction:column;gap:.25rem}
+.kpi-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.kpi-value{font-size:1.55rem;font-weight:800;line-height:1}
+.kpi-value.ok{color:var(--acc)}
+.kpi-value.warn{color:var(--warn)}
+.kpi-value.bad{color:var(--danger)}
+.kpi-value.neutral{color:var(--fg)}
+.tab-nav{display:flex;gap:.4rem;border-bottom:2px solid var(--border);margin-bottom:1rem;padding:0 1.5rem}
+.tab-btn{background:none;border:none;border-bottom:3px solid transparent;padding:.55rem .9rem;font-size:.9rem;font-weight:600;cursor:pointer;color:var(--muted);margin-bottom:-2px;transition:color .15s,border-color .15s}
+.tab-btn.active{color:var(--acc);border-bottom-color:var(--acc)}
+.tab-pane{display:none;padding:0 1.5rem}
+.tab-pane.active{display:block}
+details{border:1px solid var(--border);border-radius:var(--r);margin-bottom:.75rem;overflow:hidden;background:var(--surface)}
+summary{cursor:pointer;padding:.85rem 1.1rem;font-weight:600;display:flex;align-items:center;gap:.5rem;list-style:none;background:var(--surface)}
 summary::-webkit-details-marker{display:none}
-summary::before{content:'▶';font-size:.65rem;flex-shrink:0;transition:transform .15s}
+summary::before{content:'▶';font-size:.6rem;flex-shrink:0;transition:transform .15s;color:var(--muted)}
 details[open]>summary::before{transform:rotate(90deg)}
-.body{padding:1rem 1.1rem;white-space:pre-wrap;font-family:'Courier New',Courier,monospace;font-size:.82rem;overflow-x:auto;border-top:1px solid var(--border)}
+.section-body{padding:1rem 1.1rem;white-space:pre-wrap;font-family:'Courier New',Courier,monospace;font-size:.8rem;overflow-x:auto;border-top:1px solid var(--border);background:var(--bg)}
+.h-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.6rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.h-date{font-size:.82rem;color:var(--muted);min-width:90px}
+.h-chips{display:flex;gap:.45rem;flex-wrap:wrap}
+.chip{padding:.18rem .55rem;border-radius:99px;font-size:.72rem;font-weight:700}
+.chip.ok{background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.chip.bad{background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)}
+.chip.neutral{background:color-mix(in srgb,var(--fg) 10%,transparent);color:var(--fg)}
+.empty{color:var(--muted);font-size:.9rem;padding:.5rem 0}
 </style>
 
+<script>
+/* dados desta execução — preencher com valores reais */
+const RUN={
+  run_id:'[AAAA-MM-DDThh-mm]',        /* ex: 2026-09-01T14-00 — único por execução */
+  rotina:'[ROTINA]',                   /* ex: Aleatório Semanal */
+  periodo:'[data_inicio] a [data_fim]',
+  bqs:[BQS_NUM],                       /* número, ex: 72.3 */
+  tfc:[TFC_NUM],                       /* número, ex: 18.5 */
+  n_total:[N_TOTAL_NUM],               /* inteiro */
+  saved_at:'[ISO_TIMESTAMP]'           /* ex: 2026-09-01T17:00:00Z */
+};
+</script>
+
+<div class="brand"><span class="brand-logo">⚡</span>RecargaPay · Bot Quality Score</div>
+<div class="inner">
 <h1>🤖 [ROTINA] — [DD/MM] a [DD/MM/AAAA]</h1>
 <p class="meta">Gerado em [data e hora BRT] · [N_total] conversas analisadas</p>
 
 <div class="kpis">
-  <div class="kpi"><span class="kpi-label">BQS</span><span class="kpi-value">[X]%</span></div>
-  <div class="kpi"><span class="kpi-label">TFC</span><span class="kpi-value">[X]%</span></div>
-  <div class="kpi"><span class="kpi-label">Conversas</span><span class="kpi-value">[N]</span></div>
+  <div class="kpi">
+    <span class="kpi-label">BQS</span>
+    <!-- classe: ok se ≥75%, warn se 60–74%, bad se <60% -->
+    <span class="kpi-value [ok|warn|bad]">[X]%</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-label">TFC</span>
+    <!-- classe: ok se ≤20%, warn se 21–40%, bad se >40% -->
+    <span class="kpi-value [ok|warn|bad]">[X]%</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-label">Conversas</span>
+    <span class="kpi-value neutral">[N]</span>
+  </div>
   <!-- Apenas Cartão HP — descomentar se aplicável: -->
-  <!-- <div class="kpi"><span class="kpi-label">BQS Pleno</span><span class="kpi-value">[X]%</span></div> -->
-  <!-- <div class="kpi"><span class="kpi-label">HP Degradado</span><span class="kpi-value">[X]%</span></div> -->
+  <!-- <div class="kpi"><span class="kpi-label">BQS Pleno</span><span class="kpi-value [ok|warn|bad]">[X]%</span></div> -->
+  <!-- <div class="kpi"><span class="kpi-label">HP Degradado</span><span class="kpi-value [warn|bad]">[X]%</span></div> -->
 </div>
+</div><!-- /.inner -->
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('analise',this)">📊 Análise atual</button>
+  <button class="tab-btn" onclick="showTab('historico',this)">🕐 Histórico</button>
+</div>
+
+<div id="tab-analise" class="tab-pane active">
 
 <details open>
   <summary>📋 Resumo executivo</summary>
-  <div class="body">[Mensagem 1 e Mensagem 2 do Slack — texto completo, verbatim]</div>
+  <div class="section-body">[Mensagem 1 e Mensagem 2 do Slack — texto completo, verbatim]</div>
 </details>
 
 <details open>
   <summary>🔧 Análise de fluxo do bot</summary>
-  <div class="body">[output_fluxo COMPLETO e VERBATIM — não resumir; incluir todos os padrões, tickets e diagnósticos]</div>
+  <div class="section-body">[output_fluxo COMPLETO e VERBATIM — não resumir; incluir todos os padrões, tickets, nomes de nó Botmaker, textos antes/depois e diagnósticos]</div>
 </details>
 
 <details>
   <summary>📚 Base de conhecimento</summary>
-  <div class="body">[output_kb COMPLETO e VERBATIM — não resumir; incluir todos os artigos identificados]</div>
+  <div class="section-body">[output_kb COMPLETO e VERBATIM — não resumir; incluir IDs de artigos, títulos exatos e análise de gap]</div>
 </details>
 
 <details>
   <summary>🎯 Oportunidades identificadas</summary>
-  <div class="body">[output_oportunidades COMPLETO e VERBATIM — todos os itens, não apenas top 3]</div>
+  <div class="section-body">[output_oportunidades COMPLETO e VERBATIM — todos os itens, não apenas top 3]</div>
 </details>
 
 <details>
   <summary>✏️ Propostas de ajuste</summary>
-  <div class="body">[output_propostas COMPLETO e VERBATIM — incluir texto exato de cada proposta de prompt, artigo ou fluxo]</div>
+  <div class="section-body">[output_propostas COMPLETO e VERBATIM — incluir texto exato de cada proposta de prompt, artigo ou fluxo]</div>
 </details>
+
+</div><!-- #tab-analise -->
+
+<div id="tab-historico" class="tab-pane">
+  <div id="hist"><p class="empty">Carregando histórico…</p></div>
+</div>
+
+<script>
+function showTab(n,b){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  b.classList.add('active');
+}
+
+async function getDb(){try{return await window.claude?.use?.('db')??null;}catch{return null;}}
+
+async function saveRun(){
+  const db=await getDb();if(!db)return;
+  try{
+    const s=await db.doc('analyses/'+RUN.run_id).get();
+    if(s.exists)return;
+    await db.doc('analyses/'+RUN.run_id).set(RUN);
+  }catch(e){}
+}
+
+async function loadHist(){
+  const el=document.getElementById('hist');
+  const db=await getDb();
+  if(!db){el.innerHTML='<p class="empty">Histórico disponível apenas para membros da organização.</p>';return;}
+  try{
+    const snap=await db.collection('analyses').orderBy('saved_at','desc').limit(50).get();
+    if(snap.empty){el.innerHTML='<p class="empty">Nenhuma análise anterior registrada.</p>';return;}
+    const cls=v=>v>=75?'ok':v>=60?'warn':'bad';
+    const clsTfc=v=>v<=20?'ok':v<=40?'warn':'bad';
+    el.innerHTML=snap.docs.map(d=>{
+      const r=d.data();
+      const bqs=typeof r.bqs==='number'?r.bqs.toFixed(1):'—';
+      const tfc=typeof r.tfc==='number'?r.tfc.toFixed(1):'—';
+      const dt=r.saved_at?new Date(r.saved_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}):'—';
+      return `<div class="h-entry">
+        <span class="h-date">${dt}</span>
+        <span style="flex:1;font-size:.85rem;font-weight:600">${r.rotina||'—'} &mdash; ${r.periodo||''}</span>
+        <div class="h-chips">
+          <span class="chip ${cls(r.bqs)}">BQS ${bqs}%</span>
+          <span class="chip ${clsTfc(r.tfc)}">TFC ${tfc}%</span>
+          <span class="chip neutral">${r.n_total||'—'} conv.</span>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML='<p class="empty">Erro ao carregar histórico.</p>';}
+}
+
+saveRun();
+loadHist();
+</script>
 ```
 
 ---
