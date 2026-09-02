@@ -563,26 +563,28 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 
 **Passo 2 — Artefato de análise (URL fixa por rotina, histórico persistente)**
 
-Cada rotina tem uma URL fixa de artefato. Use a tabela abaixo para saber se esta é uma primeira execução ou uma atualização:
-
-| Rotina | URL do artefato |
-|--------|----------------|
-| Aleatório (semanal) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
-| Críticos (diário) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
-| Críticos (semanal) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
-| Cartão HP (semanal) | _(primeira execução: criar; anotar URL e substituir aqui)_ |
+O artefato de cada rotina tem URL fixa e é atualizado a cada execução. O agente descobre automaticamente se já existe um artefato para esta rotina usando a ação `list`.
 
 **Instruções:**
 
 1. Use a ferramenta `Write` para criar o arquivo `./relatorio-analise.html` com o HTML abaixo preenchido com os dados desta execução
-2. Publique via ferramenta `Artifact`:
+
+2. **Descobrir se já existe artefato para esta rotina:**
+   - Chame `Artifact` com `action: "list", limit: 50`
+   - Procure na lista retornada um artefato cujo `title` contenha o nome da rotina atual
+     (ex: para "Aleatório Semanal", buscar título contendo "Aleatório" ou "Aleatorio")
+   - Se encontrar: guarde a `url` desse artefato como `[URL_EXISTENTE]`
+   - Se não encontrar: `[URL_EXISTENTE]` = _não encontrada_
+
+3. Publique via ferramenta `Artifact`:
    - `file_path`: `./relatorio-analise.html`
    - `favicon`: `🤖`
    - `description`: "[ROTINA] · [período] · BQS [X]%"
    - `capabilities`: `{"db": {}}`
-   - **Se a URL desta rotina já constar na tabela acima:** adicionar `url: "[URL_DA_ROTINA]"` para atualizar o artefato existente
-   - **Se for primeira execução (URL ausente):** publicar sem `url`; capturar a URL retornada e postá-la no Slack como mensagem adicional: _"📌 URL do painel desta rotina: [URL] — salvar para execuções futuras"_
-3. Use a URL do artefato no lugar de `[LINK_DOC_ANALISE]` na Mensagem 2
+   - **Se `[URL_EXISTENTE]` foi encontrada:** adicionar `url: "[URL_EXISTENTE]"` para atualizar o artefato existente
+   - **Se não encontrada (primeira execução):** publicar sem `url`; o artefato será criado com URL nova automaticamente
+
+4. Use a URL do artefato retornada no lugar de `[LINK_DOC_ANALISE]` na Mensagem 2
 
 > ⚠️ O arquivo HTML não deve ter tags `<!DOCTYPE>`, `<html>`, `<head>` nem `<body>` — o Artifact as adiciona automaticamente.
 > ⚠️ **VERBATIM obrigatório**: inclua cada output de subagente na íntegra dentro da `<div class="section-body">` correspondente — não resuma, não condense.
