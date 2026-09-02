@@ -311,6 +311,16 @@ prompt: |
   concreta e pronta para implementar (texto exato do prompt, artigo ou
   lógica de roteamento).
 
+  EXIGÊNCIA DE PROFUNDIDADE — cada proposta DEVE conter:
+  - Para ajustes de fluxo Botmaker: nome exato do nó a editar, texto atual
+    (verbatim) e texto proposto (verbatim), bloco lógico afetado
+  - Para ajustes de base de conhecimento: ID e título exato do artigo,
+    seção específica a alterar, conteúdo atual e conteúdo sugerido (rascunho completo)
+  - Para ajustes de variáveis HP: nome da variável, onde inserir no prompt/nó,
+    exemplo de resposta personalizada antes e depois
+  - Para novas integrações: dado necessário, sistema de origem, impacto esperado no BQS
+  Propostas genéricas ("melhorar o prompt", "revisar artigo") não são aceitas.
+
   === BACKLOG DE OPORTUNIDADES ===
   [output_oportunidades]
 ```
