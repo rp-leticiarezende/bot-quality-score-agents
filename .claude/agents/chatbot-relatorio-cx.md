@@ -546,12 +546,42 @@ _Propostas detalhadas (o que e onde mudar): [LINK_DOC_ANALISE]_
 
 ### Como publicar
 
-> **Ordem obrigatória:** 1) publicar o artefato (Passo 2) → capturar a URL → 2) postar no Slack (Passo 1) com a URL preenchida em `[LINK_DOC_ANALISE]` na Mensagem 2.
+**Ordem de execução obrigatória: PASSO A primeiro, PASSO B depois.**
 
-**Passo 1 — Slack**
+---
+
+#### PASSO A — Artefato (executar PRIMEIRO, antes de qualquer mensagem Slack)
+
+O artefato de cada rotina tem URL fixa e é atualizado a cada execução.
+
+1. Use a ferramenta `Write` para criar o arquivo `./relatorio-analise.html` com o HTML abaixo preenchido com os dados desta execução
+
+2. Descubra se já existe um artefato para esta rotina:
+   - Chame `Artifact` com `action: "list", limit: 50`
+   - Procure na lista um artefato cujo `title` contenha o nome da rotina atual (ex: "Aleatório", "Críticos", "Cartão HP")
+   - Se encontrar: guarde a URL como `[URL_ARTEFATO]`
+   - Se não encontrar ou se a chamada falhar: `[URL_ARTEFATO]` = _não definida_
+
+3. Publique o artefato via ferramenta `Artifact`:
+   - `file_path`: `./relatorio-analise.html`
+   - `favicon`: `🤖`
+   - `description`: "[ROTINA] · [período] · BQS [X]%"
+   - `capabilities`: `{"db": {}}`
+   - **Se `[URL_ARTEFATO]` foi encontrada:** adicionar `url: "[URL_ARTEFATO]"` para atualizar o artefato existente
+   - **Se não definida:** publicar sem `url` (primeira execução — será criado com URL nova)
+
+4. Capture a URL retornada pelo `Artifact` e salve como `[LINK_DOC_ANALISE]`
+   - Se o `Artifact` falhar por qualquer motivo: `[LINK_DOC_ANALISE]` = `_(artefato indisponível neste ciclo)_`
+
+---
+
+#### PASSO B — Slack (executar DEPOIS do PASSO A, com `[LINK_DOC_ANALISE]` preenchido)
+
 1. Poste a Mensagem 1 com `slack_send_message` no canal `#bot-quality-score` (channel_id: `C0BP08WPMLP`)
 2. Capture o `ts` (timestamp) retornado
 3. Poste a Mensagem 2 como reply da thread com `slack_send_message` usando `thread_ts: [ts capturado]`
+
+> ⚠️ **A Mensagem 2 DEVE ser postada sempre** — mesmo se o PASSO A falhar. Nesse caso, usar `_(artefato indisponível neste ciclo)_` no lugar de `[LINK_DOC_ANALISE]`.
 
 Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `bot-quality-score`.
 
@@ -560,31 +590,6 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 - Itálico: `_texto_`
 - Código: `` `texto` ``
 - Tabelas: use lista com traço (Slack não renderiza markdown de tabelas)
-
-**Passo 2 — Artefato de análise (URL fixa por rotina, histórico persistente)**
-
-O artefato de cada rotina tem URL fixa e é atualizado a cada execução. O agente descobre automaticamente se já existe um artefato para esta rotina usando a ação `list`.
-
-**Instruções:**
-
-1. Use a ferramenta `Write` para criar o arquivo `./relatorio-analise.html` com o HTML abaixo preenchido com os dados desta execução
-
-2. **Descobrir se já existe artefato para esta rotina:**
-   - Chame `Artifact` com `action: "list", limit: 50`
-   - Procure na lista retornada um artefato cujo `title` contenha o nome da rotina atual
-     (ex: para "Aleatório Semanal", buscar título contendo "Aleatório" ou "Aleatorio")
-   - Se encontrar: guarde a `url` desse artefato como `[URL_EXISTENTE]`
-   - Se não encontrar: `[URL_EXISTENTE]` = _não encontrada_
-
-3. Publique via ferramenta `Artifact`:
-   - `file_path`: `./relatorio-analise.html`
-   - `favicon`: `🤖`
-   - `description`: "[ROTINA] · [período] · BQS [X]%"
-   - `capabilities`: `{"db": {}}`
-   - **Se `[URL_EXISTENTE]` foi encontrada:** adicionar `url: "[URL_EXISTENTE]"` para atualizar o artefato existente
-   - **Se não encontrada (primeira execução):** publicar sem `url`; o artefato será criado com URL nova automaticamente
-
-4. Use a URL do artefato retornada no lugar de `[LINK_DOC_ANALISE]` na Mensagem 2
 
 > ⚠️ O arquivo HTML não deve ter tags `<!DOCTYPE>`, `<html>`, `<head>` nem `<body>` — o Artifact as adiciona automaticamente.
 > ⚠️ **VERBATIM obrigatório**: inclua cada output de subagente na íntegra dentro da `<div class="section-body">` correspondente — não resuma, não condense.
