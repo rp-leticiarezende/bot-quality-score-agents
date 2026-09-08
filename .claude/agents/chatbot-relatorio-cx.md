@@ -33,7 +33,6 @@ Entregue sempre um relatório completo, estruturado e pronto para ser compartilh
 
 ## PIPELINE DE EXECUÇÃO
 
-```
 FASE 1 — ESCOPO
      ↓ definir período, verticais e métricas-alvo
 FASE 2 — COLETA DE DADOS
@@ -46,7 +45,6 @@ FASE 5 — PROPOSTAS
      ↓ texto exato de cada ajuste + checklist de validação
 FASE 6 — RELATÓRIO
      ↓ executivo + backlog priorizado + owners + próximos passos
-```
 
 ---
 
@@ -68,26 +66,20 @@ FASE 6 — RELATÓRIO
 Para cada vertical, executar três queries:
 
 **Total de tickets (universo base):**
-```
 brand:RecargaPay created>=YYYY-MM-DD created<YYYY-MM-DD
 tags:TAG_VERTICAL
 tags:"channelid:botmaker-answerbot contact-online-chat"
 -tags:created_for_side_conversation -tags:chatbot_instavel__falha_na_api
 -tags:autoatendimento-inatividade -tags:spam -tags:qa-user -tags:treinamento
 max_results: 1 | per_page: 1
-```
 
 **Tickets com transbordo:**
-```
 [mesma base] + tags:transbordo_chatbot
-```
 
 **Tickets retidos:**
-```
 Query A: [mesma base] + tags:retenção_chatbot -tags:autoatendimento-inatividade -tags:retencao_inatividade_botmaker
 Query B: [mesma base] + tags:retencao_chatbot -tags:autoatendimento-inatividade -tags:retencao_inatividade_botmaker
 (somar A + B)
-```
 
 **Métricas derivadas por vertical:**
 - Taxa de transbordo = tickets transbordo / total
@@ -96,10 +88,8 @@ Query B: [mesma base] + tags:retencao_chatbot -tags:autoatendimento-inatividade 
 
 ### 2.2 Artigos do Guide por vertical
 
-```
 action: list_help_center_articles
 per_page: 100
-```
 
 Para cada vertical, verificar:
 - Existe artigo público (sem 🔒, `draft: false`) correspondente ao KB Slug?
@@ -186,7 +176,6 @@ Para cada oportunidade identificada, gerar proposta concreta seguindo as regras 
 
 ### Proposta de prompt com HP (Tipo 2)
 
-```
 NÓ: [nome do bloco no Botmaker]
 VERTICAL: [nome] | KB: [slug]
 
@@ -200,11 +189,9 @@ Dados do usuário disponíveis:
 Regras:
 1. Se ${variavel} = [condição]: [como adaptar a resposta]
 2. Máximo [N] palavras. [demais regras padrão]
-```
 
 ### Proposta de artigo (Tipo 1 — novo)
 
-```
 TÍTULO: [sem 🔒, palavra-chave da dúvida em destaque]
 KB SLUG: /[slug]
 AUDIÊNCIA: Público
@@ -216,11 +203,9 @@ RASCUNHO:
 
 CHECKLIST:
 ☐ Sem 🔒 | ☐ draft: false | ☐ Revisado por produto | ☐ Sem taxa/prazo sem confirmação
-```
 
 ### Proposta de revisão de artigo (Tipo 1 ou 3 — existente)
 
-```
 ARTIGO: [título] | ID: [id]
 PROBLEMA: [vote_sum: -X / desatualizado / não cobre caso Y]
 
@@ -228,7 +213,6 @@ VERSÃO ATUAL: "[trecho problemático]"
 PROPOSTA:     "[trecho reescrito]"
 
 JUSTIFICATIVA: [dado que sustenta — volume, vote_sum, taxa]
-```
 
 ---
 
@@ -236,7 +220,6 @@ JUSTIFICATIVA: [dado que sustenta — volume, vote_sum, taxa]
 
 ### Estrutura do relatório
 
-```
 ═══════════════════════════════════════════════════════════
 RELATÓRIO DE ANÁLISE — CHATBOT CX RECARGAPAY
 Período: [DD/MM/AAAA] a [DD/MM/AAAA] (BRT)
@@ -346,7 +329,6 @@ Para validar o impacto das ações propostas, monitorar:
 🔍 [query completa em formato Zendesk Search Syntax]
 
 ═══════════════════════════════════════════════════════════
-```
 
 ---
 
@@ -385,13 +367,11 @@ Para validar o impacto das ações propostas, monitorar:
 
 ## EXCLUSÕES OBRIGATÓRIAS EM TODAS AS QUERIES
 
-```
 -tags:created_for_side_conversation
 -tags:spam -tags:qa-user -tags:treinamento
 -tags:chatbot_instavel__falha_na_api
 -tags:retencao_inatividade_botmaker
 -tags:autoatendimento-inatividade
-```
 
 **Timezone:** BRT (UTC-3). **Semana:** começa na segunda-feira.
 **AND de tags:** `tags:"tag1 tag2"` — nunca duas cláusulas `tags:` separadas.
@@ -479,7 +459,6 @@ O relatório é composto por **2 mensagens separadas**, postadas em sequência n
 
 Responde a: *"como está o bot esta semana/dia?"*
 
-```
 [emoji rotina] *[TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS]*
 [DD/MM] a [DD/MM/AAAA] | [N_total] conversas
 BQS: *[X]%* ([N_aprovados]/[N_total]) — [+/-]Xpp vs semana anterior ([X]%)[Somente Cartão HP: usar N_pontuados no denominador — BQS: *[X]%* ([N_aprovados]/[N_pontuados])]
@@ -492,9 +471,8 @@ Retention: Resolutiva [N] · Abandono [N] · Transbordo [N] · Loop [N]
 • [insight 2]
 • [insight 3]
 
-_Plano de ação na mensagem abaixo ↓_
+_Plano de ação na mensagem abaixo ↓ · Relatório completo: [LINK_DOC_ANALISE]_
 _Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
-```
 
 **Regras:**
 - Não misturar ações aqui — só métricas e alertas
@@ -513,7 +491,6 @@ _Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
 
 Responde a: *"o que cada time precisa fazer?"*
 
-```
 🎯 *PLANO DE AÇÃO — [rotina] · [período]*
 _Ordenado por prioridade de impacto_
 
@@ -531,7 +508,6 @@ _Ordenado por prioridade de impacto_
 • 3. Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Tickets: [IDs]
 
 _Propostas detalhadas (o que e onde mudar): [LINK_DOC_ANALISE]_
-```
 
 **Regras:**
 - **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas × severidade. Os demais itens são omitidos — não há Mensagem 3
@@ -596,7 +572,6 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 
 **Formato do HTML:**
 
-```html
 <title>[ROTINA] · [DD/MM/AAAA]</title>
 <style>
 :root{--bg:#f5f7fa;--surface:#fff;--fg:#1a2035;--border:#e2e8f0;--muted:#64748b;--acc:#00cc52;--acc-h:#00a843;--warn:#f59e0b;--danger:#ef4444;--r:10px}
@@ -628,7 +603,8 @@ summary::-webkit-details-marker{display:none}
 summary::before{content:'▶';font-size:.6rem;flex-shrink:0;transition:transform .15s;color:var(--muted)}
 details[open]>summary::before{transform:rotate(90deg)}
 .section-body{padding:1rem 1.1rem;white-space:pre-wrap;font-family:'Courier New',Courier,monospace;font-size:.8rem;overflow-x:auto;border-top:1px solid var(--border);background:var(--bg)}
-.h-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.6rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.h-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.6rem;display:flex;flex-direction:column;align-items:flex-start;gap:.4rem}
+.h-entry-top{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;width:100%}
 .h-date{font-size:.82rem;color:var(--muted);min-width:90px}
 .h-chips{display:flex;gap:.45rem;flex-wrap:wrap}
 .chip{padding:.18rem .55rem;border-radius:99px;font-size:.72rem;font-weight:700}
@@ -636,19 +612,21 @@ details[open]>summary::before{transform:rotate(90deg)}
 .chip.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
 .chip.bad{background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)}
 .chip.neutral{background:color-mix(in srgb,var(--fg) 10%,transparent);color:var(--fg)}
+.h-insights{margin:.2rem 0 0 1rem;padding:0;font-size:.78rem;color:var(--muted);list-style:disc}
+.h-insights li{margin-bottom:.15rem}
 .empty{color:var(--muted);font-size:.9rem;padding:.5rem 0}
 </style>
 
 <script>
-/* dados desta execução — preencher com valores reais */
 const RUN={
-  run_id:'[AAAA-MM-DDThh-mm]',        /* ex: 2026-09-01T14-00 — único por execução */
-  rotina:'[ROTINA]',                   /* ex: Aleatório Semanal */
+  run_id:'[AAAA-MM-DDThh-mm]',
+  rotina:'[ROTINA]',
   periodo:'[data_inicio] a [data_fim]',
-  bqs:[BQS_NUM],                       /* número, ex: 72.3 */
-  tfc:[TFC_NUM],                       /* número, ex: 18.5 */
-  n_total:[N_TOTAL_NUM],               /* inteiro */
-  saved_at:'[ISO_TIMESTAMP]'           /* ex: 2026-09-01T17:00:00Z */
+  bqs:[BQS_NUM],
+  tfc:[TFC_NUM],
+  n_total:[N_TOTAL_NUM],
+  saved_at:'[ISO_TIMESTAMP]',
+  top_insights:['[bullet 1 dos PONTOS DE ATENÇÃO, sem o • inicial]','[bullet 2]','[bullet 3]']
 };
 </script>
 
@@ -660,12 +638,10 @@ const RUN={
 <div class="kpis">
   <div class="kpi">
     <span class="kpi-label">BQS</span>
-    <!-- classe: ok se ≥75%, warn se 60–74%, bad se <60% -->
     <span class="kpi-value [ok|warn|bad]">[X]%</span>
   </div>
   <div class="kpi">
     <span class="kpi-label">TFC</span>
-    <!-- classe: ok se ≤20%, warn se 21–40%, bad se >40% -->
     <span class="kpi-value [ok|warn|bad]">[X]%</span>
   </div>
   <div class="kpi">
@@ -676,7 +652,7 @@ const RUN={
   <!-- <div class="kpi"><span class="kpi-label">BQS Pleno</span><span class="kpi-value [ok|warn|bad]">[X]%</span></div> -->
   <!-- <div class="kpi"><span class="kpi-label">HP Degradado</span><span class="kpi-value [warn|bad]">[X]%</span></div> -->
 </div>
-</div><!-- /.inner -->
+</div>
 
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('analise',this)">📊 Análise atual</button>
@@ -710,7 +686,7 @@ const RUN={
   <div class="section-body">[output_propostas COMPLETO e VERBATIM — incluir texto exato de cada proposta de prompt, artigo ou fluxo]</div>
 </details>
 
-</div><!-- #tab-analise -->
+</div>
 
 <div id="tab-historico" class="tab-pane">
   <div id="hist"><p class="empty">Carregando histórico…</p></div>
@@ -749,14 +725,20 @@ async function loadHist(){
       const bqs=typeof r.bqs==='number'?r.bqs.toFixed(1):'—';
       const tfc=typeof r.tfc==='number'?r.tfc.toFixed(1):'—';
       const dt=r.saved_at?new Date(r.saved_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}):'—';
+      const insights=Array.isArray(r.top_insights)&&r.top_insights.length
+        ?`<ul class="h-insights">${r.top_insights.map(i=>`<li>${i}</li>`).join('')}</ul>`
+        :'';
       return `<div class="h-entry">
-        <span class="h-date">${dt}</span>
-        <span style="flex:1;font-size:.85rem;font-weight:600">${r.rotina||'—'} &mdash; ${r.periodo||''}</span>
-        <div class="h-chips">
-          <span class="chip ${cls(r.bqs)}">BQS ${bqs}%</span>
-          <span class="chip ${clsTfc(r.tfc)}">TFC ${tfc}%</span>
-          <span class="chip neutral">${r.n_total||'—'} conv.</span>
+        <div class="h-entry-top">
+          <span class="h-date">${dt}</span>
+          <span style="flex:1;font-size:.85rem;font-weight:600">${r.rotina||'—'} &mdash; ${r.periodo||''}</span>
+          <div class="h-chips">
+            <span class="chip ${cls(r.bqs)}">BQS ${bqs}%</span>
+            <span class="chip ${clsTfc(r.tfc)}">TFC ${tfc}%</span>
+            <span class="chip neutral">${r.n_total||'—'} conv.</span>
+          </div>
         </div>
+        ${insights}
       </div>`;
     }).join('');
   }catch(e){el.innerHTML='<p class="empty">Erro ao carregar histórico.</p>';}
@@ -765,7 +747,6 @@ async function loadHist(){
 saveRun();
 loadHist();
 </script>
-```
 
 ---
 
@@ -779,4 +760,5 @@ loadHist();
 - **Nunca agrupe artigos distintos em um único item** — cada artigo a criar ou atualizar é um item separado com sua própria linha
 - **Compliance primeiro:** se houver conteúdo contraditório, risco financeiro ou risco regulatório, ele é sempre o item 1 dentro do bloco Produto CX, marcado com 🚨 — não vai para bloco separado
 - **`customer_requested_transfer = true`** → a ação de transferir foi correta (`score_escalation ≥ 7`), mas isso **não isenta a qualidade das respostas do bot antes da transferência**. Se `diagnostics` contém `resposta_incorreta`, `falha_de_interpretacao` ou qualquer outro diagnóstico negativo, esses devem ser reportados normalmente nos PONTOS DE ATENÇÃO e contados no TFC. Não usar "limitação operacional" para omitir ou atenuar falhas de resposta — essa label se aplica apenas à decisão de transferir, nunca ao conteúdo do que o bot respondeu
+- **`top_insights` obrigatório:** ao preencher o objeto `RUN` no HTML, extrair os bullets da seção ⚠️ PONTOS DE ATENÇÃO da Mensagem 1 (máximo 3), sem o `•` inicial, e preencher o array `top_insights`. Se não houver pontos de atenção: `top_insights:[]`
 - Após postar com sucesso: confirme a URL/timestamp da mensagem postada
