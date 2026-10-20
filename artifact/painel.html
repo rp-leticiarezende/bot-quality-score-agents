@@ -365,7 +365,7 @@ function visao(){
   FLUXOS.forEach(function(f){var d=fluxoDados(f);arr(g(d,"oportunidades")).forEach(function(o){todas.push({f:f,o:o})})});
   var rank={alta:0,media:1,baixa:2};
   todas.sort(function(a,b){return ((rank[a.o.prioridade]==null?3:rank[a.o.prioridade])-(rank[b.o.prioridade]==null?3:rank[b.o.prioridade]))||(g(b.o,"contatos.estimado",0)-g(a.o,"contatos.estimado",0))});
-  h+='<section class="block"><h2>O que mais pesa agora</h2>';
+  h+='<section class="block"><h2>Principais ações</h2>';
   if(todas.length){
     h+='<p class="sub">Cada item diz o que ajustar, onde mexer, como a resposta fica depois e traz tickets reais para conferir. Os mais pesados primeiro.</p><div class="pesas">'+todas.slice(0,6).map(function(x,i){return pesa(x.f,x.o,i+1)}).join("")+'</div>';
   }else h+=empty(mensal?"Visão mensal ainda sem oportunidades":"Sem oportunidades ainda",mensal?"As oportunidades do mês serão consolidadas a partir das semanais. Veja a visão semanal.":"Elas aparecem depois que a análise completa de uma rotina roda.");

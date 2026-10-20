@@ -122,7 +122,7 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 
 ## Passo 5c — conteúdo do painel (20/10/2026)
 
-- **Tickets de exemplo** (até 3, só `ticket_id`): em "O que mais pesa agora", em "Contatos evitáveis" (por causa, na visão geral e na aba do fluxo), em "O que mudar" (resumo de cada oportunidade e coluna na tabela de artigos) e nos pontos de atenção dos casos críticos/aleatório. Contrato atualizado (`tickets` em causas, artigos e pontos de atenção).
+- **Tickets de exemplo** (até 3, só `ticket_id`): em "Principais ações", em "Contatos evitáveis" (por causa, na visão geral e na aba do fluxo), em "O que mudar" (resumo de cada oportunidade e coluna na tabela de artigos) e nos pontos de atenção dos casos críticos/aleatório. Contrato atualizado (`tickets` em causas, artigos e pontos de atenção).
 - **Nome:** "Cartão HP" virou "Agente de Cartão de Crédito" (painel, dados, Slack, orquestrador). A chave técnica `cartao-hp` não mudou.
 - **Períodos:** Agente de Cartão de Crédito e Aleatório com visão semanal e mensal; Casos críticos com semanal, diário e mensal; a Visão geral filtra por semanal ou mensal para todos os produtos. A linha do tempo também alterna semanal/mensal.
 - **Visões mensais e diária:** dados de teste calculados no Databricks (sem auditoria nem classificação); a consolidação mensal a partir das semanais fica para depois (otimização de tokens). Chaves novas: `cartao-hp-mensal`, `aleatorio-mensal`, `criticos-mensal`.
