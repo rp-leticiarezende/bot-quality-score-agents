@@ -459,8 +459,14 @@ O painel é **uma página única** (`artifact/painel.html` neste repositório) q
 
 1. **Gere `latest.json`** seguindo o contrato abaixo e salve com `Write` em `./painel-data/[chave_artefato]/latest.json`. A chave vem no prompt do orquestrador (`aleatorio`, `cartao-hp`, `criticos-diario` ou `criticos-semanal`).
 2. **Leia o histórico atual:** `Artifact` com `action: "read"`, `url: [URL_PAINEL]`, `path: "data/[chave_artefato]/history.json"`. Se o arquivo não existir, parta de `[]`. Acrescente o item desta rodada (substituindo o de mesmo `fim`; inclua `prompt_version` do Pacote V), ordene por `fim`, mantenha os 104 mais recentes e salve em `./painel-data/[chave_artefato]/history.json`.
+2b. **Atualize o backlog de ações** (aba "Backlog" do painel). O arquivo é `data/[fluxo_backlog]/…` com `[fluxo_backlog]` = `cartao-hp` (rotina `cartao-hp`), `aleatorio` (rotina `aleatorio`) ou `criticos` (rotinas `criticos-diario` e `criticos-semanal` compartilham o mesmo arquivo). Leia o arquivo atual com `Artifact` (`action: "read"`, `path: "data/backlog/[fluxo_backlog].json"`; se não existir, parta de `[]`) e salve o resultado com `Write` em `./painel-data/backlog/[fluxo_backlog].json`. Para **cada oportunidade desta rodada** (`oportunidades` do JSON que você gerou):
+   - **Mesmo problema de um item existente** (mesmo fluxo, mesma causa e mesmo tema ou nó; compare pelo sentido, não pelo texto): acrescente uma `ocorrencia` `{"fim", "periodo_label", "rotina", "contatos_estimados", "tickets" (até 3)}` (se já houver ocorrência com o mesmo `fim`, substitua-a) e atualize `ultima_vez`, `prioridade` e os campos descritivos (`titulo`, `problema`, `proposta`, `no`, `antes`, `depois`, `como_medir`, `dependencias`) com a versão mais recente.
+   - **Problema novo**: crie o item com `id` sequencial (`CC-NNN` cartão, `AL-NNN` aleatório, `CR-NNN` críticos), `fluxo`, `criada_em` e `ultima_vez` = `fim` do período, `origem: "rotina"` (ou `"teste"` se `meta.origem` for teste), `status: "aberta"`, `status_em: null`, `nota: ""`, `reapareceu_em: []` e a primeira ocorrência.
+   - **Nunca altere** `status`, `status_em` nem `nota`: quem define é a Leticia, em conversa. Se o item casado estiver `concluida` ou `cancelada`, apenas acrescente o `fim` desta rodada em `reapareceu_em` (sem repetir datas).
+   - Itens que não apareceram nesta rodada ficam como estão. Nunca apague itens.
+   - Mantenha o JSON válido, sem dados pessoais (tickets só por `ticket_id`).
 3. **Leia o painel uma vez** (`action: "read"`, `url: [URL_PAINEL]`, sem `path`) — a plataforma exige ler antes de publicar em artefato existente.
-4. **Publique** com `Artifact`: `file_path: "artifact/painel.html"`, `url: [URL_PAINEL]`, `files: {"data/[chave_artefato]/latest.json": "painel-data/[chave_artefato]/latest.json", "data/[chave_artefato]/history.json": "painel-data/[chave_artefato]/history.json"}`. Não passe `icon` nem `capabilities` (mantêm-se os atuais).
+4. **Publique** com `Artifact`: `file_path: "artifact/painel.html"`, `url: [URL_PAINEL]`, `files: {"data/[chave_artefato]/latest.json": "painel-data/[chave_artefato]/latest.json", "data/[chave_artefato]/history.json": "painel-data/[chave_artefato]/history.json", "data/backlog/[fluxo_backlog].json": "painel-data/backlog/[fluxo_backlog].json"}`. Não passe `icon` nem `capabilities` (mantêm-se os atuais).
 5. **Conflito:** se a publicação falhar por conflito (outra rotina publicou no meio), releia o painel (passo 3) e publique de novo **uma vez**. Se falhar de novo, siga para o Slack com `[LINK_PAINEL]` = `_(painel indisponível neste ciclo)_` e avise na mensagem do Slack.
 6. **URL do painel:** `[URL_PAINEL]` = `https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ`. Se ela não existir ou não for do dono da rotina, procure com `action: "list"` o artefato de título exato `BQS RecargaBot`; se também não existir, publique sem `url` (cria o painel) e avise na mensagem do Slack que o link mudou. Guarde a URL final como `[LINK_PAINEL]`.
 
@@ -537,6 +543,23 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 **`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 104 mais recentes). Mesmo `bqs` do `latest.json` (já com a nota revisada):
 `{ "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false, "prompt_version": "…" | null, "pct_recontato_24h": 0.0 }`
 O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` entre pontos seguidos. Itens antigos sem `prompt_version` ou com a chave `bqs_final` continuam válidos.
+### Backlog de ações (`data/backlog/<fluxo>.json`)
+
+Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (as rotinas `criticos-diario` e `criticos-semanal` compartilham o mesmo). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é a Leticia, em conversa; as rotinas nunca o alteram.
+
+```
+{
+  "id": "CC-001", "fluxo": "cartao-hp | aleatorio | criticos",
+  "titulo": "…", "frente": "…", "causa": "…", "classe": "A|B|C|D", "dono": "Produto CX | Help Design", "prioridade": "alta | media | baixa",
+  "problema": "…", "proposta": "…", "no": "…", "antes": "…", "depois": "…", "como_medir": "…", "dependencias": "…",
+  "criada_em": "AAAA-MM-DD", "ultima_vez": "AAAA-MM-DD", "origem": "rotina | teste",
+  "status": "aberta | em_andamento | concluida | cancelada", "status_em": "AAAA-MM-DD ou null", "nota": "texto livre (motivo, link do ajuste)",
+  "reapareceu_em": ["AAAA-MM-DD"],                 // datas em que o problema voltou depois de concluído ou cancelado
+  "ocorrencias": [ { "fim": "AAAA-MM-DD", "periodo_label": "…", "rotina": "chave da rotina", "contatos_estimados": 0, "tickets": ["ticket_id", "até 3"] } ]
+}
+```
+
+**Regras de atualização (a cada rodada):** problema já existente (mesmo fluxo, causa e tema/nó, comparado pelo sentido) ganha uma `ocorrencia` e a descrição mais recente; problema novo vira item `aberta`; **nunca** mude `status`, `status_em` ou `nota`; item `concluida` ou `cancelada` que reaparece só ganha a data em `reapareceu_em`; nada é apagado.
 <!-- SCHEMA_PAINEL:END -->
 
 ---

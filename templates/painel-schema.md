@@ -70,3 +70,20 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 **`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 104 mais recentes). Mesmo `bqs` do `latest.json` (já com a nota revisada):
 `{ "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false, "prompt_version": "…" | null, "pct_recontato_24h": 0.0 }`
 O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` entre pontos seguidos. Itens antigos sem `prompt_version` ou com a chave `bqs_final` continuam válidos.
+### Backlog de ações (`data/backlog/<fluxo>.json`)
+
+Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (as rotinas `criticos-diario` e `criticos-semanal` compartilham o mesmo). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é a Leticia, em conversa; as rotinas nunca o alteram.
+
+```
+{
+  "id": "CC-001", "fluxo": "cartao-hp | aleatorio | criticos",
+  "titulo": "…", "frente": "…", "causa": "…", "classe": "A|B|C|D", "dono": "Produto CX | Help Design", "prioridade": "alta | media | baixa",
+  "problema": "…", "proposta": "…", "no": "…", "antes": "…", "depois": "…", "como_medir": "…", "dependencias": "…",
+  "criada_em": "AAAA-MM-DD", "ultima_vez": "AAAA-MM-DD", "origem": "rotina | teste",
+  "status": "aberta | em_andamento | concluida | cancelada", "status_em": "AAAA-MM-DD ou null", "nota": "texto livre (motivo, link do ajuste)",
+  "reapareceu_em": ["AAAA-MM-DD"],                 // datas em que o problema voltou depois de concluído ou cancelado
+  "ocorrencias": [ { "fim": "AAAA-MM-DD", "periodo_label": "…", "rotina": "chave da rotina", "contatos_estimados": 0, "tickets": ["ticket_id", "até 3"] } ]
+}
+```
+
+**Regras de atualização (a cada rodada):** problema já existente (mesmo fluxo, causa e tema/nó, comparado pelo sentido) ganha uma `ocorrencia` e a descrição mais recente; problema novo vira item `aberta`; **nunca** mude `status`, `status_em` ou `nota`; item `concluida` ou `cancelada` que reaparece só ganha a data em `reapareceu_em`; nada é apagado.

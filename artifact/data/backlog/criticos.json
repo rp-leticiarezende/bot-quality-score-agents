@@ -1,0 +1,458 @@
+[
+    {
+        "id":  "CR-001",
+        "fluxo":  "criticos",
+        "titulo":  "Fluxo de encerramento e CSAT: não encerrar com pergunta aberta e retomar intenção nova",
+        "frente":  "fluxo",
+        "causa":  "loop_fluxo",
+        "classe":  "A",
+        "dono":  "Produto CX",
+        "prioridade":  "alta",
+        "problema":  "Após a CSAT ou por inatividade, o bot responde \u0027Conversa encerrada!\u0027 ou \u0027Não consegui responder\u0027 a uma intenção nova ou ainda ativa do cliente.",
+        "proposta":  "Bloquear encerramento automático com pergunta aberta (inatividade só conta após mensagem do bot); na CSAT, texto livre que não seja nota volta para CX_CA - Validacao_Conteudo; transbordo executado na 2ª \u0027Não consegui responder\u0027; \u0027PIS\u0027 com desambiguação e \u0027limite/crédito\u0027 para o fluxo de limite.",
+        "no":  "CX_CA - Validacao_Conteudo (confirmado); nós de encerramento/CSAT a confirmar pelo Produto CX",
+        "antes":  "Cliente escreve uma dúvida nova após a CSAT e o bot responde \u0027Conversa encerrada!\u0027 ou \u0027Não consegui responder\u0027 e encerra.",
+        "depois":  "Texto livre que não seja nota volta para a validação de conteúdo; na 2ª falha: \u0027Não foi possível responder a essa dúvida por aqui. A conversa será transferida para o atendimento com o assunto já registrado.\u0027",
+        "como_medir":  "Conversas que terminam em \u0027Conversa encerrada!\u0027/\u0027Não consegui responder\u0027 após mensagem do cliente; recontato em 24h (baseline 31.3%).",
+        "dependencias":  "Regra de inatividade do Botmaker",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  7,
+                                "tickets":  [
+                                                "46628438",
+                                                "46628953",
+                                                "46627611"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-002",
+        "fluxo":  "criticos",
+        "titulo":  "Nós de seguro: criar intenção de contestação e transferir com contexto coletado",
+        "frente":  "handoff",
+        "causa":  "acao_humana_obrigatoria",
+        "classe":  "D",
+        "dono":  "Produto CX",
+        "prioridade":  "alta",
+        "problema":  "Na contestação de seguro não reconhecido o bot repete a política e manda \u0027contatar o suporte\u0027 sem transferir (risco regulatório).",
+        "proposta":  "Remover \u0027contate o suporte\u0027 dos nós de seguro (imediato); criar intenção \u0027Seguro – contestação de contratação/cobrança\u0027 com precedência sobre contestação Pix; coletar produto, situação, data e valor antes do handoff; validar contactOrderStatus/contactOrderAmount/orderAmount.",
+        "no":  "nó a confirmar pelo Produto CX",
+        "antes":  "Bot explica a política do seguro e orienta \u0027contate o suporte\u0027, sem transferir.",
+        "depois":  "\u0027A contestação de contratação de seguro é analisada pelo time responsável. Produto, data e valor da cobrança já foram registrados. A conversa será transferida agora.\u0027",
+        "como_medir":  "Contestações de seguro com transbordo executado e campos preenchidos; recontato em 24h no tema seguro.",
+        "dependencias":  "Validação das variáveis de pedido de seguro (fora do mapeamento atual)",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46626583",
+                                                "46629258",
+                                                "46625622"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-003",
+        "fluxo":  "criticos",
+        "titulo":  "Regra global de transbordo: gatilho jurídico com transferência imediata, sem CSAT",
+        "frente":  "politica",
+        "causa":  "acao_humana_obrigatoria",
+        "classe":  "D",
+        "dono":  "Produto CX",
+        "prioridade":  "alta",
+        "problema":  "Cliente sinalizou ação jurídica e o bot não transferiu de imediato (risco regulatório).",
+        "proposta":  "Gatilho global para Procon, advogado, justiça, Reclame Aqui, processar; \u0027processo\u0027 só quando acompanhado de \u0027contra\u0027, \u0027judicial\u0027 ou \u0027entrar com\u0027. Transbordo imediato, sem CSAT.",
+        "no":  "nó a confirmar pelo Produto CX",
+        "antes":  "Bot segue o fluxo estático e oferece CSAT após menção a processo.",
+        "depois":  "Transbordo imediato com o assunto registrado, sem CSAT.",
+        "como_medir":  "Conversas com termos jurídicos e transbordo na mesma mensagem.",
+        "dependencias":  "—",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46626567"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-004",
+        "fluxo":  "criticos",
+        "titulo":  "Fluxo Pix negado: explicar no 1º pedido de atendente e transferir no 2º",
+        "frente":  "politica",
+        "causa":  "politica_produto",
+        "classe":  "A",
+        "dono":  "Produto CX",
+        "prioridade":  "media",
+        "problema":  "Pedido explícito de atendente ignorado até a CSAT em Pix negado; transferência tardia.",
+        "proposta":  "Regra de pedido de atendente no fluxo Pix negado: 1º pedido explica e sonda; 2º pedido transfere.",
+        "no":  "nó a confirmar pelo Produto CX",
+        "antes":  "Cliente pede atendente e o bot repete a orientação até a CSAT.",
+        "depois":  "1º pedido: o atendimento não libera Pix recusado por verificação automática; alternativas em Área Pix \u003e Meus limites Pix; sonda a dúvida. 2º pedido: transfere.",
+        "como_medir":  "% de pedidos de atendente atendidos até o 2º pedido no tema Pix.",
+        "dependencias":  "—",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  2,
+                                "tickets":  [
+                                                "46628593",
+                                                "46625909"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-005",
+        "fluxo":  "criticos",
+        "titulo":  "Prompt de Pix: responder direto na primeira frase e usar o limite noturno",
+        "frente":  "prompt",
+        "causa":  "prompt_resposta",
+        "classe":  "A",
+        "dono":  "Produto CX",
+        "prioridade":  "media",
+        "problema":  "Pix negado/limite respondido com texto genérico e disclaimer; artigo de limite noturno não usado.",
+        "proposta":  "Ajustar o prompt de Pix: a primeira frase responde direto; incluir limite noturno R$ 1.000 das 20h às 6h conforme o artigo. Investigar o transbordo não executado em 46625592.",
+        "no":  "nó a confirmar pelo Produto CX",
+        "antes":  "Resposta genérica sobre segurança do Pix, sem dizer o limite.",
+        "depois":  "Primeira frase com a resposta direta, ex.: limite noturno de *R$ 1.000* das *20h às 6h*.",
+        "como_medir":  "BQS 2.0 e TFC do produto pix; respostas com \u0027Não\u0027 após a resposta de limite.",
+        "dependencias":  "Confirmar valores de limite com produto",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  2,
+                                "tickets":  [
+                                                "46628537",
+                                                "46625592"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-006",
+        "fluxo":  "criticos",
+        "titulo":  "Validação de conteúdo: conteúdo antes de \u0027Consegui responder?\u0027 e sondagem após \u0027Não\u0027",
+        "frente":  "fluxo",
+        "causa":  "prompt_resposta",
+        "classe":  "B",
+        "dono":  "Produto CX",
+        "prioridade":  "media",
+        "problema":  "\u0027Consegui responder?\u0027 aparece antes do conteúdo e não há sondagem após \u0027Não\u0027; \u0027não reconheço\u0027 no pagamento negado é ignorado.",
+        "proposta":  "Reordenar o nó de validação; adicionar sondagem após \u0027Não\u0027; aceitar texto livre no pagamento negado; usar ${walletStatus} na carteira bloqueada (mapeamento a confirmar).",
+        "no":  "CX_CA - Validacao_Conteudo",
+        "antes":  "Bot pergunta \u0027Consegui responder?\u0027 antes de mostrar o conteúdo e, após \u0027Não\u0027, só pede o botão OK.",
+        "depois":  "Conteúdo primeiro; após \u0027Não\u0027: \u0027O que ficou faltando: o motivo, o prazo ou como resolver?\u0027; \u0027não reconheço\u0027 leva à contestação.",
+        "como_medir":  "% de \u0027Não\u0027 na validação seguidos de resolução; CSAT 1–2 nos temas wallet-blocked e pagamento negado.",
+        "dependencias":  "Confirmar mapeamento de walletStatus",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  2,
+                                "tickets":  [
+                                                "46627600",
+                                                "46625938"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-007",
+        "fluxo":  "criticos",
+        "titulo":  "Fluxos estáticos (Transporte/URBS, CC Error): detectar troca de intenção no texto livre",
+        "frente":  "fluxo",
+        "causa":  "nlu_roteamento",
+        "classe":  "B",
+        "dono":  "Produto CX",
+        "prioridade":  "media",
+        "problema":  "Fluxos estáticos prendem o cliente e ignoram quando ele muda de assunto.",
+        "proposta":  "Detecção de intenção nos nós de texto livre de Transporte/URBS e CC Error; ramo \u0027\u003e24h\u0027 no Transporte com transbordo.",
+        "no":  "nó a confirmar pelo Produto CX",
+        "antes":  "Cliente muda de assunto e o bot repete as opções do fluxo estático.",
+        "depois":  "Nova intenção detectada e roteada; no Transporte, ramo \u0027\u003e24h\u0027 com transbordo.",
+        "como_medir":  "Abandono e loop nos fluxos estáticos de Transporte e CC Error.",
+        "dependencias":  "—",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  2,
+                                "tickets":  [
+                                                "46629622",
+                                                "46625849"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-008",
+        "fluxo":  "criticos",
+        "titulo":  "Empréstimo: intenção global \u0027cancelar empréstimo\u0027 com handoff e prazo",
+        "frente":  "fluxo",
+        "causa":  "acao_humana_obrigatoria",
+        "classe":  "D",
+        "dono":  "Produto CX",
+        "prioridade":  "media",
+        "problema":  "Pedido de cancelamento de empréstimo ignorado; conversa marcada como \u0027resolutiva\u0027 sem resolução.",
+        "proposta":  "Intenção global \u0027cancelar empréstimo\u0027 com handoff e prazo de 7 dias corridos (marco inicial a confirmar no artigo); usar ${hasActiveLoan}.",
+        "no":  "nó a confirmar pelo Produto CX",
+        "antes":  "Cliente pede para cancelar o empréstimo e o bot segue no fluxo de pagamento negado.",
+        "depois":  "Intenção reconhecida; informa o prazo de *7 dias corridos* para desistência e transfere.",
+        "como_medir":  "Conversas com \u0027cancelar empréstimo\u0027 transferidas com o assunto registrado.",
+        "dependencias":  "Confirmar marco inicial do prazo com produto",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46628652",
+                                                "46629396"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-009",
+        "fluxo":  "criticos",
+        "titulo":  "Central de Ajuda: criar artigo sobre seguro não contratado ou já cancelado",
+        "frente":  "artigo",
+        "causa":  "acao_humana_obrigatoria",
+        "classe":  "D",
+        "dono":  "Help Design",
+        "prioridade":  "media",
+        "problema":  "Não há artigo externo sobre cobrança de seguro não contratado ou reembolso pós-cancelamento.",
+        "proposta":  "Criar \u0027Fui cobrado por um seguro que não contratei ou que já cancelei. O que fazer?\u0027 (prazo e forma de devolução preenchidos pelo produto; nunca publicar com colchetes).",
+        "no":  "Artigo novo na Central de Ajuda",
+        "antes":  "Bot usa o artigo de forma de pagamento do seguro, que não responde à contestação.",
+        "depois":  "Artigo responde o que fazer em cobrança indevida de seguro.",
+        "como_medir":  "Uso do artigo pelo bot no tema seguro e recontato em 24h.",
+        "dependencias":  "Prazo e forma de devolução confirmados pelo produto",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46626583",
+                                                "46629258",
+                                                "46628562"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-010",
+        "fluxo":  "criticos",
+        "titulo":  "Central de Ajuda: criar artigo sobre desconectar conta ou dispositivo",
+        "frente":  "artigo",
+        "causa":  "prompt_resposta",
+        "classe":  "B",
+        "dono":  "Help Design",
+        "prioridade":  "baixa",
+        "problema":  "Não há conteúdo sobre desconectar conta ou dispositivo conectado.",
+        "proposta":  "Criar artigo sobre desconectar conta ou dispositivo conectado (caminho de menu a confirmar com produto).",
+        "no":  "Artigo novo na Central de Ajuda",
+        "antes":  "Bot sem material para responder.",
+        "depois":  "Artigo com a resposta direta (caminho de menu a confirmar).",
+        "como_medir":  "Conversas do tema com resposta \u0027Sim\u0027 na validação.",
+        "dependencias":  "Caminho de menu confirmado pelo produto",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  1,
+                                "tickets":  [
+                                                "46629622"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-011",
+        "fluxo":  "criticos",
+        "titulo":  "Artigo \u0027Recarga não validada - Cartão URBS (Curitiba)\u0027: incluir telefone 156 e seção \u003e24h",
+        "frente":  "artigo",
+        "causa":  "artigo",
+        "classe":  "A",
+        "dono":  "Help Design",
+        "prioridade":  "baixa",
+        "problema":  "O artigo não cobre o caso de recarga não validada após 24h nem o canal 156.",
+        "proposta":  "Revisar o artigo: acrescentar o telefone 156 e uma seção para recarga não validada há mais de 24h.",
+        "no":  "Recarga não validada - Cartão URBS (Curitiba)",
+        "antes":  "Artigo sem orientação para mais de 24h.",
+        "depois":  "Seção \u0027\u003e24h\u0027 com o telefone 156.",
+        "como_medir":  "Problema de KB no artigo nas próximas rodadas.",
+        "dependencias":  "—",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  1,
+                                "tickets":  [
+                                                "46625849"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-012",
+        "fluxo":  "criticos",
+        "titulo":  "Bloco Empréstimo: trocar o link para o artigo \u0027Como pedir um empréstimo\u0027",
+        "frente":  "artigo",
+        "causa":  "nenhuma",
+        "classe":  "R",
+        "dono":  "Help Design",
+        "prioridade":  "baixa",
+        "problema":  "O bloco Empréstimo envia um link errado.",
+        "proposta":  "Corrigir o link do bloco Empréstimo para \u0027Como pedir um empréstimo\u0027.",
+        "no":  "Bloco Empréstimo (nó a confirmar pelo Produto CX)",
+        "antes":  "Link do bloco Empréstimo aponta para outro artigo.",
+        "depois":  "Link aponta para \u0027Como pedir um empréstimo\u0027.",
+        "como_medir":  "Conversas do bloco com o link correto.",
+        "dependencias":  "Produto CX publica a troca no Botmaker",
+        "criada_em":  "2026-10-19",
+        "ultima_vez":  "2026-10-19",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-19",
+                                "periodo_label":  "19/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  2,
+                                "tickets":  [
+                                                "46627269",
+                                                "46626714"
+                                            ]
+                            }
+                        ]
+    }
+]

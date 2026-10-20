@@ -213,7 +213,7 @@ var CLASSES={
 };
 var FRENTES={artigo:"Artigos",variavel_hp:"Variáveis e prompts",prompt:"Variáveis e prompts",fluxo:"Fluxo e regras",politica:"Fluxo e regras",capacidade:"Capacidades novas",handoff:"Handoff"};
 var GRUPOS=["Todos","Artigos","Variáveis e prompts","Fluxo e regras","Capacidades novas","Handoff"];
-var S={data:{},hist:{},eventos:[],tab:"visao",per:"semanal",perFluxo:{},filtro:{},metric:"bqs",linhaFluxo:"cartao-hp",linhaPer:"semanal"};
+var S={data:{},hist:{},bk:{},eventos:[],tab:"visao",per:"semanal",perFluxo:{},filtro:{},metric:"bqs",linhaFluxo:"cartao-hp",linhaPer:"semanal"};
 var $=function(s){return document.querySelector(s)};
 
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -586,6 +586,55 @@ function opo(o){
   return h+'</dl></div></details>';
 }
 
+/* ---------- backlog ---------- */
+var BK_FLUXOS=[["cartao-hp","Agente de Cartão de Crédito"],["aleatorio","Aleatório"],["criticos","Casos críticos"]];
+var BK_STATUS={aberta:["Aberta","warn"],em_andamento:["Em andamento","info"],concluida:["Concluída","good"],cancelada:["Cancelada",""]};
+function dataBr(s){return s?String(s).slice(8,10)+"/"+String(s).slice(5,7)+"/"+String(s).slice(0,4):"—"}
+function bkItens(){
+  var l=[];
+  BK_FLUXOS.forEach(function(f){arr(S.bk[f[0]]).forEach(function(it){l.push(it)})});
+  return l;
+}
+function bkItem(it){
+  var st=BK_STATUS[it.status]||BK_STATUS.aberta,oc=arr(it.ocorrencias),ult=oc[oc.length-1]||{};
+  var fl=BK_FLUXOS.filter(function(f){return f[0]===it.fluxo})[0];
+  var h='<details class="opo"><summary>'+prioChip(it.prioridade)+'<div><div class="ttl">'+esc(it.id?it.id+" · ":"")+esc(it.titulo)+'</div><div class="meta">'+chip(st[0],st[1])+'<span class="chip">'+esc(fl?fl[1]:it.fluxo)+'</span><span class="chip">'+esc(FR_ROTULO[it.frente]||it.frente||"Ajuste")+'</span><span class="chip">'+esc(it.dono||"—")+'</span>'+
+    '<span class="chip">'+oc.length+(oc.length===1?' ocorrência':' ocorrências')+'</span><span class="chip muted">1ª vez '+esc(dataBr(it.criada_em))+' · última '+esc(dataBr(it.ultima_vez))+'</span>'+
+    (arr(it.reapareceu_em).length?'<span class="chip crit">Reapareceu depois de '+(it.status==="cancelada"?"cancelada":"concluída")+'</span>':'')+
+    (it.origem==="teste"?'<span class="chip info">rodada de teste</span>':'')+'</div></div><span class="mono" style="text-align:right;white-space:nowrap">'+(num(ult.contatos_estimados)?'≈ '+int(ult.contatos_estimados)+'<br><span class="muted" style="font-size:11px">contatos na última</span>':'')+'</span></summary><div class="body">';
+  if(it.status==="concluida"||it.status==="cancelada"||it.status==="em_andamento"){
+    h+='<div class="banner '+(it.status==="concluida"?"info":"")+'"><span class="dot '+(it.status==="concluida"?"good":"info")+'"></span><div><b>'+esc(st[0])+(it.status_em?' em '+esc(dataBr(it.status_em)):'')+'.</b> '+esc(it.nota||"Sem nota.")+(arr(it.reapareceu_em).length?' <b>Voltou a aparecer em '+arr(it.reapareceu_em).map(dataBr).join(", ")+'.</b>':(it.status==="concluida"?' Sem reaparecer nas rodadas seguintes até agora.':''))+'</div></div>';
+  }
+  if(it.antes||it.depois)h+='<div class="ba"><div class="antes"><b>Hoje</b>'+esc(it.antes||"—")+'</div><div class="depois"><b>Deveria ser</b>'+esc(it.depois||"—")+'</div></div>';
+  h+='<dl>';
+  if(it.problema)h+='<dt>O que acontece</dt><dd>'+esc(it.problema)+'</dd>';
+  if(it.proposta)h+='<dt>O que ajustar</dt><dd><b>'+esc(it.proposta)+'</b></dd>';
+  if(it.no)h+='<dt>Onde mexer</dt><dd>'+esc(it.no)+'</dd>';
+  if(it.dependencias&&it.dependencias!=="—")h+='<dt>Depende de</dt><dd>'+esc(it.dependencias)+'</dd>';
+  if(it.como_medir)h+='<dt>Como saber que funcionou</dt><dd>'+esc(it.como_medir)+'</dd>';
+  h+='</dl>';
+  h+='<div class="panel scroll"><h3>Ocorrências</h3><table><thead><tr><th>Período</th><th>Rotina</th><th class="n">Contatos (est.)</th><th>Tickets de exemplo</th></tr></thead><tbody>'+oc.slice().reverse().map(function(o){return '<tr><td>'+esc(o.periodo_label||dataBr(o.fim))+'</td><td>'+esc(o.rotina||"—")+'</td><td class="n">'+(num(o.contatos_estimados)?int(o.contatos_estimados):"—")+'</td><td>'+(tix(o.tickets,3)||'<span class="muted">—</span>')+'</td></tr>'}).join("")+'</tbody></table></div>';
+  return h+'</div></details>';
+}
+function abaBacklog(){
+  var todos=bkItens(),f=S.bkF||{fluxo:"todos",status:"abertas"};
+  var cont={aberta:0,em_andamento:0,concluida:0,cancelada:0};
+  todos.forEach(function(it){cont[it.status]=(cont[it.status]||0)+1});
+  var h='<section class="block"><h2>Backlog de ações</h2><p class="sub">Tudo o que as rotinas já levantaram, em ordem de última aparição. O que é novo entra sozinho a cada rodada; quando o mesmo problema reaparece, ele ganha uma ocorrência em vez de virar item novo. O status (aberta, em andamento, concluída ou cancelada) é atualizado a pedido, com data e nota. Se um item concluído ou cancelado voltar a aparecer, o painel avisa.</p>';
+  h+='<div class="kpis">'+kpi("Abertas",int(cont.aberta),"aguardando ajuste")+kpi("Em andamento",int(cont.em_andamento),"em análise ou ajuste")+kpi("Concluídas",int(cont.concluida),"ajuste publicado")+kpi("Canceladas",int(cont.cancelada),"não serão feitas")+'</div>';
+  h+='<div class="pills" role="group" aria-label="Fluxo">'+[["todos","Todos os fluxos"]].concat(BK_FLUXOS).map(function(x){return '<button class="pill" data-bkf="'+x[0]+'" aria-pressed="'+(f.fluxo===x[0])+'">'+esc(x[1])+'</button>'}).join("")+'</div>';
+  h+='<div class="pills" role="group" aria-label="Status">'+[["abertas","Em aberto"],["aberta","Abertas"],["em_andamento","Em andamento"],["concluida","Concluídas"],["cancelada","Canceladas"],["todas","Todas"]].map(function(x){return '<button class="pill" data-bks="'+x[0]+'" aria-pressed="'+(f.status===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>';
+  var ra={alta:0,media:1,baixa:2};
+  var lista=todos.filter(function(it){
+    if(f.fluxo!=="todos"&&it.fluxo!==f.fluxo)return false;
+    if(f.status==="todas")return true;
+    if(f.status==="abertas")return it.status==="aberta"||it.status==="em_andamento";
+    return it.status===f.status;
+  }).sort(function(a,b){return (a.ultima_vez<b.ultima_vez?1:a.ultima_vez>b.ultima_vez?-1:0)||((ra[a.prioridade]==null?3:ra[a.prioridade])-(ra[b.prioridade]==null?3:ra[b.prioridade]))||(String(a.id)<String(b.id)?-1:1)});
+  h+=lista.length?'<div class="opos">'+lista.map(bkItem).join("")+'</div>':empty("Nenhum item neste filtro","Troque o fluxo ou o status para ver os demais.");
+  main(h+'</section>');
+}
+
 /* ---------- como ler ---------- */
 function comoLer(){
   main('<section class="block"><h2>Como ler este painel</h2><div class="panel"><dl class="def">'+
@@ -607,20 +656,22 @@ function comoLer(){
 /* ---------- navegação ---------- */
 function main(h){$("#main").innerHTML=h}
 function tabs(){
-  var t=[{id:"visao",n:"Visão geral"},{id:"linha",n:"Linha do tempo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
+  var t=[{id:"visao",n:"Visão geral"},{id:"backlog",n:"Backlog"},{id:"linha",n:"Linha do tempo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
   $("#tabs").innerHTML=t.map(function(x){return '<button role="tab" data-tab="'+x.id+'" aria-selected="'+(S.tab===x.id)+'">'+esc(x.n)+'</button>'}).join("");
 }
 function render(){
   tabs();
   var f=FLUXOS.filter(function(x){return x.id===S.tab})[0];
-  if(S.tab==="visao")visao();else if(S.tab==="linha")abaLinha();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
+  if(S.tab==="visao")visao();else if(S.tab==="linha")abaLinha();else if(S.tab==="backlog")abaBacklog();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
   var ult=Object.keys(S.data).map(function(k){return g(S.data[k],"gerado_em")}).filter(Boolean).sort().pop();
   $("#atualizado").textContent=ult?"Atualizado em "+dt(ult):"";
 }
 document.addEventListener("click",function(e){
-  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro],[data-metric],[data-lf],[data-gper],[data-fper],[data-lper]");if(!el)return;
+  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro],[data-metric],[data-lf],[data-gper],[data-fper],[data-lper],[data-bkf],[data-bks]");if(!el)return;
   if(el.dataset.tab||el.dataset.go){S.tab=el.dataset.tab||el.dataset.go;if(el.dataset.go&&S.per!=="semanal")S.perFluxo[el.dataset.go]=S.per;else if(el.dataset.go)S.perFluxo[el.dataset.go]="semanal";store("bqs-tab",S.tab);window.scrollTo(0,0)}
   if(el.dataset.metric)S.metric=el.dataset.metric;
+  if(el.dataset.bkf){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.fluxo=el.dataset.bkf}
+  if(el.dataset.bks){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.status=el.dataset.bks}
   if(el.dataset.lf)S.linhaFluxo=el.dataset.lf;
   if(el.dataset.gper)S.per=el.dataset.gper;
   if(el.dataset.lper)S.linhaPer=el.dataset.lper;
@@ -643,7 +694,7 @@ document.addEventListener("pointerleave",function(){tip.hidden=true});
 /* ---------- boot ---------- */
 var chaves=["cartao-hp","cartao-hp-mensal","aleatorio","aleatorio-mensal","criticos-semanal","criticos-diario","criticos-mensal"];
 var salvo=store("bqs-tab");if(salvo)S.tab=salvo;
-Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
+Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat(["cartao-hp","aleatorio","criticos"].map(function(k){return load("data/backlog/"+k+".json").then(function(r){S.bk[k]=arr(r)})})).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
 render();
 })();
 </script>

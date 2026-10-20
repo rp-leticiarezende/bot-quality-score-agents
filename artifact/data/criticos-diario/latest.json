@@ -1,26 +1,829 @@
 {
   "schema": "bqs-run/1",
   "chave": "criticos-diario",
-  "rotina": "Casos críticos (diário)",
-  "meta": { "origem": "teste", "nota": "BQS 2.0, dia 19/10/2026: métricas do Databricks, sem classificação nem auditoria." },
-  "periodo": { "tipo": "diario", "inicio": "2026-10-19", "fim": "2026-10-19", "label": "19/10/2026" },
-  "gerado_em": "2026-10-20T14:10:00-03:00",
-  "cobertura": { "baixa": false, "comparacao_indisponivel": true, "texto": "18/10 foi domingo, sem registros; o dia anterior com dado é 16/10." },
-  "metricas": {
-    "n_total": 25, "n_avaliaveis": 24, "n_ok": 11,
-    "bqs": 45.8, "bqs_anterior": null, "ultimo_ponto_anterior": null,
-    "prompt_version": "v1",
-    "pct_recontato_24h": 31.3,
-    "sinalizados": { "transbordo_sem_pedido": { "n": 0, "pct": 0.0, "tickets": [] } },
-    "tfc": 24.0, "pct_pediu_humano": 8.0, "pct_transbordo": 8.0, "n_transbordo_nota_ok": 2,
-    "labels": { "excelente": 7, "bom": 4, "regular": 1, "ruim": 5, "critico": 7 },
-    "retention": { "resolutiva": 16, "abandono": 6, "transbordo": 2, "loop": 0 },
-    "criterios": { "understanding": 5.40, "resolution": 4.60, "clarity": 5.84, "tone": 6.64, "efficiency": 5.04, "escalation": 4.80 }
+  "rotina": "Casos Críticos (diário)",
+  "meta": {
+    "origem": "rotina",
+    "nota": "Análise de KB (Zendesk Guide) não rodou nesta execução: conector Zendesk falhou; dados de KB vêm só do Databricks. Ticket 46628593 sem transcrição na auditoria."
   },
-  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
+  "periodo": {
+    "tipo": "diario",
+    "inicio": "2026-10-19",
+    "fim": "2026-10-19",
+    "label": "19/10/2026"
+  },
+  "gerado_em": "2026-10-20T15:57:12-03:00",
+  "cobertura": {
+    "baixa": false,
+    "comparacao_indisponivel": true,
+    "texto": "25 conversas (média prévia 11). Sem dados em 12/10/2026 para comparação; buracos nos últimos 14 dias: 06/10 a 14/10, 17/10 e 18/10. Ingestão em dia (última 20/10 04:56 UTC)."
+  },
+  "metricas": {
+    "n_total": 25,
+    "n_avaliaveis": 24,
+    "n_ok": 8,
+    "bqs": 33.3,
+    "bqs_anterior": null,
+    "ultimo_ponto_anterior": null,
+    "prompt_version": "v1",
+    "tfc": 24.0,
+    "pct_pediu_humano": 8.0,
+    "pct_transbordo": 8.0,
+    "n_transbordo_nota_ok": 2,
+    "labels": {
+      "excelente": 7,
+      "bom": 4,
+      "regular": 1,
+      "ruim": 5,
+      "critico": 7
+    },
+    "retention": {
+      "resolutiva": 16,
+      "abandono": 6,
+      "transbordo": 2,
+      "loop": 0
+    },
+    "criterios": {
+      "understanding": 5.4,
+      "resolution": 4.6,
+      "clarity": 5.84,
+      "tone": 6.64,
+      "efficiency": 5.04,
+      "escalation": 4.8
+    },
+    "pct_recontato_24h": 31.3,
+    "sinalizados": {
+      "transbordo_sem_pedido": {
+        "n": 0,
+        "pct": 0.0,
+        "tickets": []
+      }
+    }
+  },
+  "auditoria": {
+    "auditados": 4,
+    "revisados": 3,
+    "aprovado_para_reprovado": 3,
+    "reprovado_para_aprovado": 0,
+    "divergencias": [
+      "Avaliador aprovou e deu resolution alto apesar de resposta 'Não'/CSAT 1 com dúvida não resolvida (46627600, 46625938).",
+      "Avaliador premiou resolução anterior e ignorou o beco sem saída final 'Não consegui responder' pós-CSAT (46624803).",
+      "Resumo não bate com a transcrição: possível erro de vínculo ticket x transcrição; ticket sem transcrição, mantém nota original e deve ser reauditado (46628593).",
+      "retention_type 'resolutiva' incorreto em conversa com pedido de cancelamento de empréstimo ignorado (46628652)."
+    ]
+  },
+  "dimensoes": {
+    "effective_vertical": [
+      {
+        "valor": "n8n_critico",
+        "rotulo": "Casos críticos (n8n)",
+        "n": 22,
+        "pct_volume": 88.0,
+        "bqs": 42.9,
+        "tfc": 22.7,
+        "pct_pediu_humano": 9.1
+      },
+      {
+        "valor": "emprestimo",
+        "rotulo": "Empréstimo",
+        "n": 3,
+        "pct_volume": 12.0,
+        "bqs": 66.7,
+        "tfc": 33.3,
+        "pct_pediu_humano": 0.0
+      }
+    ],
+    "product": [
+      {
+        "valor": "emprestimo",
+        "n": 6,
+        "pct_volume": 24.0,
+        "bqs": 33.3,
+        "tfc": 33.3,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "pix",
+        "n": 5,
+        "pct_volume": 20.0,
+        "bqs": 60.0,
+        "tfc": 20.0,
+        "pct_pediu_humano": 40.0
+      },
+      {
+        "valor": "seguro-protecao-pix-e-cartoes",
+        "n": 4,
+        "pct_volume": 16.0,
+        "bqs": 0.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "cartao-recargapay",
+        "n": 2,
+        "pct_volume": 8.0,
+        "bqs": 100.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "pix-in",
+        "n": 2,
+        "pct_volume": 8.0,
+        "bqs": 50.0,
+        "tfc": 100.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "perfil-seguranca",
+        "n": 2,
+        "pct_volume": 8.0,
+        "bqs": 100.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "recarga-de-celular",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 0.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "adicionar-dinheiro",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 100.0,
+        "tfc": 100.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "recarga-de-transporte",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 0.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "(sem valor)",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": null,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      }
+    ],
+    "topic": [
+      {
+        "valor": "pix-payment",
+        "n": 4,
+        "pct_volume": 16.0,
+        "bqs": 75.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 50.0
+      },
+      {
+        "valor": "overdraft-direct",
+        "n": 3,
+        "pct_volume": 12.0,
+        "bqs": 66.7,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "wallet-blocked",
+        "n": 3,
+        "pct_volume": 12.0,
+        "bqs": 100.0,
+        "tfc": 66.7,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "cartao-recargapay",
+        "n": 2,
+        "pct_volume": 8.0,
+        "bqs": 50.0,
+        "tfc": 50.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "pix",
+        "n": 2,
+        "pct_volume": 8.0,
+        "bqs": 0.0,
+        "tfc": 100.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "loan-payment",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 0.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "encerramento-de-cadastro",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 100.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "dúvidas sobre seguro",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 0.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "seguro-protecao-pix-e-cartoes",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 0.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "pix-receive",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 0.0,
+        "tfc": 100.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "recargapay-cards",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 100.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      },
+      {
+        "valor": "transport",
+        "n": 1,
+        "pct_volume": 4.0,
+        "bqs": 0.0,
+        "tfc": 0.0,
+        "pct_pediu_humano": 0.0
+      }
+    ]
+  },
+  "contencao": {
+    "n_classificadas": 24,
+    "n_elegiveis": 24,
+    "pct_evitavel": 62.5,
+    "ic95": [
+      43,
+      79
+    ],
+    "ce_pct_total": 60.0,
+    "classes": {
+      "A": 12,
+      "B": 3,
+      "C": 0,
+      "D": 6,
+      "R": 3,
+      "E": 0
+    },
+    "causas": [
+      {
+        "classe": "D",
+        "causa": "acao_humana_obrigatoria",
+        "causa_rotulo": "Ação humana obrigatória (seguro, jurídico, cancelamento)",
+        "n": 6,
+        "tickets": [
+          "46626583",
+          "46629258",
+          "46625622"
+        ]
+      },
+      {
+        "classe": "A",
+        "causa": "loop_fluxo",
+        "causa_rotulo": "Encerramento/pós-CSAT ignora intenção nova",
+        "n": 6,
+        "tickets": [
+          "46628438",
+          "46628953",
+          "46627611"
+        ]
+      },
+      {
+        "classe": "R",
+        "causa": "nenhuma",
+        "causa_rotulo": "Retido provável",
+        "n": 3,
+        "tickets": [
+          "46627269",
+          "46626714",
+          "46630039"
+        ]
+      },
+      {
+        "classe": "A",
+        "causa": "nlu_roteamento",
+        "causa_rotulo": "Intenção perdida no roteamento (empréstimo/crédito/limite)",
+        "n": 2,
+        "tickets": [
+          "46629647",
+          "46629396"
+        ]
+      },
+      {
+        "classe": "B",
+        "causa": "nlu_roteamento",
+        "causa_rotulo": "Fluxo estático ignora troca de intenção",
+        "n": 2,
+        "tickets": [
+          "46625938",
+          "46629622"
+        ]
+      },
+      {
+        "classe": "A",
+        "causa": "politica_produto",
+        "causa_rotulo": "Pix negado + pedido de atendente com transferência tardia",
+        "n": 2,
+        "tickets": [
+          "46628593",
+          "46625909"
+        ]
+      },
+      {
+        "classe": "A",
+        "causa": "prompt_resposta",
+        "causa_rotulo": "Resposta genérica no lugar da resposta direta",
+        "n": 2,
+        "tickets": [
+          "46625592",
+          "46628537"
+        ]
+      },
+      {
+        "classe": "B",
+        "causa": "prompt_resposta",
+        "causa_rotulo": "'Consegui responder?' antes do conteúdo e sem sondagem após 'Não'",
+        "n": 1,
+        "tickets": [
+          "46627600"
+        ]
+      }
+    ],
+    "por_dono": {
+      "Produto CX": 15,
+      "Help Design": 0
+    },
+    "handoff": {
+      "correto": 0,
+      "improvisado": 6,
+      "tardio": 0
+    }
+  },
   "pontos_atencao": [
-    { "tipo": "warn", "texto": "Dia 19/10: 7 das 25 conversas foram classificadas como críticas, a resolução média é 4,6 e 6 conversas terminaram em abandono. Exemplos com resolução 0:", "tickets": [46625592, 46625677, 46626567] }
+    {
+      "tipo": "crit",
+      "texto": "Padrão mais recorrente: encerramento automático e pós-CSAT respondem 'Conversa encerrada!' ou 'Não consegui responder' a uma intenção nova ou ainda ativa (8 conversas).",
+      "tickets": [
+        "46628438",
+        "46628953",
+        "46624803"
+      ]
+    },
+    {
+      "tipo": "crit",
+      "texto": "Risco regulatório: contestação de seguro respondida com política e 'contate o suporte' sem transferir (4 conversas) e sinal jurídico sem transbordo imediato (46626567).",
+      "tickets": [
+        "46626567",
+        "46626583",
+        "46629258"
+      ]
+    },
+    {
+      "tipo": "warn",
+      "texto": "Falha de coleta: a análise de KB (Zendesk Guide) não rodou porque o conector Zendesk falhou; dados de artigos vêm só do Databricks. Ticket 46628593 sem transcrição: reauditar quando o Zendesk voltar.",
+      "tickets": [
+        "46628593"
+      ]
+    },
+    {
+      "tipo": "info",
+      "texto": "O avaliador superestima resolução: 16 conversas 'resolutivas', 15 evitáveis e recontato em 24h de 31.3%. Recomendada calibração (resposta 'Não'/CSAT baixo sem resolução posterior não pode ser 'resolutiva').",
+      "tickets": [
+        "46628652",
+        "46627600"
+      ]
+    },
+    {
+      "tipo": "info",
+      "texto": "Sem base de comparação: não há dados em 12/10/2026; buracos de 06/10 a 14/10, 17/10 e 18/10. Todas as dimensões têm n < 30 (não ranquear)."
+    }
   ],
-  "oportunidades": [],
-  "artigos": []
+  "oportunidades": [
+    {
+      "id": "OPO-001",
+      "prioridade": "alta",
+      "classe": "A",
+      "causa": "loop_fluxo",
+      "tipo": "fluxo",
+      "frente": "fluxo",
+      "titulo": "Fluxo de encerramento e CSAT: não encerrar com pergunta aberta e retomar intenção nova",
+      "vertical_tema": "Transversal",
+      "problema": "Após a CSAT ou por inatividade, o bot responde 'Conversa encerrada!' ou 'Não consegui responder' a uma intenção nova ou ainda ativa do cliente.",
+      "evidencia": "8 conversas no padrão; 7 evitáveis (≈6 clientes); auditoria reprovou 46624803 ('encerrar conta' 2x pós-CSAT).",
+      "tickets": [
+        "46628438",
+        "46628953",
+        "46627611"
+      ],
+      "contatos": {
+        "observado": 7,
+        "estimado": 7,
+        "pct_total": 28.0
+      },
+      "nota_impacto": "Maior grupo de evitáveis do dia; há possíveis duplicidades de cliente (46628953/46625677).",
+      "antes": "Cliente escreve uma dúvida nova após a CSAT e o bot responde 'Conversa encerrada!' ou 'Não consegui responder' e encerra.",
+      "depois": "Texto livre que não seja nota volta para a validação de conteúdo; na 2ª falha: 'Não foi possível responder a essa dúvida por aqui. A conversa será transferida para o atendimento com o assunto já registrado.'",
+      "proposta": "Bloquear encerramento automático com pergunta aberta (inatividade só conta após mensagem do bot); na CSAT, texto livre que não seja nota volta para CX_CA - Validacao_Conteudo; transbordo executado na 2ª 'Não consegui responder'; 'PIS' com desambiguação e 'limite/crédito' para o fluxo de limite.",
+      "no": "CX_CA - Validacao_Conteudo (confirmado); nós de encerramento/CSAT a confirmar pelo Produto CX",
+      "dono": "Produto CX",
+      "prazo": "Sprint",
+      "dependencias": "Regra de inatividade do Botmaker",
+      "como_medir": "Conversas que terminam em 'Conversa encerrada!'/'Não consegui responder' após mensagem do cliente; recontato em 24h (baseline 31.3%)."
+    },
+    {
+      "id": "OPO-002",
+      "prioridade": "alta",
+      "classe": "D",
+      "causa": "acao_humana_obrigatoria",
+      "tipo": "handoff",
+      "frente": "handoff",
+      "titulo": "Nós de seguro: criar intenção de contestação e transferir com contexto coletado",
+      "vertical_tema": "Seguro Pix e CC",
+      "problema": "Na contestação de seguro não reconhecido o bot repete a política e manda 'contatar o suporte' sem transferir (risco regulatório).",
+      "evidencia": "4 conversas, todas com handoff improvisado; BQS do produto seguro-protecao-pix-e-cartoes 0.0% (n=4).",
+      "tickets": [
+        "46626583",
+        "46629258",
+        "46625622"
+      ],
+      "contatos": {
+        "observado": 0,
+        "estimado": 0,
+        "pct_total": 0.0
+      },
+      "nota_impacto": "classe D: contato humano necessário; o ganho é o handoff correto e menos recontato",
+      "antes": "Bot explica a política do seguro e orienta 'contate o suporte', sem transferir.",
+      "depois": "'A contestação de contratação de seguro é analisada pelo time responsável. Produto, data e valor da cobrança já foram registrados. A conversa será transferida agora.'",
+      "proposta": "Remover 'contate o suporte' dos nós de seguro (imediato); criar intenção 'Seguro – contestação de contratação/cobrança' com precedência sobre contestação Pix; coletar produto, situação, data e valor antes do handoff; validar contactOrderStatus/contactOrderAmount/orderAmount.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX",
+      "prazo": "Sprint",
+      "dependencias": "Validação das variáveis de pedido de seguro (fora do mapeamento atual)",
+      "como_medir": "Contestações de seguro com transbordo executado e campos preenchidos; recontato em 24h no tema seguro."
+    },
+    {
+      "id": "OPO-003",
+      "prioridade": "alta",
+      "classe": "D",
+      "causa": "acao_humana_obrigatoria",
+      "tipo": "politica",
+      "frente": "politica",
+      "titulo": "Regra global de transbordo: gatilho jurídico com transferência imediata, sem CSAT",
+      "vertical_tema": "Transversal",
+      "problema": "Cliente sinalizou ação jurídica e o bot não transferiu de imediato (risco regulatório).",
+      "evidencia": "1 conversa com sinal jurídico e handoff improvisado.",
+      "tickets": [
+        "46626567"
+      ],
+      "contatos": {
+        "observado": 0,
+        "estimado": 0,
+        "pct_total": 0.0
+      },
+      "nota_impacto": "classe D: contato humano necessário; o ganho é o handoff correto e menos recontato",
+      "antes": "Bot segue o fluxo estático e oferece CSAT após menção a processo.",
+      "depois": "Transbordo imediato com o assunto registrado, sem CSAT.",
+      "proposta": "Gatilho global para Procon, advogado, justiça, Reclame Aqui, processar; 'processo' só quando acompanhado de 'contra', 'judicial' ou 'entrar com'. Transbordo imediato, sem CSAT.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX",
+      "prazo": "Imediato",
+      "dependencias": "—",
+      "como_medir": "Conversas com termos jurídicos e transbordo na mesma mensagem."
+    },
+    {
+      "id": "OPO-004",
+      "prioridade": "media",
+      "classe": "A",
+      "causa": "politica_produto",
+      "tipo": "politica",
+      "frente": "politica",
+      "titulo": "Fluxo Pix negado: explicar no 1º pedido de atendente e transferir no 2º",
+      "vertical_tema": "Pix",
+      "problema": "Pedido explícito de atendente ignorado até a CSAT em Pix negado; transferência tardia.",
+      "evidencia": "2 conversas evitáveis; possível duplicidade de cliente.",
+      "tickets": [
+        "46628593",
+        "46625909"
+      ],
+      "contatos": {
+        "observado": 2,
+        "estimado": 2,
+        "pct_total": 8.0
+      },
+      "nota_impacto": "46628593 sem transcrição: reauditar.",
+      "antes": "Cliente pede atendente e o bot repete a orientação até a CSAT.",
+      "depois": "1º pedido: o atendimento não libera Pix recusado por verificação automática; alternativas em Área Pix > Meus limites Pix; sonda a dúvida. 2º pedido: transfere.",
+      "proposta": "Regra de pedido de atendente no fluxo Pix negado: 1º pedido explica e sonda; 2º pedido transfere.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX",
+      "prazo": "Sprint",
+      "dependencias": "—",
+      "como_medir": "% de pedidos de atendente atendidos até o 2º pedido no tema Pix."
+    },
+    {
+      "id": "OPO-005",
+      "prioridade": "media",
+      "classe": "A",
+      "causa": "prompt_resposta",
+      "tipo": "fluxo",
+      "frente": "prompt",
+      "titulo": "Prompt de Pix: responder direto na primeira frase e usar o limite noturno",
+      "vertical_tema": "Pix",
+      "problema": "Pix negado/limite respondido com texto genérico e disclaimer; artigo de limite noturno não usado.",
+      "evidencia": "2 conversas evitáveis; artigo 'Qual o limite do Pix no período noturno?' com problema em 1 de 1.",
+      "tickets": [
+        "46628537",
+        "46625592"
+      ],
+      "contatos": {
+        "observado": 2,
+        "estimado": 2,
+        "pct_total": 8.0
+      },
+      "nota_impacto": "46625592 tem transbordo oferecido e não executado: investigar possível bug (Imediato).",
+      "antes": "Resposta genérica sobre segurança do Pix, sem dizer o limite.",
+      "depois": "Primeira frase com a resposta direta, ex.: limite noturno de *R$ 1.000* das *20h às 6h*.",
+      "proposta": "Ajustar o prompt de Pix: a primeira frase responde direto; incluir limite noturno R$ 1.000 das 20h às 6h conforme o artigo. Investigar o transbordo não executado em 46625592.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX",
+      "prazo": "Sprint",
+      "dependencias": "Confirmar valores de limite com produto",
+      "como_medir": "BQS 2.0 e TFC do produto pix; respostas com 'Não' após a resposta de limite."
+    },
+    {
+      "id": "OPO-006",
+      "prioridade": "media",
+      "classe": "B",
+      "causa": "prompt_resposta",
+      "tipo": "fluxo",
+      "frente": "fluxo",
+      "titulo": "Validação de conteúdo: conteúdo antes de 'Consegui responder?' e sondagem após 'Não'",
+      "vertical_tema": "Transversal (pagamento negado, carteira bloqueada)",
+      "problema": "'Consegui responder?' aparece antes do conteúdo e não há sondagem após 'Não'; 'não reconheço' no pagamento negado é ignorado.",
+      "evidencia": "2 conversas evitáveis; ambas reprovadas pela auditoria (aprovado → reprovado).",
+      "tickets": [
+        "46627600",
+        "46625938"
+      ],
+      "contatos": {
+        "observado": 2,
+        "estimado": 2,
+        "pct_total": 8.0
+      },
+      "nota_impacto": "",
+      "antes": "Bot pergunta 'Consegui responder?' antes de mostrar o conteúdo e, após 'Não', só pede o botão OK.",
+      "depois": "Conteúdo primeiro; após 'Não': 'O que ficou faltando: o motivo, o prazo ou como resolver?'; 'não reconheço' leva à contestação.",
+      "proposta": "Reordenar o nó de validação; adicionar sondagem após 'Não'; aceitar texto livre no pagamento negado; usar ${walletStatus} na carteira bloqueada (mapeamento a confirmar).",
+      "no": "CX_CA - Validacao_Conteudo",
+      "dono": "Produto CX",
+      "prazo": "Sprint",
+      "dependencias": "Confirmar mapeamento de walletStatus",
+      "como_medir": "% de 'Não' na validação seguidos de resolução; CSAT 1–2 nos temas wallet-blocked e pagamento negado."
+    },
+    {
+      "id": "OPO-007",
+      "prioridade": "media",
+      "classe": "B",
+      "causa": "nlu_roteamento",
+      "tipo": "fluxo",
+      "frente": "fluxo",
+      "titulo": "Fluxos estáticos (Transporte/URBS, CC Error): detectar troca de intenção no texto livre",
+      "vertical_tema": "Transporte / Cartão",
+      "problema": "Fluxos estáticos prendem o cliente e ignoram quando ele muda de assunto.",
+      "evidencia": "2 conversas evitáveis no padrão (A+B).",
+      "tickets": [
+        "46629622",
+        "46625849"
+      ],
+      "contatos": {
+        "observado": 2,
+        "estimado": 2,
+        "pct_total": 8.0
+      },
+      "nota_impacto": "",
+      "antes": "Cliente muda de assunto e o bot repete as opções do fluxo estático.",
+      "depois": "Nova intenção detectada e roteada; no Transporte, ramo '>24h' com transbordo.",
+      "proposta": "Detecção de intenção nos nós de texto livre de Transporte/URBS e CC Error; ramo '>24h' no Transporte com transbordo.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX",
+      "prazo": "Sprint",
+      "dependencias": "—",
+      "como_medir": "Abandono e loop nos fluxos estáticos de Transporte e CC Error."
+    },
+    {
+      "id": "OPO-008",
+      "prioridade": "media",
+      "classe": "D",
+      "causa": "acao_humana_obrigatoria",
+      "tipo": "fluxo",
+      "frente": "fluxo",
+      "titulo": "Empréstimo: intenção global 'cancelar empréstimo' com handoff e prazo",
+      "vertical_tema": "Empréstimo",
+      "problema": "Pedido de cancelamento de empréstimo ignorado; conversa marcada como 'resolutiva' sem resolução.",
+      "evidencia": "Auditoria confirmou nota baixa (0,2,0,2,3,5) e retention_type incorreto; intenção de empréstimo/crédito perdida em 4 conversas.",
+      "tickets": [
+        "46628652",
+        "46629396"
+      ],
+      "contatos": {
+        "observado": 0,
+        "estimado": 0,
+        "pct_total": 0.0
+      },
+      "nota_impacto": "classe D: contato humano necessário; o ganho é o handoff correto e menos recontato",
+      "antes": "Cliente pede para cancelar o empréstimo e o bot segue no fluxo de pagamento negado.",
+      "depois": "Intenção reconhecida; informa o prazo de *7 dias corridos* para desistência e transfere.",
+      "proposta": "Intenção global 'cancelar empréstimo' com handoff e prazo de 7 dias corridos (marco inicial a confirmar no artigo); usar ${hasActiveLoan}.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX",
+      "prazo": "Sprint",
+      "dependencias": "Confirmar marco inicial do prazo com produto",
+      "como_medir": "Conversas com 'cancelar empréstimo' transferidas com o assunto registrado."
+    },
+    {
+      "id": "OPO-009",
+      "prioridade": "media",
+      "classe": "D",
+      "causa": "acao_humana_obrigatoria",
+      "tipo": "artigo",
+      "frente": "artigo",
+      "titulo": "Central de Ajuda: criar artigo sobre seguro não contratado ou já cancelado",
+      "vertical_tema": "Seguro Pix e CC",
+      "problema": "Não há artigo externo sobre cobrança de seguro não contratado ou reembolso pós-cancelamento.",
+      "evidencia": "Lacuna apontada pelos dados de KB do Databricks; 'Como troco a forma de pagamento do meu seguro?' usado em 4 conversas, problema em 4.",
+      "tickets": [
+        "46626583",
+        "46629258",
+        "46628562"
+      ],
+      "contatos": {
+        "observado": 0,
+        "estimado": 0,
+        "pct_total": 0.0
+      },
+      "nota_impacto": "classe D: contato humano necessário; o ganho é o handoff correto e menos recontato",
+      "antes": "Bot usa o artigo de forma de pagamento do seguro, que não responde à contestação.",
+      "depois": "Artigo responde o que fazer em cobrança indevida de seguro.",
+      "proposta": "Criar 'Fui cobrado por um seguro que não contratei ou que já cancelei. O que fazer?' (prazo e forma de devolução preenchidos pelo produto; nunca publicar com colchetes).",
+      "no": "Artigo novo na Central de Ajuda",
+      "dono": "Help Design",
+      "prazo": "Imediato",
+      "dependencias": "Prazo e forma de devolução confirmados pelo produto",
+      "como_medir": "Uso do artigo pelo bot no tema seguro e recontato em 24h."
+    },
+    {
+      "id": "OPO-010",
+      "prioridade": "baixa",
+      "classe": "B",
+      "causa": "prompt_resposta",
+      "tipo": "artigo",
+      "frente": "artigo",
+      "titulo": "Central de Ajuda: criar artigo sobre desconectar conta ou dispositivo",
+      "vertical_tema": "Perfil/Segurança",
+      "problema": "Não há conteúdo sobre desconectar conta ou dispositivo conectado.",
+      "evidencia": "Lacuna apontada pelos dados de KB do Databricks; 1 conversa.",
+      "tickets": [
+        "46629622"
+      ],
+      "contatos": {
+        "observado": 1,
+        "estimado": 1,
+        "pct_total": 4.0
+      },
+      "nota_impacto": "",
+      "antes": "Bot sem material para responder.",
+      "depois": "Artigo com a resposta direta (caminho de menu a confirmar).",
+      "proposta": "Criar artigo sobre desconectar conta ou dispositivo conectado (caminho de menu a confirmar com produto).",
+      "no": "Artigo novo na Central de Ajuda",
+      "dono": "Help Design",
+      "prazo": "Backlog",
+      "dependencias": "Caminho de menu confirmado pelo produto",
+      "como_medir": "Conversas do tema com resposta 'Sim' na validação."
+    },
+    {
+      "id": "OPO-011",
+      "prioridade": "baixa",
+      "classe": "A",
+      "causa": "artigo",
+      "tipo": "artigo",
+      "frente": "artigo",
+      "titulo": "Artigo 'Recarga não validada - Cartão URBS (Curitiba)': incluir telefone 156 e seção >24h",
+      "vertical_tema": "Transporte",
+      "problema": "O artigo não cobre o caso de recarga não validada após 24h nem o canal 156.",
+      "evidencia": "Artigo usado em 1 conversa, com problema em 1 (kb 6.0).",
+      "tickets": [
+        "46625849"
+      ],
+      "contatos": {
+        "observado": 1,
+        "estimado": 1,
+        "pct_total": 4.0
+      },
+      "nota_impacto": "Consulta de status de recarga de transporte fica no backlog do Produto CX (capacidade nova).",
+      "antes": "Artigo sem orientação para mais de 24h.",
+      "depois": "Seção '>24h' com o telefone 156.",
+      "proposta": "Revisar o artigo: acrescentar o telefone 156 e uma seção para recarga não validada há mais de 24h.",
+      "no": "Recarga não validada - Cartão URBS (Curitiba)",
+      "dono": "Help Design",
+      "prazo": "Sprint",
+      "dependencias": "—",
+      "como_medir": "Problema de KB no artigo nas próximas rodadas."
+    },
+    {
+      "id": "OPO-012",
+      "prioridade": "baixa",
+      "classe": "R",
+      "causa": "nenhuma",
+      "tipo": "artigo",
+      "frente": "artigo",
+      "titulo": "Bloco Empréstimo: trocar o link para o artigo 'Como pedir um empréstimo'",
+      "vertical_tema": "Empréstimo",
+      "problema": "O bloco Empréstimo envia um link errado.",
+      "evidencia": "2 conversas com o link errado (classificadas como retido provável).",
+      "tickets": [
+        "46627269",
+        "46626714"
+      ],
+      "contatos": {
+        "observado": 2,
+        "estimado": 2,
+        "pct_total": 8.0
+      },
+      "nota_impacto": "Não evitável hoje; corrige a experiência das conversas retidas.",
+      "antes": "Link do bloco Empréstimo aponta para outro artigo.",
+      "depois": "Link aponta para 'Como pedir um empréstimo'.",
+      "proposta": "Corrigir o link do bloco Empréstimo para 'Como pedir um empréstimo'.",
+      "no": "Bloco Empréstimo (nó a confirmar pelo Produto CX)",
+      "dono": "Help Design",
+      "prazo": "Imediato",
+      "dependencias": "Produto CX publica a troca no Botmaker",
+      "como_medir": "Conversas do bloco com o link correto."
+    }
+  ],
+  "artigos": [
+    {
+      "acao": "criar",
+      "tickets": [
+        "46626583",
+        "46629258",
+        "46628562"
+      ],
+      "titulo": "Fui cobrado por um seguro que não contratei ou que já cancelei. O que fazer?",
+      "secao": "Seguro Proteção Pix e Cartões",
+      "problema": "Não há artigo externo sobre cobrança de seguro não contratado ou reembolso após cancelamento.",
+      "primeira_frase": "Uma cobrança de seguro não reconhecida ou feita após o cancelamento pode ser contestada pelo atendimento, que analisa o caso.",
+      "conversas": 4,
+      "prioridade": "media"
+    },
+    {
+      "acao": "atualizar",
+      "tickets": [
+        "46625849"
+      ],
+      "titulo": "Recarga não validada - Cartão URBS (Curitiba)",
+      "secao": "Transporte",
+      "problema": "Não cobre recarga não validada há mais de 24h nem o telefone 156.",
+      "primeira_frase": "Quando a recarga do Cartão URBS não é validada em até 24 horas, o atendimento é feito pela central 156.",
+      "conversas": 1,
+      "prioridade": "baixa"
+    },
+    {
+      "acao": "criar",
+      "tickets": [
+        "46629622"
+      ],
+      "titulo": "Título a definir pelo Help Design: desconectar conta ou dispositivo conectado",
+      "secao": "Perfil e Segurança",
+      "problema": "Não há conteúdo sobre desconectar conta ou dispositivo conectado.",
+      "primeira_frase": "Resposta direta a definir após confirmação do caminho de menu pelo produto.",
+      "conversas": 1,
+      "prioridade": "baixa"
+    }
+  ]
 }
