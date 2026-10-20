@@ -6,7 +6,7 @@ O painel (`artifact/painel.html`) é uma página fixa que lê arquivos JSON publ
 Chaves das rotinas: `cartao-hp` (Agente de Cartão de Crédito, semanal), `aleatorio`, `criticos-diario`, `criticos-semanal`. Chaves das visões mensais (`cartao-hp-mensal`, `aleatorio-mensal`, `criticos-mensal`, `periodo.tipo = "mensal"`) são geradas depois, consolidando as rodadas semanais; o painel já as lê quando existirem.
 O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global e mantido por humanos**: nenhuma rotina escreve nele.
 
-**Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo. Existe **um único BQS** (o que inclui a nota revisada pelo auditor): não grave "BQS original" nem "BQS legado".
+**Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo. Existe **um único BQS, o BQS 2.0** (conduta boa e desfecho aceitável, já com a nota revisada pelo auditor): não grave "BQS original" nem "BQS legado".
 
 ```
 {
@@ -25,6 +25,8 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
     "labels": { "excelente": 0, "bom": 0, "regular": 0, "ruim": 0, "critico": 0 },
     "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 0, "loop": 0 },
     "criterios": { "understanding": 0.0, "resolution": 0.0, "clarity": 0.0, "tone": 0.0, "efficiency": 0.0, "escalation": 0.0 },
+    "pct_recontato_24h": 0.0,                        // indicador de acompanhamento; NÃO entra no BQS 2.0
+    "sinalizados": { "transbordo_sem_pedido": { "n": 0, "pct": 0.0, "tickets": ["até 3 ticket_id de exemplo"] } },   // reprovam o BQS 2.0 e vão para análise
     "qualidade_dado": { "n_sem_boas_vindas": 0, "pct_sem_boas_vindas": 0.0 }   // só no cartao-hp; indicador em revisão, informativo
   },
   "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": ["frase sem dados pessoais"] },
@@ -61,10 +63,10 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 - **Tickets de exemplo (obrigatório para o que o painel mostra):** em cada oportunidade, em cada causa de `contencao.causas` e em cada item de `artigos`, informe até 3 `ticket_id` reais que exemplifiquem o problema (do `output_contencao`, `output_fluxo`, `output_kb`); nunca invente. Em `pontos_atencao` de casos críticos, inclua `tickets` quando o ponto descrever um padrão.
 - **Oportunidades acionáveis (quem revisa precisa saber o que mudar):** `titulo` = onde + o que mudar (ex.: "Prompt do Agente CC Produção: corrigir prazos que contradizem o artigo"), nunca só o sintoma. `proposta` diz o que escrever ou alterar, em texto ou regra; `no` aponta o nó, artigo ou campo (ou "nó a confirmar pelo Produto CX"); `antes` e `depois` mostram a resposta atual e a esperada; `como_medir` diz o indicador que prova o ajuste. O painel exibe esses campos em "O que mais pesa agora".
 - Em `artigos`, só títulos exatos que vieram do `output_kb`; nunca invente título, ID ou URL (a URL costuma chegar redigida: omita).
-- Nomes internos do prompt → contrato: `bqs_final` → `bqs`, `n_ok_final` → `n_ok`, `n_hp_degradado`/`pct_degradado` → `qualidade_dado.n_sem_boas_vindas`/`pct_sem_boas_vindas`. Não grave `bqs_original`, `bqs_pleno`, `bqs_degradado` nem colunas fora do contrato.
+- Nomes internos do prompt → contrato: `bqs_final` → `bqs`, `n_ok_final` → `n_ok`, `pct_recontato_24h` → `pct_recontato_24h`, `n_transbordo_sem_pedido`/`pct_transbordo_sem_pedido`/`sinalizados_transbordo` → `sinalizados.transbordo_sem_pedido`, `n_hp_degradado`/`pct_degradado` → `qualidade_dado.n_sem_boas_vindas`/`pct_sem_boas_vindas`. Não grave `bqs_original`, `bqs_pleno`, `bqs_degradado` nem colunas fora do contrato.
 - `dimensoes`: copie as linhas do SQL (só as colunas do contrato); se `n < 30` mantenha a linha (o painel marca "amostra pequena").
 - Sem classificação/auditoria/oportunidades nesta rodada: omita `contencao`, use `auditoria` com `auditados: 0` e `oportunidades: []`. O painel mostra o estado vazio.
 
 **`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 104 mais recentes). Mesmo `bqs` do `latest.json` (já com a nota revisada):
-`{ "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false, "prompt_version": "…" | null }`
+`{ "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false, "prompt_version": "…" | null, "pct_recontato_24h": 0.0 }`
 O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` entre pontos seguidos. Itens antigos sem `prompt_version` ou com a chave `bqs_final` continuam válidos.

@@ -1,6 +1,3 @@
 [
-  {"inicio":"2026-07-20","fim":"2026-07-31","periodo_label":"Jul/2026","bqs":43.0,"tfc":80.1,"ce_pct_total":null,"n_total":880,"cobertura_baixa":true,"prompt_version":"v1"},
-  {"inicio":"2026-08-01","fim":"2026-08-31","periodo_label":"Ago/2026","bqs":67.2,"tfc":49.0,"ce_pct_total":null,"n_total":6392,"cobertura_baixa":false,"prompt_version":"v1"},
-  {"inicio":"2026-09-01","fim":"2026-09-30","periodo_label":"Set/2026","bqs":68.9,"tfc":42.4,"ce_pct_total":null,"n_total":3049,"cobertura_baixa":true,"prompt_version":"v1"},
-  {"inicio":"2026-10-01","fim":"2026-10-20","periodo_label":"Out/2026 (até 20/10)","bqs":72.3,"tfc":45.5,"ce_pct_total":null,"n_total":673,"cobertura_baixa":true,"prompt_version":"v1"}
+  {"inicio":"2026-10-01","fim":"2026-10-20","periodo_label":"Out/2026 (até 20/10)","bqs":63.8,"tfc":45.5,"ce_pct_total":null,"n_total":673,"cobertura_baixa":true,"prompt_version":"v1","pct_recontato_24h":9.2}
 ]

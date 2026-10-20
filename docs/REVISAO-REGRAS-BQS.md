@@ -81,3 +81,20 @@ Variantes simuladas (ago / out até 20/10):
 | V4: só resolvida pelo bot | 22,0 / 26,7 | 0 / 0 | 49,4 / 46,0 |
 
 Decisões a alinhar: (1) transbordo pedido pelo cliente conta como sucesso de qualidade? (2) abandono sem pedido de atendente: reprova sempre ou aprova se o bot entregou a resposta (resolução ≥ 7)? (3) recontato em 24h entra na conta? (4) transbordo não pedido: reprova sempre ou só quando a contenção o classifica como evitável (A, B ou C)?
+
+## 8. Definição oficial: BQS 2.0 (decidida em 20/10/2026)
+
+Nome: **BQS 2.0** (o formato evoluiu; dashboards e histórico recomeçam em 20/10/2026; não comparar com números anteriores). Objetivo: dar insights valiosos do que e como melhorar no fluxo do bot, facilitando a vida de quem faz os ajustes.
+
+Uma conversa conta como boa quando passa nas duas verificações:
+1. **Conduta:** nota geral ponderada ≥ 7, resolução > 2 e transbordo > 2 (com a nota revisada pelo auditor quando houver). "Regular" reprova.
+2. **Desfecho aceitável:**
+   - resolvida pelo bot: ok;
+   - transbordo **pedido pelo cliente**: ok, desde que bem conduzido (o bot é programado para transferir quando o humano é pedido, então é fluxo esperado);
+   - abandono: ok se a resposta do bot foi boa (resolução ≥ 7), porque o cliente pode sair satisfeito;
+   - loop: reprova;
+   - transbordo **sem pedido do cliente**: reprova **e é sinalizado** para análise (pode ser erro do bot).
+
+Indicadores de acompanhamento, fora da conta: **recontato em 24h** (`prod.cx.fat_botmaker_metrics`), TFC e contatos evitáveis.
+
+Primeiros números (rodada de teste, sem a revisão do auditor): Agente de Cartão de Crédito 64,4% (semana 12 a 18/10) e 63,8% (outubro até 20/10); Aleatório 76,9% e 77,5%; Casos críticos 66,7% (semana), 54,0% (mês) e 45,8% (dia 19/10, onde nada muda porque não há transbordo pedido). Transbordos sem pedido sinalizados: 32 no cartão na semana (8,0%), 2 no Aleatório.

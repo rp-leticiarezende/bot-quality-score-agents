@@ -1,4 +1,4 @@
-<title>BQS RecargaBot</title>
+<title>BQS 2.0 RecargaBot</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,7 +185,7 @@ code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:
 
 <div class="brandbar"><div class="wrap"><span>RecargaPay · Bot Quality Score</span><span id="atualizado"></span></div></div>
 <header class="top"><div class="wrap">
-  <h1>Qualidade do RecargaBot</h1>
+  <h1>BQS 2.0 · Qualidade do RecargaBot</h1>
   <p>Quanto o bot conduziu bem cada conversa e quantos contatos humanos ele poderia ter evitado. Só conversas do bot; só conteúdo externo da Central de Ajuda.</p>
 </div></header>
 <nav class="tabs" aria-label="Seções"><div class="wrap" role="tablist" id="tabs"></div></nav>
@@ -317,6 +317,7 @@ function cardRotina(f){
   h+='<div><div class="big mono">'+fmt(m.bqs,1)+'<small>%</small></div>'+deltaRun(fluxoKey(f),d)+'</div>';
   h+='<div class="mini"><div><span>TFC</span><b>'+fmt(m.tfc,1)+'%</b></div><div><span>Evitáveis</span><b>'+(num(g(d,"contencao.ce_pct_total"))?fmt(g(d,"contencao.ce_pct_total"),0)+'%':"—")+'</b></div><div><span>Conversas</span><b>'+int(m.n_total)+'</b></div></div>';
   h+=retSeg(m);
+  h+='<div class="delta">Recontato 24h: <b class="mono">'+(num(m.pct_recontato_24h)?fmt(m.pct_recontato_24h,1)+'%':'—')+'</b> · Sinalizados: <b class="mono">'+int(g(m,"sinalizados.transbordo_sem_pedido.n",0))+'</b></div>';
   if(g(d,"cobertura.baixa"))h+='<div>'+chip("Cobertura baixa","warn")+'</div>';
   return h+'<button class="linkbtn" data-go="'+f.id+'">Ver evolução, detalhes e o que mudar →</button></div>';
 }
@@ -369,8 +370,13 @@ function visao(){
     h+='<p class="sub">Cada item diz o que ajustar, onde mexer, como a resposta fica depois e traz tickets reais para conferir. Os mais pesados primeiro.</p><div class="pesas">'+todas.slice(0,6).map(function(x,i){return pesa(x.f,x.o,i+1)}).join("")+'</div>';
   }else h+=empty(mensal?"Visão mensal ainda sem oportunidades":"Sem oportunidades ainda",mensal?"As oportunidades do mês serão consolidadas a partir das semanais. Veja a visão semanal.":"Elas aparecem depois que a análise completa de uma rotina roda.");
   h+='</section>';
+  // sinalizados
+  var sinal=FLUXOS.map(function(f){var d=fluxoDados(f);var s=g(d,"metricas.sinalizados.transbordo_sem_pedido",null);return s&&s.n>0?{f:f,s:s}:null}).filter(Boolean);
+  h+='<section class="block"><h2>Sinalizados para análise</h2><p class="sub">Transbordo que o cliente não pediu reprova a conversa no BQS 2.0 e é reportado aqui: pode ser erro do bot.</p>';
+  h+=sinal.length?'<div class="panel">'+sinal.map(function(x){return '<div class="exrow"><span class="lbl"><b>'+esc(x.f.nome)+'</b> · '+int(x.s.n)+' transbordos sem pedido ('+fmt(x.s.pct,1)+'%)</span>'+tix(x.s.tickets,3)+'</div>'}).join("")+'</div>':empty("Nenhum transbordo sem pedido","Neste período não houve transferência que o cliente não tenha pedido.");
+  h+='</section>';
   // auditoria
-  h+='<section class="block"><h2>Quanto o avaliador automático erra</h2><p class="sub">O auditor lê a transcrição de casos duvidosos e revisa as notas. A nota revisada entra no BQS. É uma amostra seletiva, não aleatória.</p>';
+  h+='<section class="block"><h2>Quanto o avaliador automático erra</h2><p class="sub">O auditor lê a transcrição de casos duvidosos e revisa as notas. A nota revisada entra no BQS 2.0. É uma amostra seletiva, não aleatória.</p>';
   var au=FLUXOS.map(function(f){var d=fluxoDados(f);return d&&g(d,"auditoria.auditados")!=null?{f:f,a:d.auditoria}:null}).filter(Boolean);
   if(au.length){
     h+='<div class="panel scroll"><table><thead><tr><th>Rotina</th><th class="n">Auditados</th><th class="n">Notas revisadas</th><th class="n">Aprovado → reprovado</th><th class="n">Reprovado → aprovado</th></tr></thead><tbody>'+au.map(function(x){return '<tr><td>'+esc(x.f.nome)+'</td><td class="n">'+int(x.a.auditados)+'</td><td class="n">'+int(x.a.revisados)+'</td><td class="n">'+int(x.a.aprovado_para_reprovado)+'</td><td class="n">'+int(x.a.reprovado_para_aprovado)+'</td></tr>'}).join("")+'</tbody></table></div>';
@@ -382,7 +388,7 @@ function visao(){
 /* ---------- linha do tempo ---------- */
 var CORES={"cartao-hp":"var(--cD)","aleatorio":"var(--cA)","criticos-semanal":"var(--cR)","criticos-diario":"var(--cC)","cartao-hp-mensal":"var(--cD)","aleatorio-mensal":"var(--cA)","criticos-mensal":"var(--cR)"};
 var NOMES={"cartao-hp":"Agente de Cartão de Crédito (semanal)","aleatorio":"Aleatório (semanal)","criticos-semanal":"Casos críticos (semanal)","criticos-diario":"Casos críticos (diário)","cartao-hp-mensal":"Agente de Cartão de Crédito (mensal)","aleatorio-mensal":"Aleatório (mensal)","criticos-mensal":"Casos críticos (mensal)"};
-var METRICAS={bqs:{n:"BQS",f:"bqs"},tfc:{n:"TFC",f:"tfc"},ce:{n:"Contatos evitáveis",f:"ce_pct_total"}};
+var METRICAS={bqs:{n:"BQS 2.0",f:"bqs"},tfc:{n:"TFC",f:"tfc"},ce:{n:"Contatos evitáveis",f:"ce_pct_total"},rec:{n:"Recontato 24h",f:"pct_recontato_24h"}};
 var MESES=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 var DIA=86400000;
 function metricPills(){
@@ -469,7 +475,7 @@ function tabelaPeriodos(k,limite){
     var p=i?h[i-1]:null,ok=p?(dia(x.fim)-dia(p.fim))<=lim(k):false;
     return '<tr><td>'+esc(x.periodo_label||x.fim)+(x.cobertura_baixa?' '+chip("cobertura baixa","warn"):'')+'</td><td class="n">'+int(x.n_total)+'</td><td class="n"><b>'+fmt(x.bqs,1)+'%</b></td>'+dcell(x,p,"bqs",ok)+'<td class="n">'+fmt(x.tfc,1)+'%</td>'+dcell(x,p,"tfc",ok)+'<td class="n">'+(num(x.ce_pct_total)?fmt(x.ce_pct_total,0)+'%':'—')+'</td><td class="n">'+esc(x.prompt_version||"—")+'</td></tr>';
   }).reverse().slice(0,limite||30);
-  return '<div class="panel scroll"><table><thead><tr><th>Período</th><th class="n">Conversas</th><th class="n">BQS</th><th class="n">Δ pp</th><th class="n">TFC</th><th class="n">Δ pp</th><th class="n">Evitáveis</th><th class="n">Prompt</th></tr></thead><tbody>'+linhas.join("")+'</tbody></table></div>';
+  return '<div class="panel scroll"><table><thead><tr><th>Período</th><th class="n">Conversas</th><th class="n">BQS 2.0</th><th class="n">Δ pp</th><th class="n">TFC</th><th class="n">Δ pp</th><th class="n">Evitáveis</th><th class="n">Prompt</th></tr></thead><tbody>'+linhas.join("")+'</tbody></table></div>';
 }
 function abaLinha(){
   var m=S.linhaPer==="mensal",ks=FLUXOS.map(function(f){return f.keys[m?"mensal":"semanal"]});
@@ -488,17 +494,20 @@ function fluxo(f){
   h+='<section class="block"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><p class="sub">'+esc(f.desc)+'</p>';
   if(g(d,"meta.origem")==="teste")h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> '+esc(g(d,"meta.nota","Dados de validação."))+'</div></div>';
   h+='<div class="kpis">'+
-    kpi("BQS",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f,per),d))+
+    kpi("BQS 2.0",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f,per),d))+
     kpi("TFC",fmt(m.tfc,1)+'%','falha de condução sem pedido do cliente')+
     kpi("Contatos evitáveis",num(c.ce_pct_total)?'≈ '+fmt(c.ce_pct_total,0)+'%':'—',num(c.pct_evitavel)?fmt(c.pct_evitavel,0)+'% das classificadas'+(c.ic95?' (IC '+esc(c.ic95.join("–"))+'%)':''):'sem classificação')+
     kpi("Pediram humano",fmt(m.pct_pediu_humano,1)+'%',int(m.n_total)+' conversas · '+int(m.n_avaliaveis)+' avaliáveis')+
     kpi("Auditados",int(a.auditados),int(a.revisados)+' notas revisadas')+
+    (num(m.pct_recontato_24h)?kpi("Recontato 24h",fmt(m.pct_recontato_24h,1)+'%','indicador de acompanhamento, fora do BQS 2.0'):'')+
   '</div></section>';
   // alertas
   var pa=arr(d.pontos_atencao);
   if(g(d,"cobertura.baixa"))pa=[{tipo:"warn",texto:"Cobertura baixa: "+g(d,"cobertura.texto","dados incompletos no período")}].concat(pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x}));
   else pa=pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x});
   if(pa.length)h+='<section class="block"><h2>Pontos de atenção</h2><div class="panel"><ul class="plain">'+pa.map(function(x){return '<li><span class="dot '+esc(x.tipo||"warn")+'"></span><span>'+esc(x.texto)+(arr(x.tickets).length?' '+tix(x.tickets,3):'')+'</span></li>'}).join("")+'</ul></div></section>';
+  var sn=g(m,"sinalizados.transbordo_sem_pedido",null);
+  if(sn&&sn.n>0)h+='<section class="block"><h2>Sinalizados para análise</h2><div class="panel"><p><b>'+int(sn.n)+' transbordos sem pedido do cliente</b> ('+fmt(sn.pct,1)+'% das conversas). Reprovam o BQS 2.0 e podem ser erro do bot (regra de transbordo, interpretação, integração). Tickets para conferir:</p>'+tix(sn.tickets,3)+'</div></section>';
   // evolução
   var kf=fluxoKey(f,per);
   h+='<section class="block"><h2>Evolução desta rotina</h2>'+linhaTempo([kf])+tabelaPeriodos(kf,8)+'</section>';
@@ -531,7 +540,7 @@ function qualDado(q){
 }
 function tabelaDim(k,rows){
   var nome={effective_vertical:"Agente / vertical",topic:"Tema",product:"Produto"}[k]||k;
-  return '<div class="panel scroll"><h3>'+esc(nome)+'</h3><table><thead><tr><th>'+esc(nome)+'</th><th class="n">Conversas</th><th>BQS</th><th class="n">TFC</th><th class="n">Pediu humano</th>'+'</tr></thead><tbody>'+rows.map(function(r){
+  return '<div class="panel scroll"><h3>'+esc(nome)+'</h3><table><thead><tr><th>'+esc(nome)+'</th><th class="n">Conversas</th><th>BQS 2.0</th><th class="n">TFC</th><th class="n">Pediu humano</th>'+'</tr></thead><tbody>'+rows.map(function(r){
     var peq=(r.n||0)<30;
     return '<tr><td>'+esc(r.rotulo||r.valor)+(peq?' '+chip("amostra pequena"):'')+'</td><td class="n">'+int(r.n)+' <span class="muted">('+fmt(r.pct_volume,0)+'%)</span></td><td><div class="inbar"><span class="bar"><span style="width:'+(r.bqs||0)+'%;'+(peq?'opacity:.45;':'')+(r.bqs<60?'background:var(--crit)':r.bqs<80?'background:var(--warn)':'background:var(--good)')+'"></span></span><b class="mono">'+fmt(r.bqs,1)+'%</b></div></td><td class="n">'+fmt(r.tfc,1)+'%</td><td class="n">'+fmt(r.pct_pediu_humano,1)+'%</td>'+'</tr>';
   }).join("")+'</tbody></table></div>';
@@ -580,15 +589,17 @@ function opo(o){
 /* ---------- como ler ---------- */
 function comoLer(){
   main('<section class="block"><h2>Como ler este painel</h2><div class="panel"><dl class="def">'+
-  '<dt>BQS</dt><dd>Percentual de conversas aprovadas. A nota geral é recalculada a partir das 6 notas (resolução 30%, eficiência 20%, transbordo 20%, entendimento 15%, clareza 10%, tom 5%). A conversa é aprovada quando a nota geral é 7 ou mais e <i>resolução</i> e <i>transbordo</i> ficam acima de 2. Conversas "regular" são reprovadas (sem crédito parcial). Nos tickets auditados, vale a nota revisada pelo auditor. Existe um único BQS, calculado da mesma forma em toda a série.</dd>'+
-  '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
+  '<dt>BQS 2.0</dt><dd>É o resultado final da qualidade do atendimento do bot, igual em todos os fluxos. Uma conversa conta como boa quando passa em duas verificações. <b>1. Conduta:</b> a nota geral (resolução 30%, eficiência 20%, transbordo 20%, entendimento 15%, clareza 10%, tom 5%) é 7 ou mais e resolução e transbordo ficam acima de 2; conversas "regular" reprovam. <b>2. Desfecho:</b> resolvida pelo bot; transferida porque o cliente pediu (fluxo esperado, desde que bem conduzida); ou abandonada depois de uma resposta boa (resolução 7 ou mais), porque o cliente pode sair satisfeito. Loop e transbordo que o cliente não pediu reprovam e são sinalizados para análise. Nos tickets auditados, vale a nota revisada pelo auditor. O histórico do BQS 2.0 começa em 20/10/2026.</dd>'+
+  '<dt>Recontato em 24h</dt><dd>Percentual de conversas cujo cliente voltou a falar com o atendimento em até 24 horas. É um indicador de acompanhamento e não entra no BQS 2.0.</dd>'+
+  '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 2.0 e vão para análise, porque podem ser erro do bot.</dd>'+
+  '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS 2.0 (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
   '<dt>TFC</dt><dd>Taxa de falha de condução: conversas que terminaram em transbordo, abandono ou loop sem o cliente ter pedido atendente.</dd>'+
   '<dt>Contatos evitáveis</dt><dd>Entre as conversas classificadas, as que o bot poderia ter resolvido hoje (A), resolveria com ajuste de conteúdo, variável ou roteamento (B) ou exigiria uma capacidade nova (C). A estimativa para o período vem de uma amostra aleatória e traz intervalo de confiança.</dd>'+
   '<dt>Classes</dt><dd>A bot resolvia hoje · B resolveria com ajuste · C exigiria capacidade nova · D só humano resolve (mede o handoff do bot) · R retido provável · E indeterminado.</dd>'+
   '<dt>Auditoria</dt><dd>Um segundo agente lê a transcrição dos casos duvidosos, refaz as 6 notas e a classe. Tende a mostrar onde o avaliador automático erra, por exemplo aprovar transbordo depois de uma resposta falha.</dd>'+
   '<dt>Cobertura</dt><dd>Quando há poucos dias com dados, a semana é uma amostra reduzida. O painel avisa e não calcula variação sem período anterior.</dd>'+
   '<dt>Escopo</dt><dd>Só conversas do bot, até a primeira fala de um atendente. Só artigos públicos da Central de Ajuda: o que começa com cadeado ou lupa é interno e o bot não consulta.</dd>'+
-  '<dt>Limiares</dt><dd>BQS abaixo de 60% é crítico e 80% ou mais é saudável. Os limiares de TFC e de pedido de atendente são provisórios até haver 4 períodos de série.</dd>'+
+  '<dt>Limiares</dt><dd>BQS 2.0 abaixo de 60% é crítico e 80% ou mais é saudável. Os limiares de TFC e de pedido de atendente são provisórios até haver 4 períodos de série.</dd>'+
   '<dt>Atualização</dt><dd>As rotinas semanais rodam às segundas (Agente de Cartão de Crédito 10h, Aleatório 14h, Casos críticos 15h) e a rotina diária de críticos às 9h40. Cada rodada atualiza a sua parte do painel.</dd>'+
   '</dl></div></section>');
 }

@@ -127,3 +127,9 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 - **Nome:** "Cartão HP" virou "Agente de Cartão de Crédito" (painel, dados, Slack, orquestrador). A chave técnica `cartao-hp` não mudou.
 - **Períodos:** Agente de Cartão de Crédito e Aleatório com visão semanal e mensal; Casos críticos com semanal, diário e mensal; a Visão geral filtra por semanal ou mensal para todos os produtos. A linha do tempo também alterna semanal/mensal.
 - **Visões mensais e diária:** dados de teste calculados no Databricks (sem auditoria nem classificação); a consolidação mensal a partir das semanais fica para depois (otimização de tokens). Chaves novas: `cartao-hp-mensal`, `aleatorio-mensal`, `criticos-mensal`.
+
+## Passo 6 — BQS 2.0 (20/10/2026)
+
+- **Regra nova** (ver `docs/REVISAO-REGRAS-BQS.md`, seção 8): conduta boa E desfecho aceitável (resolutiva; transbordo pedido pelo cliente; abandono depois de resposta boa). Loop e transbordo sem pedido reprovam; o transbordo sem pedido é sinalizado.
+- **SQL:** `BASE_CTE` ganhou `desfecho_ok`, `transbordo_sem_pedido` e `recontato_24h` (join com `prod.cx.fat_botmaker_metrics`); Passo 3.1/3.2 e 6.2 calculam o BQS 2.0; novo Passo 3.4 (sinalizados).
+- **Painel e Slack:** nome BQS 2.0; indicador de recontato 24h; seção "Sinalizados para análise"; histórico e linha do tempo recomeçam em 20/10/2026 (marco "Início do BQS 2.0"); explicação em "Como ler".

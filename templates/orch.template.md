@@ -40,15 +40,20 @@ Postura obrigatória de todo o pipeline: **criteriosa**. Transbordo bem executad
 
 ```
 nota_geral = ROUND(0,30·resolution + 0,20·efficiency + 0,20·escalation + 0,15·understanding + 0,10·clarity + 0,05·tone)   (recalculada a partir das 6 notas)
-nota_ok    = nota_geral >= 7 AND score_resolution > 2 AND score_escalation > 2
+nota_ok    = nota_geral >= 7 AND score_resolution > 2 AND score_escalation > 2      (a conduta do bot foi boa)
              -> NULL quando quality_label = 'sem_dados' ou alguma das 6 notas é nula
-BQS        = nota_ok = true / nota_ok IS NOT NULL * 100        ("regular" NÃO tem crédito parcial: é reprovado)
+desfecho_ok = retention_type = 'resolutiva'
+              OR (retention_type = 'transbordo' AND customer_requested_transfer = true)      (transferiu porque o cliente pediu: fluxo esperado)
+              OR (retention_type = 'abandono' AND score_resolution >= 7)                      (o cliente saiu depois de uma resposta boa)
+              -- loop e transbordo SEM pedido do cliente nunca são desfecho ok
+BQS 2.0    = (nota_ok AND desfecho_ok) / nota_ok IS NOT NULL * 100      ("regular" NÃO tem crédito parcial: é reprovado)
              nos tickets auditados vale a nota revisada pelo bqs-auditor (SQL do Passo 6.2)
+Recontato 24h = % das conversas cujo cliente voltou a falar com o atendimento em até 24h (prod.cx.fat_botmaker_metrics.recontacts_24h > 0). INDICADOR de acompanhamento: NÃO entra no BQS 2.0.
 TFC        = conversas com retention_type IN ('transbordo','abandono','loop') E customer_requested_transfer = false / N_total * 100
 CE         = conversas classificadas A, B ou C pelo bqs-contencao / conversas classificadas   (e estimativa sobre o total — Passo 6)
 ```
 
-**Existe um único BQS.** Não exiba "BQS original", "BQS legado" nem comparações entre versões do cálculo. Por que a nota geral é **recalculada** em vez de usar `score_overall` ou `approved`: até 09/09 o pipeline gravava a média aritmética das 6 notas e desde 14/10 grava a média ponderada; recalcular sempre com a mesma fórmula mantém a série histórica comparável. `approved` não é usado: no Databricks é booleano, mas na origem é 1 / 0.5 / 0, e as conversas "regular" chegam como `NULL` e saem do denominador.
+**Existe um único BQS: o BQS 2.0** (regra nova a partir de 20/10/2026; dashboards e histórico recomeçam daí; nunca compare com números anteriores). Não exiba "BQS original", "BQS legado" nem comparações entre versões do cálculo. Por que a nota geral é **recalculada** em vez de usar `score_overall` ou `approved`: até 09/09 o pipeline gravava a média aritmética das 6 notas e desde 14/10 grava a média ponderada; recalcular sempre com a mesma fórmula mantém a série histórica comparável. `approved` não é usado: no Databricks é booleano, mas na origem é 1 / 0.5 / 0, e as conversas "regular" chegam como `NULL` e saem do denominador.
 
 Fatos do pipeline que você deve respeitar:
 - `diagnostics` é uma string JSON: array de `{category, description, suggested_action}`. Categorias: `resposta_generica`, `resposta_incorreta`, `resposta_incompleta`, `consulta_ausente`, `conteudo_inexistente`, `falha_de_interpretacao`, `falha_de_fluxo`, `limitacao_estrutural`.
@@ -107,8 +112,8 @@ Registre `cobertura_baixa` (sim/não), `comparacao_indisponivel` (sim/não) e a 
 SELECT periodo,
   COUNT(*) AS n_total,
   SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END) AS n_avaliaveis,
-  SUM(CASE WHEN nota_ok = true THEN 1 ELSE 0 END) AS n_ok,
-  ROUND(100.0 * SUM(CASE WHEN nota_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
+  SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) AS n_ok,
+  ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
   SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) AS n_falha_conducao,
   ROUND(100.0 * SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
   SUM(CASE WHEN nota_ok IS NOT NULL AND ({{ELEGIVEL}}) THEN 1 ELSE 0 END) AS n_elegiveis_contencao,
@@ -126,6 +131,10 @@ SELECT periodo,
   SUM(CASE WHEN customer_requested_transfer = true THEN 1 ELSE 0 END) AS n_pediu_humano,
   ROUND(100.0 * SUM(CASE WHEN customer_requested_transfer = true THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_pediu_humano,
   SUM(CASE WHEN retention_type = 'transbordo' AND nota_ok = true THEN 1 ELSE 0 END) AS n_transbordo_nota_ok,
+  SUM(CASE WHEN transbordo_sem_pedido = true THEN 1 ELSE 0 END) AS n_transbordo_sem_pedido,
+  ROUND(100.0 * SUM(CASE WHEN transbordo_sem_pedido = true THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_transbordo_sem_pedido,
+  COUNT(recontato_24h) AS n_com_recontato_medido,
+  ROUND(100.0 * AVG(recontato_24h), 1) AS pct_recontato_24h,
   ROUND(AVG(score_understanding), 2) AS m_understanding,
   ROUND(AVG(score_resolution), 2) AS m_resolution,
   ROUND(AVG(score_clarity), 2) AS m_clarity,
@@ -161,10 +170,25 @@ Registre as tabelas por dimensão como `tabela_dimensoes`. Dimensões com `n < 3
 | Alerta | Condição |
 |---|---|
 | 🔥 Crítico | `bqs < 60` · ou `lbl_critico / n_total > 5%` |
-| 🟠 Atenção | `tfc > 40` · ou `pct_pediu_humano > 20` · ou alguma dimensão com `n ≥ 30` e `bqs < 65`{{ALERTAS_EXTRA}} |
+| 🟠 Atenção | `n_transbordo_sem_pedido > 0` (sinalização do Passo 3.4) · `tfc > 40` · ou `pct_pediu_humano > 20` · ou alguma dimensão com `n ≥ 30` e `bqs < 65`{{ALERTAS_EXTRA}} |
 | 🔵 Observar | `cobertura_baixa = sim` · `comparacao_indisponivel = sim` · ingestão atrasada · `pct_transbordo ≥ 90` (**amostra composta por transbordos: o BQS deste fluxo não representa a qualidade geral do bot**) |
 
 Os limiares de TFC e de pedido de humano são **provisórios** — registre-os como tal no relatório até haver 4 períodos de série.
+
+### 3.4 — Sinalizações para análise (transbordo sem pedido do cliente)
+
+No BQS 2.0, transbordo que o cliente **não pediu** reprova a conversa e deve ser **sinalizado**: pode ser erro do bot (regra de transbordo, falha de interpretação, integração) e precisa de análise.
+
+```sql
+[BASE]
+SELECT ticket_id, effective_vertical, topic, botmaker_stage, nota_ok, score_resolution, score_escalation
+FROM base
+WHERE periodo = 'atual' AND transbordo_sem_pedido = true
+ORDER BY score_resolution ASC, ticket_id
+LIMIT 12
+```
+
+Guarde como `sinalizados_transbordo` (até 12 `ticket_id`; use os 3 primeiros como exemplos no painel). Com `n_transbordo_sem_pedido > 0` dispare 🟠 **Atenção: "N transbordos sem pedido do cliente (X% das conversas) — possíveis erros do bot, sinalizados para análise"**.
 
 ---
 
@@ -308,9 +332,9 @@ ORDER BY visao, n DESC
 
 Substitua `[n_elegiveis_contencao]` e `[n_total]` pelos números do item 3.1 (período `atual`). Guarde o resultado completo como `agregados_contencao` e repasse-o aos subagentes do Passo 7. Os agregados valem para as conversas **classificadas** (amostra aleatória das elegíveis, no máximo 150) — informe sempre `n_classificadas` de `n_elegiveis_contencao`.
 
-### 6.2 — BQS (com a nota revisada nos tickets auditados)
+### 6.2 — BQS 2.0 (com a nota revisada nos tickets auditados)
 
-Monte a lista `VALUES` com as linhas de `output_auditoria` cuja `decisao` seja `CONFIRMA` ou `REVISA`: `ticket_id`, `decisao` e as seis notas (`res, eff, esc, und, cla, ton`). Se não houver nenhuma, o BQS é o do Passo 3.1 (informe "sem auditoria neste período"). A nota geral revisada é calculada **aqui, em SQL**: `ROUND(0,30·res + 0,20·eff + 0,20·esc + 0,15·und + 0,10·cla + 0,05·ton)`, aprovada com `≥ 7` e piso (`res > 2` e `esc > 2`). Tickets `CONFIRMA` mantêm a nota original; só `REVISA` a substitui.
+Monte a lista `VALUES` com as linhas de `output_auditoria` cuja `decisao` seja `CONFIRMA` ou `REVISA`: `ticket_id`, `decisao` e as seis notas (`res, eff, esc, und, cla, ton`). Se não houver nenhuma, o BQS é o do Passo 3.1 (informe "sem auditoria neste período"). O desfecho (resolutiva, transbordo pedido pelo cliente ou abandono depois de resposta boa) continua valendo: se a auditoria revisar a resolução, o abandono é reavaliado com a resolução revisada. A nota geral revisada é calculada **aqui, em SQL**: `ROUND(0,30·res + 0,20·eff + 0,20·esc + 0,15·und + 0,10·cla + 0,05·ton)`, aprovada com `≥ 7` e piso (`res > 2` e `esc > 2`). Tickets `CONFIRMA` mantêm a nota original; só `REVISA` a substitui.
 
 ```sql
 WITH a(ticket_id, decisao, res, eff, esc, und, cla, ton) AS (
@@ -326,9 +350,13 @@ rev AS (
   FROM a
 ),
 fin AS (
-  SELECT b.ticket_id, b.nota_ok AS nota_orig,
-         CASE WHEN r.ticket_id IS NULL OR r.decisao = 'CONFIRMA' THEN b.nota_ok
-              ELSE (r.score_rev >= 7 AND r.res > 2 AND r.esc > 2) END AS nota_final,
+  SELECT b.ticket_id,
+         (b.nota_ok AND b.desfecho_ok) AS nota_orig,
+         (CASE WHEN r.ticket_id IS NULL OR r.decisao = 'CONFIRMA' THEN b.nota_ok
+               ELSE (r.score_rev >= 7 AND r.res > 2 AND r.esc > 2) END)
+         AND (b.retention_type = 'resolutiva'
+              OR (b.retention_type = 'transbordo' AND COALESCE(b.customer_requested_transfer, false) = true)
+              OR (b.retention_type = 'abandono' AND (CASE WHEN r.ticket_id IS NULL OR r.decisao = 'CONFIRMA' THEN b.score_resolution ELSE r.res END) >= 7)) AS nota_final,
          (r.ticket_id IS NOT NULL) AS auditado, r.decisao
   FROM base b LEFT JOIN rev r ON r.ticket_id = b.ticket_id
   WHERE b.periodo = 'atual' AND b.nota_ok IS NOT NULL
@@ -360,7 +388,7 @@ prompt: |
   Fluxo: {{ROTINA}} | Período: [data_inicio] a [data_fim]
 
   MÉTRICAS BASE (SQL):
-  - Total: [n_total] | Avaliáveis: [n_avaliaveis] | BQS: [bqs_final]% (período anterior: [bqs_anterior]% ou "sem base de comparação")
+  - Total: [n_total] | Avaliáveis: [n_avaliaveis] | BQS 2.0: [bqs_final]% (período anterior: [bqs_anterior]% ou "sem base de comparação")
   - Auditoria: [n_auditados] tickets auditados, [n_revisados] revisados (aprovado→reprovado: [n]; reprovado→aprovado: [n]) — amostra seletiva de casos duvidosos
   - TFC: [tfc]% | Pediram humano: [pct_pediu_humano]% | Transbordos com nota_ok: [n_transbordo_nota_ok]
   - Por quality_label: [distribuição] | Por retention_type: [distribuição]
@@ -426,7 +454,7 @@ prompt: |
 
   MÉTRICAS BASE (todas vindas de SQL — não recalcule):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis]
-  - **BQS: [bqs_final]%** ([n_ok_final]/[n_avaliaveis]) | período anterior: [bqs_anterior]% ou "sem base de comparação" | último ponto da série antes de um hiato (se houver): [ultimo_ponto_anterior]
+  - **BQS 2.0: [bqs_final]%** ([n_ok_final]/[n_avaliaveis]) | período anterior: [bqs_anterior]% ou "sem base de comparação" | último ponto da série antes de um hiato (se houver): [ultimo_ponto_anterior]
   - Versão de prompt do bot no período (Pacote V): [bot_prompt_version dominante] — compare com a do item anterior do history.json para registrar evento de mudança
   - Auditoria (transcrição real): [n_auditados] tickets auditados, [n_revisados] com nota revisada; aprovado→reprovado: [n]; reprovado→aprovado: [n]. As tabelas por dimensão e o BQS por período são **originais** (a auditoria cobre só casos duvidosos).
   - Divergências do avaliador automático (do resumo dos auditores): [lista curta, sem dados pessoais]
@@ -434,6 +462,8 @@ prompt: |
   - CE: [pct_evitavel]% das classificadas ([n_classificadas] de [n_elegiveis_contencao] elegíveis) | estimativa sobre o total: [ce_pct_do_total]%
   - Por quality_label: [distribuição] | Por retention_type: [distribuição]
   - Pediram humano: [pct_pediu_humano]% | Transbordos com nota_ok: [n_transbordo_nota_ok]
+  - Recontato em 24h (indicador, fora do BQS 2.0): [pct_recontato_24h]% (medido em [n_com_recontato_medido] conversas)
+  - SINALIZADOS: transbordos sem pedido do cliente: [n_transbordo_sem_pedido] ([pct_transbordo_sem_pedido]%) — tickets: [sinalizados_transbordo]
   - Médias dos 6 critérios: [m_*] | critério mais baixo: [nome (média)]
   - Tabelas por dimensão (top 12): [tabela_dimensoes]
   - Cobertura e alertas: [cobertura_baixa / comparacao_indisponivel / buracos / alertas disparados — com os limiares marcados como provisórios]
@@ -468,7 +498,7 @@ prompt: |
 - Nunca passe transcrições para o relatório, para o artefato ou para o Slack: só `ticket_id`, notas e paráfrases curtas sem dados pessoais.
 - Se um subagente falhar, registre o erro, continue com os demais e inclua a nota de falha no relatório final. Nunca invente a saída de um subagente.
 - Nenhum número é calculado por você: copie das consultas. Percentuais com 1 casa decimal.
-- `approved` não é critério de aprovação. Use sempre `nota_ok` / BQS estrito.
+- `approved` não é critério de aprovação. Use sempre o BQS 2.0 (`nota_ok` e `desfecho_ok`).
 - Deduplicação (`QUALIFY`) já está no bloco base — não filtre manualmente.
 - Não repasse nomes de clientes, e-mails, telefones ou números de cartão para nenhum subagente nem para o relatório; use `ticket_id`.
 - `diagnostics` é JSON em string — ao montar pacotes, passe o conteúdo legível (categoria + descrição + ação) e não o JSON cru truncado no meio.

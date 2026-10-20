@@ -4,7 +4,7 @@
   "rotina": "Agente de Cartão de Crédito (semanal)",
   "meta": {
     "origem": "teste",
-    "nota": "Métricas reais do Databricks (20/10/2026). Contenção e oportunidades vêm de uma amostra aleatória de 30 das 276 conversas elegíveis; a margem de erro é grande (IC 95% de 55 a 86%). A auditoria cobre 4 tickets. Não é a rodada oficial."
+    "nota": "BQS 2.0, rodada de teste: métricas do Databricks de 12 a 18/10/2026 com a regra nova, sem a revisão do auditor (a auditoria de 4 tickets foi feita antes e será refeita no modo sombra). Contenção e oportunidades vêm de uma amostra de 30 conversas elegíveis."
   },
   "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
   "gerado_em": "2026-10-20T11:55:00-03:00",
@@ -16,9 +16,11 @@
   "metricas": {
     "n_total": 398,
     "n_avaliaveis": 388,
-    "n_ok": 280,
-    "bqs": 72.2,
+    "n_ok": 250,
+    "bqs": 64.4,
     "bqs_anterior": null,
+    "pct_recontato_24h": 12.2,
+    "sinalizados": { "transbordo_sem_pedido": { "n": 32, "pct": 8.0, "tickets": [46607623, 46610432, 46611276] } },
     "tfc": 42.5,
     "pct_pediu_humano": 25.4,
     "pct_transbordo": 32.7,
@@ -42,18 +44,22 @@
   },
   "dimensoes": {
     "effective_vertical": [
-      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 70.6, "tfc": 42.2, "pct_pediu_humano": 27.4 },
-      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 81.5, "tfc": 43.5, "pct_pediu_humano": 15.9 }
+      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 63.5, "tfc": 42.2, "pct_pediu_humano": 27.4 },
+      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 69.2, "tfc": 43.5, "pct_pediu_humano": 15.9 }
     ],
     "topic": [
-      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 82.0, "tfc": 39.8, "pct_pediu_humano": 24.9 },
+      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 73.0, "tfc": 39.8, "pct_pediu_humano": 24.9 },
       { "valor": "pix", "n": 17, "pct_volume": 4.3, "bqs": 47.1, "tfc": 41.2, "pct_pediu_humano": 35.3 },
-      { "valor": "recargapay-cards", "n": 15, "pct_volume": 3.8, "bqs": 66.7, "tfc": 26.7, "pct_pediu_humano": 13.3 },
-      { "valor": "por-que-recebi-uma-fatura", "n": 8, "pct_volume": 2.0, "bqs": 37.5, "tfc": 50.0, "pct_pediu_humano": 37.5 },
+      { "valor": "recargapay-cards", "n": 15, "pct_volume": 3.8, "bqs": 53.3, "tfc": 26.7, "pct_pediu_humano": 13.3 },
       { "valor": "pix-payment", "n": 8, "pct_volume": 2.0, "bqs": 62.5, "tfc": 37.5, "pct_pediu_humano": 37.5 },
-      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 100.0, "pct_pediu_humano": 0.0 },
-      { "valor": "investimentos", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 66.7, "pct_pediu_humano": 16.7 },
-      { "valor": "fatura", "n": 5, "pct_volume": 1.3, "bqs": 60.0, "tfc": 80.0, "pct_pediu_humano": 20.0 }
+      { "valor": "por-que-recebi-uma-fatura", "n": 8, "pct_volume": 2.0, "bqs": 37.5, "tfc": 50.0, "pct_pediu_humano": 37.5 },
+      { "valor": "investimentos", "n": 6, "pct_volume": 1.5, "bqs": 33.3, "tfc": 66.7, "pct_pediu_humano": 16.7 },
+      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": 1.5, "bqs": 33.3, "tfc": 100.0, "pct_pediu_humano": 0.0 },
+      { "valor": "fatura", "n": 5, "pct_volume": 1.3, "bqs": 60.0, "tfc": 80.0, "pct_pediu_humano": 20.0 },
+      { "valor": "cashback-e-rendimento", "n": 4, "pct_volume": 1.0, "bqs": 50.0, "tfc": 25.0, "pct_pediu_humano": 25.0 },
+      { "valor": "roubaram-meu-cartao", "n": 4, "pct_volume": 1.0, "bqs": 50.0, "tfc": 75.0, "pct_pediu_humano": 25.0 },
+      { "valor": "wallet-blocked", "n": 4, "pct_volume": 1.0, "bqs": 50.0, "tfc": 25.0, "pct_pediu_humano": 50.0 },
+      { "valor": "chargeback-recovery", "n": 3, "pct_volume": 0.8, "bqs": 100.0, "tfc": 0.0, "pct_pediu_humano": 100.0 }
     ]
   },
   "contencao": {
@@ -79,7 +85,8 @@
     "handoff": { "correto": 2, "tardio": 1 }
   },
   "pontos_atencao": [
-    { "tipo": "warn", "texto": "Transbordo bem executado não é transbordo evitado: 115 dos 130 transbordos receberam nota de aprovado, e 73% das conversas classificadas na amostra eram evitáveis." },
+    { "tipo": "warn", "texto": "32 transbordos sem pedido do cliente (8,0% das conversas) reprovam o BQS 2.0 e foram sinalizados para análise: podem ser erro do bot. Exemplos:", "tickets": [46607623, 46610432, 46611276] },
+    { "tipo": "warn", "texto": "32 transbordos sem pedido do cliente (8,0% das conversas) reprovam o BQS 2.0 e foram sinalizados para anÃ¡lise: podem ser erro do bot. Exemplos:", "tickets": [46607623, 46610432, 46611276] },
     { "tipo": "info", "texto": "Pediram atendente 25,4% dos clientes: 27,4% no Agente CC Produção contra 15,9% no Agente CC Anuidade." }
   ],
   "oportunidades": [

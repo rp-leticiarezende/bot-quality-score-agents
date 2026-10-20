@@ -34,8 +34,16 @@ base AS (
     ROUND(0.30*q.score_resolution + 0.20*q.score_efficiency + 0.20*q.score_escalation + 0.15*q.score_understanding + 0.10*q.score_clarity + 0.05*q.score_tone) AS score_pond,
     CASE WHEN q.quality_label = 'sem_dados' OR q.score_resolution IS NULL OR q.score_efficiency IS NULL OR q.score_escalation IS NULL OR q.score_understanding IS NULL OR q.score_clarity IS NULL OR q.score_tone IS NULL THEN NULL
          WHEN ROUND(0.30*q.score_resolution + 0.20*q.score_efficiency + 0.20*q.score_escalation + 0.15*q.score_understanding + 0.10*q.score_clarity + 0.05*q.score_tone) >= 7 AND q.score_resolution > 2 AND q.score_escalation > 2 THEN true
-         ELSE false END AS nota_ok
+         ELSE false END AS nota_ok,
+    CASE WHEN q.retention_type = 'transbordo' AND COALESCE(q.customer_requested_transfer, false) = false THEN true ELSE false END AS transbordo_sem_pedido,
+    CASE WHEN q.retention_type = 'resolutiva' THEN true
+         WHEN q.retention_type = 'transbordo' AND COALESCE(q.customer_requested_transfer, false) = true THEN true
+         WHEN q.retention_type = 'abandono' AND q.score_resolution >= 7 THEN true
+         ELSE false END AS desfecho_ok,
+    m.recontato_24h
   FROM prod.cx.fat_botmaker_conversations_quality q CROSS JOIN par p
+  LEFT JOIN (SELECT CAST(id_ticket AS STRING) AS tid, MAX(CASE WHEN recontacts_24h > 0 THEN 1 ELSE 0 END) AS recontato_24h
+             FROM prod.cx.fat_botmaker_metrics WHERE creation_date >= DATE_SUB(CURRENT_DATE(), 75) GROUP BY 1) m ON CAST(q.ticket_id AS STRING) = m.tid
   WHERE q.flow = '{{FLOW}}'
     AND q.received_timestamp >= p.ini_ant + INTERVAL 3 HOURS
     AND q.received_timestamp <  p.fim_atual + INTERVAL 3 HOURS
@@ -136,7 +144,7 @@ function New-DimAgg([string[]]$dims, [string]$extra) {
 @"
   SELECT '$d' AS dimensao, COALESCE(NULLIF(TRIM(CAST($d AS STRING)), ''), '(sem valor)') AS valor, COUNT(*) AS n,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct_volume,
-    ROUND(100.0 * SUM(CASE WHEN nota_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
+    ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
     ROUND(100.0 * SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
     ROUND(100.0 * SUM(CASE WHEN customer_requested_transfer = true THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_pediu_humano$extra
   FROM base WHERE periodo = 'atual' GROUP BY $d
