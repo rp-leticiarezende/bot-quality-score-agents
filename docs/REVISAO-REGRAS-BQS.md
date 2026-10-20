@@ -63,3 +63,21 @@ Por que o BQS atual infla (Ago a 09/09, Agente de Cartão de Crédito):
 - **Transbordo pedido pelo cliente** (2.640): 86% aprovados.
 - **Casos críticos** (todos com CSAT 1 ou 2): 57,5% das conversas "resolutivas" são aprovadas. O avaliador discorda do cliente em mais da metade dos casos.
 - O 49,4% "sem falha de condução" bate com a classificação de contatos evitáveis (evitáveis ≈ 51%, logo ≈ 49% sem falha evitável): duas medidas independentes chegam ao mesmo número.
+
+## 7. Alinhamento do cálculo do BQS (20/10/2026)
+
+**Regra de nomenclatura (Leticia):** BQS é o nome do resultado final da qualidade do atendimento do bot, igual em todos os fluxos. O que se ajusta é **como o BQS é calculado**, e isso precisa ser alinhado antes de implementar. Não criar outras "notas" com nomes diferentes: indicadores de apoio (TFC, contatos evitáveis, recontato) explicam o BQS, não o substituem.
+
+Dados que sustentam a conta (join com `prod.cx.fat_botmaker_metrics` por `id_ticket`): recontato em 24h existe e discrimina pouco, mas discrimina (abandono aprovado 6,4% × reprovado 11,1%; resolutiva 12,9% × 18,5%). O CSAT quase não vem nesses fluxos (poucas dezenas de respostas). `flg_fcr_bot` não discrimina (85% a 90% em tudo). A retenção oficial do Botmaker conta abandono passivo como retido (99,8%), então o BQS estrito vai divergir dela de propósito.
+
+Variantes simuladas (ago / out até 20/10):
+
+| Variante | Cartão | Aleatório | Críticos |
+|---|---|---|---|
+| Atual | 67,2 / 72,3 | 80,4 / 80,0 | 50,5 / 54,0 |
+| V1: aprova só resolutiva ou transbordo pedido pelo cliente | 45,1 / 49,2 | 71,9 / 77,5 | 49,9 / 50,0 |
+| V2: V1 + abandono aprovado se resolução ≥ 7 | 58,5 / 63,8 | 71,9 / 77,5 | 49,9 / 54,0 |
+| V3: V2 + sem recontato em 24h | 52,3 / 57,6 | 60,1 / 69,2 | 37,6 / 40,0 |
+| V4: só resolvida pelo bot | 22,0 / 26,7 | 0 / 0 | 49,4 / 46,0 |
+
+Decisões a alinhar: (1) transbordo pedido pelo cliente conta como sucesso de qualidade? (2) abandono sem pedido de atendente: reprova sempre ou aprova se o bot entregou a resposta (resolução ≥ 7)? (3) recontato em 24h entra na conta? (4) transbordo não pedido: reprova sempre ou só quando a contenção o classifica como evitável (A, B ou C)?
