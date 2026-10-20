@@ -98,3 +98,16 @@ Uma conversa conta como boa quando passa nas duas verificações:
 Indicadores de acompanhamento, fora da conta: **recontato em 24h** (`prod.cx.fat_botmaker_metrics`), TFC e contatos evitáveis.
 
 Primeiros números (rodada de teste, sem a revisão do auditor): Agente de Cartão de Crédito 64,4% (semana 12 a 18/10) e 63,8% (outubro até 20/10); Aleatório 76,9% e 77,5%; Casos críticos 66,7% (semana), 54,0% (mês) e 45,8% (dia 19/10, onde nada muda porque não há transbordo pedido). Transbordos sem pedido sinalizados: 32 no cartão na semana (8,0%), 2 no Aleatório.
+
+## 9. Fluxo Aleatório: por que o BQS 2.0 continua alto (20/10/2026)
+
+BQS 2.0 do Aleatório: 76,9% (semana 12 a 18/10) e 77,5% (outubro até 20/10). Em outubro, 100% das conversas terminam em transbordo, 95,8% a pedido do cliente.
+
+- **A nota de transbordo não discrimina.** Média 9,79; 92% das conversas recebem 9 ou 10. Como pesa 20%, soma cerca de 2 pontos fixos à nota geral de toda conversa transferida a pedido do cliente.
+- **Auditoria de calibração (12 aprovados sorteados em outubro, lidos pela transcrição):** 8 dos 12 passariam a reprovados (67%; intervalo de confiança de 95% de Wilson: 39% a 86%). Médias originais × revisadas: resolução 8,08 × 4,58; eficiência 8,00 × 5,58; transbordo 10,00 × 6,25; entendimento 8,33 × 6,00; clareza 8,08 × 6,33; tom 8,67 × 7,58. O bot ajudou de verdade antes de transferir em apenas 2 dos 12.
+- **Padrões de erro do avaliador:** (1) dá transbordo 10 a qualquer transferência pedida pelo cliente, mesmo evitável, tardia ou depois de pedido ignorado (um ticket teve 5 pedidos ignorados); (2) dá resolução e entendimento altos a respostas de template que não tratam a dúvida real; (3) não penaliza loops e pedidos de reformulação em eficiência e trata o "Não" do cliente como transbordo bem feito.
+- **Estimativa do BQS real:** 77,5% × (1 − 67%) ≈ 26%, com faixa de 11% a 47% (amostra pequena).
+
+Simulações só com as notas do avaliador (outubro): atual 77,5% · exigir resolução ≥ 7: 75,8% · resolução ≥ 7 e eficiência ≥ 7: 57,5% · ignorar a nota de transbordo e exigir resolução ≥ 7: 63,3% · ignorar transbordo com limiar 8: 40,8%. Nenhuma regra baseada só nas notas chega perto do resultado da auditoria, porque a resolução e o entendimento também estão inflados.
+
+Proposta em análise: **calibrar o BQS 2.0 com auditoria aleatória dos aprovados** (BQS = taxa de aprovação × (1 − taxa de falsos aprovados medida na auditoria), com faixa), aplicável a todos os fluxos, e exigir que o transbordo pedido pelo cliente só conte se o bot tentou ajudar antes.
