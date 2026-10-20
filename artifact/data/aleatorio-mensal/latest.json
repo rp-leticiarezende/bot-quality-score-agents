@@ -8,8 +8,9 @@
   "cobertura": { "baixa": true, "comparacao_indisponivel": false, "texto": "mês parcial: dados em 4 dias (15, 16, 19 e 20/10); setembro tem só 10 dias, por causa do hiato." },
   "metricas": {
     "n_total": 120, "n_avaliaveis": 120, "n_ok": 93,
-    "bqs": 77.5, "bqs_anterior": null, "ultimo_ponto_anterior": null,
+    "bqs": 25.8, "bqs_avaliador": 77.5, "bqs_anterior": null, "ultimo_ponto_anterior": null,
     "prompt_version": "v1",
+    "calibracao": { "calibrado": true, "n_amostra": 12, "n_revertidos": 8, "taxa_falso_aprovado": 66.7, "faixa": [10.7, 47.2] },
     "pct_recontato_24h": 11.7,
     "sinalizados": { "transbordo_sem_pedido": { "n": 5, "pct": 4.2, "tickets": [46626986, 46627582, 46608599] } },
     "tfc": 4.2, "pct_pediu_humano": 95.8, "pct_transbordo": 100.0, "n_transbordo_nota_ok": 96,

@@ -492,7 +492,8 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
   "cobertura": { "baixa": true|false, "comparacao_indisponivel": true|false, "texto": "frase curta (dias com dado, buracos, ingestão atrasada)" },
   "metricas": {
     "n_total": 0, "n_avaliaveis": 0, "n_ok": 0,
-    "bqs": 0.0, "bqs_anterior": null, "ultimo_ponto_anterior": { "bqs": 0.0, "fim": "AAAA-MM-DD" },   // ultimo_ponto_anterior: só quando não há período anterior comparável (ex.: depois de um hiato); senão null
+    "bqs": 0.0, "bqs_avaliador": 0.0, "bqs_anterior": null, "ultimo_ponto_anterior": { "bqs": 0.0, "fim": "AAAA-MM-DD" },   // ultimo_ponto_anterior: só quando não há período anterior comparável (ex.: depois de um hiato); senão null
+    "calibracao": { "calibrado": true, "n_amostra": 0, "n_revertidos": 0, "taxa_falso_aprovado": 0.0, "faixa": [0.0, 0.0] },   // a faixa NÃO é exibida; `bqs` é o BQS 2.0 calibrado (um número só)
     "prompt_version": "versão do prompt do bot dominante no período (Pacote V) ou null",
     "tfc": 0.0, "pct_pediu_humano": 0.0, "pct_transbordo": 0.0, "n_transbordo_nota_ok": 0,
     "labels": { "excelente": 0, "bom": 0, "regular": 0, "ruim": 0, "critico": 0 },

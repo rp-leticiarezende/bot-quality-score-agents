@@ -111,3 +111,13 @@ BQS 2.0 do Aleatório: 76,9% (semana 12 a 18/10) e 77,5% (outubro até 20/10). E
 Simulações só com as notas do avaliador (outubro): atual 77,5% · exigir resolução ≥ 7: 75,8% · resolução ≥ 7 e eficiência ≥ 7: 57,5% · ignorar a nota de transbordo e exigir resolução ≥ 7: 63,3% · ignorar transbordo com limiar 8: 40,8%. Nenhuma regra baseada só nas notas chega perto do resultado da auditoria, porque a resolução e o entendimento também estão inflados.
 
 Proposta em análise: **calibrar o BQS 2.0 com auditoria aleatória dos aprovados** (BQS = taxa de aprovação × (1 − taxa de falsos aprovados medida na auditoria), com faixa), aplicável a todos os fluxos, e exigir que o transbordo pedido pelo cliente só conte se o bot tentou ajudar antes.
+
+## 10. Decisão: BQS 2.0 calibrado por auditoria em todos os fluxos (20/10/2026)
+
+Decidido pela Leticia: auditoria de calibração em todos os fluxos; o BQS é **sempre exibido como um número só**; a regra **nasce valendo para todos os casos** (sem manter o BQS 2.0 anterior).
+
+- **Fórmula:** BQS 2.0 = (aprovados com as notas revisadas − aprovados não auditados × taxa de falsos aprovados) ÷ avaliáveis. A taxa vem da auditoria aleatória dos aprovados (Passo 5C). Com menos de 5 tickets na amostra, não se calibra e o relatório avisa.
+- **Amostra por rodada (aprovados lidos por transcrição):** Agente de Cartão de Crédito 25 (≈10% dos aprovados) · Aleatório 15 (≈40%) · Casos Críticos semanal 15 (todos, ≈100%) · Casos Críticos diário 6 (≈55%). Se houver menos aprovados que o limite, audita todos. Ajuste em `N_CAL` no `build.ps1`.
+- **Régua do auditor:** transbordo pedido pelo cliente só recebe 9–10 se o bot tentou ajudar antes e transferiu com canal e prazo; transferência anunciada e nunca conectada vale 0–2; "transferir não é resolver".
+- **Faixa de incerteza:** calculada (Wilson 95%) e guardada só no JSON (`metricas.calibracao.faixa`); não é exibida.
+- **Primeiro número calibrado (teste):** Aleatório 25,6% na semana 12 a 18/10 e 25,8% em outubro (o avaliador marcava 76,9% e 77,5%).
