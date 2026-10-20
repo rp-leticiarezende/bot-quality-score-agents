@@ -45,3 +45,21 @@ Recomendação: abandonar a segmentação como indicador de qualidade; manter `w
 - `botmaker_chatbot_flow` está 0% preenchido e `botmaker_stage` 37%; `issues` e `improvement_suggestions` vazios; `approved` não é confiável.
 - A aba Aleatório é 100% transbordo e 96% pediu atendente: o BQS dela mede a conduta até o transbordo, não a qualidade geral do bot.
 - Limiares de alerta (BQS < 60% crítico, ≥ 80% saudável; TFC e pedido de atendente) são provisórios até haver 4 períodos de série.
+
+## 6. Diagnóstico do cálculo por fluxo (20/10/2026, a pedido da Leticia: "não acho que temos 72% de qualidade")
+
+Mesma conta do BQS atual (nota ≥ 7, resolução > 2, transbordo > 2) aberta por desfecho. Ago/2026 e out/2026 até 20/10.
+
+| Fluxo | BQS atual | Sem falha de condução | Resolvida pelo bot com nota boa |
+|---|---|---|---|
+| Agente de Cartão de Crédito (ago) | 67,2% | 45,1% | 22,0% |
+| Agente de Cartão de Crédito (out) | 72,3% | 49,4% | 26,7% |
+| Aleatório (ago / out) | 80,4% / 80,0% | 71,9% / 77,5% | 0% (100% transbordo) |
+| Casos críticos, CSAT 1 e 2 (ago / out) | 50,5% / 54,0% | 49,9% / 50,0% | 49,4% / 46,0% |
+
+Por que o BQS atual infla (Ago a 09/09, Agente de Cartão de Crédito):
+- **Abandono sem o cliente pedir atendente** (o maior grupo, 3.307 conversas, 35% do volume): 41% saem aprovados, com resolução média 5,1. O cliente desistiu e a conversa conta como boa.
+- **Transbordo que o cliente não pediu** (969): 67% aprovados. Loop: 0% (ok).
+- **Transbordo pedido pelo cliente** (2.640): 86% aprovados.
+- **Casos críticos** (todos com CSAT 1 ou 2): 57,5% das conversas "resolutivas" são aprovadas. O avaliador discorda do cliente em mais da metade dos casos.
+- O 49,4% "sem falha de condução" bate com a classificação de contatos evitáveis (evitáveis ≈ 51%, logo ≈ 49% sem falha evitável): duas medidas independentes chegam ao mesmo número.

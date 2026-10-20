@@ -85,7 +85,7 @@
   "oportunidades": [
     {
       "id": "OPO-001", "prioridade": "alta", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "O bot contradiz ou omite o que o artigo diz",
+      "titulo": "Prompt do Agente CC Produção: corrigir prazos e regras que contradizem o artigo (limite, estorno, faturas antigas)",
       "vertical_tema": "Cartão: limite, faturas, estorno",
       "problema": "Prazo de limite após pagamento por Pix dito como 30 minutos (artigo: até 1 dia útil); faturas antigas indicadas no app (artigo: só nos e-mails de cobrança); prazo de estorno trocado (10 dias úteis × 2 faturas); conceito do limite garantido não respondido antes dos dados.",
       "evidencia": "6 de 30 conversas classificadas; 59% das conversas do período têm algum problema de alinhamento com a Central.",
@@ -101,7 +101,7 @@
     },
     {
       "id": "OPO-002", "prioridade": "alta", "classe": "A", "causa": "nlu_roteamento", "tipo": "fluxo", "frente": "fluxo",
-      "titulo": "Frase clara vira 'Não entendi' ou troca de tema",
+      "titulo": "NLU e roteamento: mapear frases claras que viram \"Não entendi\" e separar Pix de cartão e a pesquisa 0–5",
       "vertical_tema": "Limite, fatura, acesso à conta, Pix × cartão",
       "problema": "'Fatura do cartão', 'liberar R$ 100 de limite' e 'não consigo entrar na conta' recebem 'Não entendi sua dúvida'; contestação de Pix é respondida como contestação de cartão; resposta da pesquisa de satisfação (0 a 5) é lida como nova intenção.",
       "evidencia": "5 de 30 conversas classificadas, em quatro temas diferentes.",
@@ -117,7 +117,7 @@
     },
     {
       "id": "OPO-003", "prioridade": "alta", "classe": "A", "causa": "politica_produto", "tipo": "politica", "frente": "politica",
-      "titulo": "O bot transfere logo depois do 'Não', sem sondar o que faltou",
+      "titulo": "Regra de transbordo: sondar com uma pergunta depois do \"Não\" antes de transferir",
       "vertical_tema": "Fatura, limite garantido, limite pré-aprovado",
       "problema": "Depois de uma explicação correta, o cliente responde 'Não' à confirmação de resolução e pede atendente; o bot transfere ou reabre 'Tem mais dúvidas?' sem perguntar o que ficou em aberto.",
       "evidencia": "3 de 30 conversas classificadas; padrão repetido nos temas 'por que recebi uma fatura' (42% pedem atendente) e 'paguei e o limite não voltou' (44%).",
@@ -133,7 +133,7 @@
     },
     {
       "id": "OPO-004", "prioridade": "alta", "classe": "A", "causa": "loop_fluxo", "tipo": "fluxo", "frente": "fluxo",
-      "titulo": "O bot repete o mesmo bloco ou pede 'reformule' sem avançar",
+      "titulo": "Fluxo: interromper a repetição do bloco de cancelamento e do \"reformule\" e mudar a abordagem",
       "vertical_tema": "Cancelar cartão, aumentar limite",
       "problema": "O bloco de 'Encerrar relacionamento com cartão' é repetido 4 vezes ou mais, inclusive depois de o cliente pedir para não repetir; pedidos claros de limite recebem 'reformule em uma única mensagem'.",
       "evidencia": "3 de 30 conversas classificadas.",
@@ -149,7 +149,7 @@
     },
     {
       "id": "OPO-005", "prioridade": "alta", "classe": "C", "causa": "integracao_acao", "tipo": "capacidade", "frente": "capacidade",
-      "titulo": "O bot não consulta lançamento de fatura, histórico de pagamento nem valor do limite",
+      "titulo": "Payload de contexto: expor lançamento da fatura, pagamento do empréstimo e limite concedido",
       "vertical_tema": "Cobrança de empréstimo na fatura, limite concedido",
       "problema": "Dúvidas do tipo 'por que esta cobrança de R$ 139 está na fatura?' ou 'qual meu limite?' dependem de dado que o payload do cartão não traz (histórico de pagamento do empréstimo, lançamento específico, valor concedido). O bot presume ('Pix com cartão') e recicla a explicação.",
       "evidencia": "3 de 30 conversas classificadas com 'consulta ausente' ou 'limitação estrutural' nos diagnósticos.",
@@ -165,7 +165,7 @@
     },
     {
       "id": "OPO-006", "prioridade": "alta", "classe": "B", "causa": "conteudo_kb", "tipo": "cross-domain", "frente": "artigo",
-      "titulo": "Artigos de cartão com texto interno publicado, sem passo a passo ou sem resposta na primeira frase",
+      "titulo": "Central de Ajuda: corrigir 8 artigos de cartão (marcações [VALIDAR], passo a passo e primeira frase)",
       "vertical_tema": "Compra recusada, compra não reconhecida, roubo, cancelar cartão físico",
       "problema": "Dois artigos públicos têm marcações internas '[VALIDAR: …]' no texto; o de cancelar cartão físico termina em 'conforme detalhado abaixo' sem conteúdo; 'Roubaram meu cartão' abre com uma frase que não responde. Não existe conteúdo externo com o passo a passo de 'Encerrar relacionamento com cartão'.",
       "evidencia": "Compra recusada: 67% pedem atendente. Roubo: TFC de 73% e 93% das conversas com problema de alinhamento.",
@@ -181,7 +181,7 @@
     },
     {
       "id": "OPO-007", "prioridade": "media", "classe": "A", "causa": "prompt_resposta", "tipo": "variavel", "frente": "variavel_hp",
-      "titulo": "Template da anuidade com variável quebrada",
+      "titulo": "Agente CC Anuidade: corrigir a variável quebrada no template da anuidade",
       "vertical_tema": "Agente CC Anuidade",
       "problema": "O texto sai como 'seu limite disponível agora é de o mesmo valor da anuidade' e, com dois cartões virtuais, o passo a passo fala no singular.",
       "evidencia": "1 de 30 conversas classificadas.",
@@ -197,7 +197,7 @@
     },
     {
       "id": "OPO-008", "prioridade": "media", "classe": "D", "causa": "acao_humana_obrigatoria", "tipo": "handoff", "frente": "handoff",
-      "titulo": "Handoff do bot quando só uma pessoa resolve",
+      "titulo": "Handoff: transferir informando canal, prazo e os dados já coletados quando só uma pessoa resolve",
       "vertical_tema": "Contestação de Pix, cancelamento de cartão físico, anuidade já lançada",
       "problema": "Em um caso o bot anunciou a transferência e voltou a perguntar se tinha respondido; só transferiu no segundo pedido, sem informar canal nem prazo.",
       "evidencia": "3 de 30 conversas; 2 handoffs corretos e 1 tardio.",
