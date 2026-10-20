@@ -27,6 +27,8 @@ O BQS mede a **qualidade da condução** do bot. A taskforce quer saber, além d
 | **TFC** (taxa de falha de condução) | Quantas conversas terminaram em transbordo, abandono ou loop sem o cliente ter pedido humano? |
 | **CE** (contatos evitáveis) | Quantas conversas o bot poderia ter resolvido/retido — e por qual causa, com qual dono? |
 
+**Conteúdo da Central: somente externo.** O bot só consome artigos públicos. Artigo cujo título começa com 🔒 ou 🔍 é interno: nunca entra como fonte, evidência, lacuna ou recomendação (nem "criar/atualizar"). Se algum `kb_matched_article_title` vier com esse prefixo, trate a conversa como "sem artigo externo".
+
 **Escopo: somente conversas do bot.** Nenhuma etapa deste pipeline analisa ou recomenda algo sobre o atendimento humano (macros, orientação a atendentes, filas, TMO, CSAT do humano). Donos de ação válidos: **Produto CX** e **Help Design**.
 
 Postura obrigatória de todo o pipeline: **criteriosa**. Transbordo bem executado não é transbordo evitado. Nota alta não prova que o contato era inevitável.
@@ -40,6 +42,7 @@ Postura obrigatória de todo o pipeline: **criteriosa**. Transbordo bem executad
 nota_ok   = score_overall >= 7 AND score_resolution > 2 AND score_escalation > 2     (e quality_label <> 'sem_dados')
             -> NULL quando quality_label = 'sem_dados' ou score_overall IS NULL
 BQS       = nota_ok = true / nota_ok IS NOT NULL * 100        ("regular" NÃO tem crédito parcial: é reprovado)
+BQS final = BQS com a nota revisada pelo bqs-auditor nos tickets auditados (SQL do Passo 6.2); é o BQS do cabeçalho do relatório
 BQS legado= approved = true / approved IS NOT NULL * 100      (somente para comparação histórica — veja abaixo)
 TFC       = conversas com retention_type IN ('transbordo','abandono','loop') E customer_requested_transfer = false / N_total * 100
 CE        = conversas classificadas A, B ou C pelo bqs-contencao / conversas classificadas   (e estimativa sobre o total — Passo 6)
@@ -244,17 +247,41 @@ Se um lote retornar `FALHA DE COLETA`, registre a falha, continue com os demais 
 
 ---
 
-## PASSO 6 — CONSOLIDAÇÃO DA CONTENÇÃO (SQL)
+## PASSO 5B — AUDITORIA (transcrição real dos casos duvidosos)
+
+O `bqs-contencao` marca `auditar = sim` nos casos em que a nota ou a classe não se sustentam só com o resumo. O `bqs-auditor` lê a **transcrição** (tabela `prod.cx.fat_tickets_transcription`, com o Zendesk como reserva), revisa as 6 notas e a classe, e a **nota revisada substitui a original** no BQS final (Passo 6.2).
+
+1. **Seleção (sem contas, só ordenação):** das linhas de `output_contencao` com `auditar = sim`, ordene por: classe `E` primeiro; depois `confianca = baixa`; depois as demais, mantendo a ordem de chegada. Tome no máximo **12** tickets. Se houver menos de 1, pule este passo e registre "sem tickets a auditar".
+2. **Distribuição:** divida em auditores de **até 6 tickets** (no máximo 2 auditores, disparados na mesma mensagem). Não cole transcrições: o auditor busca tudo sozinho.
+
+```
+subagent_type: bqs-auditor
+prompt: |
+  MODO CURADORIA ativo.
+  Fluxo: {{ROTINA}} | flow (valor exato da coluna `flow`): {{FLOW}} | Período: [data_inicio] a [data_fim] | AUDITOR [n]
+
+  Audite os tickets abaixo conforme o seu sistema. Identifique-os só por ticket_id (não repita dados pessoais).
+  [uma linha por ticket: ticket_id | motivo da auditoria (classe E / confianca baixa / contradição nota×desfecho / crítico aprovado / alto impacto) | classe|causa atual]
+```
+3. Guarde cada saída como `output_auditoria_n` e concatene como `output_auditoria`. Se um auditor retornar `FALHA DE COLETA`, registre e siga (os tickets ficam com a nota original e a classe do `bqs-contencao`). Tickets `SEM_TRANSCRICAO` também mantêm a nota e a classe originais.
+
+---
+
+## PASSO 6 — CONSOLIDAÇÃO (SQL): CONTENÇÃO E BQS FINAL
+
+### 6.1 — Contenção (com as correções do auditor)
 
 Cada linha de `output_contencao` tem o formato `ticket_id|classe|causa|dono|confianca|auditar|o_que_reteria`.
-**Não conte à mão.** Monte a lista `VALUES` com **apenas** os seis primeiros campos mais `handoff` (extraído do prefixo `[handoff correto|improvisado|tardio]` do campo `o_que_reteria`; use `-` quando não houver prefixo) e execute a consulta abaixo. Escape aspas simples duplicando-as; não inclua o texto livre.
+**Não conte à mão.** Monte a lista `VALUES` com **apenas** os seis primeiros campos mais `handoff` (extraído do prefixo `[handoff correto|improvisado|tardio]` do campo `o_que_reteria`; use `-` quando não houver prefixo) e `auditado`. Escape aspas simples duplicando-as; não inclua o texto livre.
+
+**Correções do auditor:** para cada ticket com `decisao` `CONFIRMA` ou `REVISA` em `output_auditoria`, **substitua** a linha do `bqs-contencao` pela classe/causa/confiança do auditor, com `auditar = 'nao'` e `auditado = 'sim'`. O `dono` não vem do auditor: use `Help Design` quando a causa for `conteudo_kb`; `-` quando a classe for `R` ou `E`; caso contrário `Produto CX`. O `handoff` vem do prefixo do `o_que_reteria` do auditor. Tickets não auditados entram com `auditado = 'nao'`.
 
 ```sql
-WITH c(ticket_id, classe, causa, dono, confianca, auditar, handoff) AS (
+WITH c(ticket_id, classe, causa, dono, confianca, auditar, handoff, auditado) AS (
   VALUES
-    (46629316, 'B', 'conteudo_kb', 'Help Design', 'alta', 'nao', '-'),
-    -- ... uma tupla por linha de output_contencao ...
-    (46629317, 'D', 'acao_humana_obrigatoria', 'Produto CX', 'media', 'nao', 'correto')
+    (46629316, 'B', 'conteudo_kb', 'Help Design', 'alta', 'nao', '-', 'nao'),
+    -- ... uma tupla por linha de output_contencao (já com as correções do auditor) ...
+    (46629317, 'D', 'acao_humana_obrigatoria', 'Produto CX', 'media', 'nao', 'correto', 'sim')
 ),
 {{PAR}},
 {{BASE_CTE}},
@@ -269,7 +296,8 @@ SELECT visao, chave1, chave2, n, n_evitaveis, pct_evitavel, ce_pct_do_total FROM
   UNION ALL SELECT 'classe_causa', classe, causa, COUNT(*), NULL, NULL, NULL FROM j GROUP BY classe, causa
   UNION ALL SELECT 'dono_evitavel', dono, '', COUNT(*), NULL, NULL, NULL FROM j WHERE classe IN ('A','B','C') GROUP BY dono
   UNION ALL SELECT 'handoff_classe_D', handoff, '', COUNT(*), NULL, NULL, NULL FROM j WHERE classe = 'D' GROUP BY handoff
-  UNION ALL SELECT 'auditar', auditar, '', COUNT(*), NULL, NULL, NULL FROM j GROUP BY auditar
+  UNION ALL SELECT 'auditar_pendente', auditar, '', COUNT(*), NULL, NULL, NULL FROM j GROUP BY auditar
+  UNION ALL SELECT 'auditado', auditado, '', COUNT(*), NULL, NULL, NULL FROM j GROUP BY auditado
   UNION ALL SELECT 'dimensao_vertical', COALESCE(NULLIF(TRIM(effective_vertical), ''), '(sem valor)'), '', COUNT(*),
          SUM(CASE WHEN classe IN ('A','B','C') THEN 1 ELSE 0 END),
          ROUND(100.0 * SUM(CASE WHEN classe IN ('A','B','C') THEN 1 ELSE 0 END) / COUNT(*), 1), NULL FROM j GROUP BY effective_vertical
@@ -281,6 +309,45 @@ ORDER BY visao, n DESC
 ```
 
 Substitua `[n_elegiveis_contencao]` e `[n_total]` pelos números do item 3.1 (período `atual`). Guarde o resultado completo como `agregados_contencao` e repasse-o aos subagentes do Passo 7. Os agregados valem para as conversas **classificadas** (amostra aleatória das elegíveis, no máximo 150) — informe sempre `n_classificadas` de `n_elegiveis_contencao`.
+
+### 6.2 — BQS final (após auditoria)
+
+Monte a lista `VALUES` com as linhas de `output_auditoria` cuja `decisao` seja `CONFIRMA` ou `REVISA`: `ticket_id`, `decisao` e as seis notas (`res, eff, esc, und, cla, ton`). Se não houver nenhuma, o BQS final é igual ao original (informe "sem auditoria neste período"). A nota geral revisada é calculada **aqui, em SQL**: `ROUND(0,30·res + 0,20·eff + 0,20·esc + 0,15·und + 0,10·cla + 0,05·ton)`, aprovada com `≥ 7` e piso (`res > 2` e `esc > 2`). Tickets `CONFIRMA` mantêm a nota original; só `REVISA` a substitui.
+
+```sql
+WITH a(ticket_id, decisao, res, eff, esc, und, cla, ton) AS (
+  VALUES
+    (46629316, 'REVISA', 3, 4, 4, 4, 5, 6),
+    (46629317, 'CONFIRMA', 8, 8, 8, 8, 8, 8)
+),
+{{PAR}},
+{{BASE_CTE}},
+rev AS (
+  SELECT ticket_id, decisao, res, esc,
+         CAST(ROUND(0.30 * res + 0.20 * eff + 0.20 * esc + 0.15 * und + 0.10 * cla + 0.05 * ton, 0) AS INT) AS score_rev
+  FROM a
+),
+fin AS (
+  SELECT b.ticket_id, b.nota_ok AS nota_orig,
+         CASE WHEN r.ticket_id IS NULL OR r.decisao = 'CONFIRMA' THEN b.nota_ok
+              ELSE (r.score_rev >= 7 AND r.res > 2 AND r.esc > 2) END AS nota_final,
+         (r.ticket_id IS NOT NULL) AS auditado, r.decisao
+  FROM base b LEFT JOIN rev r ON r.ticket_id = b.ticket_id
+  WHERE b.periodo = 'atual' AND b.nota_ok IS NOT NULL
+)
+SELECT COUNT(*) AS n_avaliaveis,
+       SUM(CASE WHEN nota_orig THEN 1 ELSE 0 END) AS n_ok_original,
+       SUM(CASE WHEN nota_final THEN 1 ELSE 0 END) AS n_ok_final,
+       ROUND(100.0 * SUM(CASE WHEN nota_orig THEN 1 ELSE 0 END) / COUNT(*), 1) AS bqs_original,
+       ROUND(100.0 * SUM(CASE WHEN nota_final THEN 1 ELSE 0 END) / COUNT(*), 1) AS bqs_final,
+       SUM(CASE WHEN auditado THEN 1 ELSE 0 END) AS n_auditados,
+       SUM(CASE WHEN decisao = 'REVISA' THEN 1 ELSE 0 END) AS n_revisados,
+       SUM(CASE WHEN auditado AND nota_orig = true AND nota_final = false THEN 1 ELSE 0 END) AS n_aprovado_para_reprovado,
+       SUM(CASE WHEN auditado AND nota_orig = false AND nota_final = true THEN 1 ELSE 0 END) AS n_reprovado_para_aprovado
+FROM fin
+```
+
+Guarde como `bqs_final`. **O BQS do cabeçalho do relatório é o `bqs_final`**; o `bqs_original` aparece ao lado quando for diferente, junto com `n_auditados`, `n_revisados` e as trocas de aprovação. As tabelas por dimensão do Passo 3 e o BQS por período seguem **originais** (a auditoria cobre só uma amostra seletiva de casos duvidosos — diga isso no relatório) e não devem ser misturados com o `bqs_final`. Informe também o saldo da auditoria (`n_aprovado_para_reprovado` × `n_reprovado_para_aprovado`) e as "divergências do avaliador" do resumo dos auditores: elas mostram onde o avaliador automático erra.
 
 ---
 
@@ -295,7 +362,8 @@ prompt: |
   Fluxo: {{ROTINA}} | Período: [data_inicio] a [data_fim]
 
   MÉTRICAS BASE (SQL):
-  - Total: [n_total] | Avaliáveis: [n_avaliaveis] | BQS: [bqs]% (anterior: [bqs_anterior]% ou "sem base de comparação") | BQS legado: [bqs_legado]%
+  - Total: [n_total] | Avaliáveis: [n_avaliaveis] | BQS final (após auditoria): [bqs_final]% (original: [bqs_original]%; período anterior, sem auditoria: [bqs_anterior]% ou "sem base de comparação") | BQS legado: [bqs_legado]%
+  - Auditoria: [n_auditados] tickets auditados, [n_revisados] revisados (aprovado→reprovado: [n]; reprovado→aprovado: [n]) — amostra seletiva de casos duvidosos
   - TFC: [tfc]% | Pediram humano: [pct_pediu_humano]% | Transbordos com nota_ok: [n_transbordo_nota_ok]
   - Por quality_label: [distribuição] | Por retention_type: [distribuição]
   - Tabelas por dimensão: [tabela_dimensoes]
@@ -316,6 +384,9 @@ prompt: |
 {{HP_OPO_BLOCO}}
   === CONTENÇÃO (linhas por conversa) ===
   [output_contencao]
+
+  === AUDITORIA (transcrição real dos casos duvidosos) ===
+  [output_auditoria]
 ```
 Guarde como `output_oportunidades`.
 
@@ -355,7 +426,9 @@ prompt: |
 
   MÉTRICAS BASE (todas vindas de SQL — não recalcule):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis]
-  - BQS estrito: [bqs]% ([n_ok]/[n_avaliaveis]) | anterior: [bqs_anterior]% ou "sem base de comparação" | BQS legado (nota de rodapé): [bqs_legado]% ([n_fora_do_legado] conversas fora do denominador)
+  - **BQS final (após auditoria): [bqs_final]%** ([n_ok_final]/[n_avaliaveis]) | BQS estrito original: [bqs_original]% | período anterior (sem auditoria): [bqs_anterior]% ou "sem base de comparação" | BQS legado (nota de rodapé): [bqs_legado]% ([n_fora_do_legado] conversas fora do denominador)
+  - Auditoria (transcrição real): [n_auditados] tickets auditados, [n_revisados] com nota revisada; aprovado→reprovado: [n]; reprovado→aprovado: [n]. As tabelas por dimensão e o BQS por período são **originais** (a auditoria cobre só casos duvidosos).
+  - Divergências do avaliador automático (do resumo dos auditores): [lista curta, sem dados pessoais]
   - TFC: [tfc]% ([n_falha_conducao]/[n_total]) | anterior: [tfc_anterior]%
   - CE: [pct_evitavel]% das classificadas ([n_classificadas] de [n_elegiveis_contencao] elegíveis) | estimativa sobre o total: [ce_pct_do_total]%
   - Por quality_label: [distribuição] | Por retention_type: [distribuição]
@@ -376,6 +449,9 @@ prompt: |
   === CONTENÇÃO (linhas por conversa) ===
   [output_contencao]
 
+  === AUDITORIA (transcrição real dos casos duvidosos) ===
+  [output_auditoria]
+
   === OPORTUNIDADES ===
   [output_oportunidades]
 
@@ -387,7 +463,8 @@ prompt: |
 
 ## REGRAS DO ORQUESTRADOR
 
-- Ordem: Passos 1 a 4; Passo 5 (subagentes em paralelo); Passo 6; Passo 7 (7.1, 7.2 e 7.3 em sequência).
+- Ordem: Passos 1 a 4; Passo 5 (subagentes em paralelo); Passo 5B (auditoria); Passo 6 (6.1 e 6.2); Passo 7 (7.1, 7.2 e 7.3 em sequência).
+- Nunca passe transcrições para o relatório, para o artefato ou para o Slack: só `ticket_id`, notas e paráfrases curtas sem dados pessoais.
 - Se um subagente falhar, registre o erro, continue com os demais e inclua a nota de falha no relatório final. Nunca invente a saída de um subagente.
 - Nenhum número é calculado por você: copie das consultas. Percentuais com 1 casa decimal.
 - `approved` não é critério de aprovação. Use sempre `nota_ok` / BQS estrito.

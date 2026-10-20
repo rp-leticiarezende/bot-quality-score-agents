@@ -338,7 +338,7 @@ $flows = @(
 # ---------------------------------------------------------------- injecao do playbook (fonte unica: templates/playbook-cartao.md)
 $outDir = Join-Path $root '.claude\agents'
 $playbook = [System.IO.File]::ReadAllText((Join-Path $root 'templates\playbook-cartao.md'), [System.Text.Encoding]::UTF8).Replace("`r`n", "`n").Trim()
-foreach ($name in @('bqs-contencao', 'chatbot-proposta-ajustes')) {
+foreach ($name in @('bqs-contencao', 'bqs-auditor', 'chatbot-proposta-ajustes')) {
     $path = Join-Path $outDir ($name + '.md')
     $txt = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8).Replace("`r`n", "`n")
     $pattern = '(?s)<!-- PLAYBOOK_CARTAO:START -->.*?<!-- PLAYBOOK_CARTAO:END -->'

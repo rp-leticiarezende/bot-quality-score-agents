@@ -4,6 +4,8 @@ Branch: `bqs-v2-estrito-contencao` · Data: 20/10/2026 · Status: **não publica
 
 ## Escopo (decisão de 20/10)
 
+**Só conteúdo externo da Central de Ajuda** (o que o bot consome): artigos cujo título começa com 🔒 ou 🔍 são internos, não são consultados pelo bot e ficam fora de qualquer análise, fonte ou recomendação. Verificado em 15–20/10: nenhuma conversa foi associada pelo avaliador a título 🔒/🔍.
+
 **Somente conversas do bot.** Nenhum agente analisa ou recomenda sobre o atendimento humano (macros, orientação a atendentes, filas, TMO, CSAT do humano). Donos de ação: **Produto CX** e **Help Design**. Quando só uma pessoa resolve (classe D), a análise é sobre o que o bot deveria ter coletado e informado antes de transferir.
 
 ## Por que mudar
@@ -79,11 +81,21 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 
 **Achados de conteúdo para o Help Design (independem do bot):**
 - Dois artigos públicos têm marcações internas **`[VALIDAR: …]`** no texto: 51856715765267 (compra não reconhecida) e 51706375319827 (compra recusada).
-- O passo a passo de "Encerrar relacionamento com cartão" só existe em artigo **interno** (54888224369043); o público de cancelar físico (54886179457427) termina em "conforme detalhado abaixo" sem conteúdo e tem HTML sujo de colagem.
+- Não existe conteúdo **externo** com o passo a passo de "Encerrar relacionamento com cartão"; o público de cancelar físico (54886179457427) termina em "conforme detalhado abaixo" sem conteúdo e tem HTML sujo de colagem.
 - "Roubaram meu cartão" (43654947527443): a 1ª frase não responde e 93% das conversas do tema têm problema de KB, com TFC 73%.
 - Cashback em 7 cópias e anuidade de limite garantido em 2 cópias.
 - O artigo de limite pré-aprovado está em rascunho.
 - Taxonomia de `topic` com variantes de grafia (`roubaram-meu-cartão` × `roubaram-meu-cartao`).
 
+## Passo 4 — `bqs-auditor` (nota revisada com a transcrição)
+
+- **Agente novo** `bqs-auditor.md`: lê a transcrição (`prod.cx.fat_tickets_transcription`, em janelas de 6.000 caracteres; reserva: Zendesk `get_ticket` com `full_comments`), reavalia as 6 dimensões com a régua do pipeline (pesos 30/20/20/15/10/5 e piso) e a classe/causa de contenção. Decide `CONFIRMA`, `REVISA` ou `SEM_TRANSCRICAO`. Só lê o trecho do bot (até a primeira fala humana), só conteúdo externo, e nunca copia dados pessoais.
+- **Orquestradores:** novo **Passo 5B** (até 12 tickets `auditar = sim`, em até 2 auditores de 6; ordem: classe E, confiança baixa, demais) e **Passo 6.2** (BQS final por SQL: a nota geral revisada é `ROUND(0,30·res + 0,20·eff + 0,20·esc + 0,15·und + 0,10·cla + 0,05·ton)`, aprovada com `≥ 7` e piso; `REVISA` substitui a nota, `CONFIRMA` mantém). As correções de classe do auditor substituem as do `bqs-contencao` no Passo 6.1.
+- **Decisão da usuária:** a nota revisada **entra no BQS** do relatório. O cabeçalho mostra o BQS final, o original, nº de auditados, nº de revisados e o saldo de trocas de aprovação. As tabelas por dimensão e o período anterior continuam **originais** (a auditoria é uma amostra seletiva de casos duvidosos, não aleatória).
+- **Evidência:** 99% das notas já seguem a média ponderada arredondada (820 de 830), e 12 conversas violam o piso na origem — por isso o BQS final recalcula a regra em SQL.
+- **Teste real (4 tickets do HP, 12–18/10):** o auditor revisou os 4; em todos a nota original estava **alta demais** (o avaliador premia o transbordo mesmo quando a resposta anterior falhou); um mudou de aprovado para reprovado (nota 8 → 4). SQL do 6.2 validada: BQS 72,4% → 72,2%. A amostra é seletiva e pequena — não generalizar.
+- **Ajustes após o teste:** fim do trecho do bot (falas `RecargaPay:`/`RecargaPay Ajuda:` e "você será conectado…"), transferência anunciada e não executada, pergunta SIM/NÃO do fluxo ≠ CSAT, regra para conversa em fases, `REVISA` só quando muda aprovação, `resolution`/`escalation` ≥ 2 pontos ou a classe.
+- **Não testado:** a reserva via Zendesk (todas as transcrições do teste estavam na tabela; cobertura da tabela 66–78% nos tickets avaliados) e a execução dentro da rotina em nuvem (nome do conector Zendesk `mcp__MCP_Proxy_RecargaPay__zendesk` e limite de consultas simultâneas ao Databricks).
+
 ## Próximos passos
-4. Subagente `bqs-auditor` (transcrição via `prod.cx.fat_tickets_transcription` / Zendesk; a nota revisada entra no BQS) · 5. Artefato consolidado + Slack visual.
+5. Artefato consolidado (tela inicial com dashboards; abas por fluxo com o que mudar: artigos, variáveis HP, ajustes de fluxo) + Slack mais visual · depois: rodada de teste (modo sombra) antes de publicar, reteste da auditoria seletiva da contenção, atualização do Confluence, push/PR.

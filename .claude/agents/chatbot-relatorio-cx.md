@@ -425,7 +425,8 @@ Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados n
 
 1. **Métricas base (SQL):** `n_total`, `n_avaliaveis`, **BQS estrito** (`n_ok`/`n_avaliaveis`) e o do período anterior, BQS legado (+ `n_fora_do_legado`), **TFC**, **CE** (% das classificadas e estimativa sobre o total), distribuição por `quality_label` e `retention_type`, % que pediu humano, transbordos com `nota_ok`, médias dos 6 critérios, tabelas por dimensão, cobertura/alertas. Cartão HP: HP pleno/degradado, BQS por segmento.
 2. **Agregados de contenção (SQL):** matriz classe × causa, evitáveis por dono, qualidade dos handoffs (classe D), itens a auditar, evitáveis por vertical/tema.
-3. **output_fluxo**, **output_kb**, **output_hp** (só Cartão HP), **output_contencao** (linhas por conversa), **output_oportunidades**, **output_propostas**.
+3. **output_fluxo**, **output_kb**, **output_hp** (só Cartão HP), **output_contencao** (linhas por conversa), **output_auditoria** (notas revisadas pelo auditor após ler a transcrição; o BQS final já vem calculado), **output_oportunidades**, **output_propostas**.
+   Transcrições nunca chegam a você nem entram no artefato: só `ticket_id`, notas e paráfrases curtas sem dados pessoais.
 
 ### Mapeamento de times (owner de cada ação)
 
@@ -453,7 +454,8 @@ Responde a: *"como está o bot neste período e quantos contatos ele poderia ter
 ```
 [emoji rotina] *[TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS]*
 [DD/MM] a [DD/MM/AAAA] | [N_total] conversas
-BQS: *[X]%* ([n_ok]/[n_avaliaveis]) — [+/-]Xpp vs período anterior ([X]%)   (ou: sem base de comparação)
+BQS: *[X]%* ([n_ok_final]/[n_avaliaveis]) — [+/-]Xpp vs período anterior ([X]%, sem auditoria)   (ou: sem base de comparação)
+Auditoria: [n_auditados] tickets lidos na transcrição · [n_revisados] notas revisadas · BQS original [X]%
 TFC: *[X]%* · CE: *[X]%* das classificadas (≈ [Y]% do total)
 [Somente Cartão HP:] HP pleno: [X]% · HP degradado: *[X]%* (limite: 5%)
 Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
@@ -471,7 +473,7 @@ _BQS legado (approved): [X]% — só para comparação histórica · limiares de
 
 **Regras:**
 - Não misturar ações aqui — só métricas e alertas.
-- **BQS = BQS estrito, com denominador `n_avaliaveis`, para todos os fluxos.** Formato: `BQS: *X%* (n_ok/n_avaliaveis)`.
+- **BQS = BQS final (estrito, com a nota revisada pelo auditor nos tickets auditados), denominador `n_avaliaveis`, para todos os fluxos.** Formato: `BQS: *X%* (n_ok_final/n_avaliaveis)`. A linha de auditoria mostra o original, o nº de tickets auditados e de notas revisadas; se o auditor trocou aprovações, cite o saldo (ex.: "3 aprovados→reprovados, 0 reprovados→aprovados") em um dos pontos de atenção e as **divergências do avaliador** que ele relatou (ex.: "o avaliador aprova transbordo mesmo quando a resposta anterior falhou"). Sem auditoria no período: `Auditoria: nenhum ticket auditado neste período`.
 - Variação vs período anterior é obrigatória **quando houver dado anterior**; quando o orquestrador informar "sem base de comparação", escreva exatamente isso (nunca omita sem avisar e nunca invente).
 - TFC e CE aparecem sempre na linha de números; surfaçar inline nos bullets quando explicam o problema (ex.: "tópico X (BQS 48,4% · TFC 88,6%)").
 - **O primeiro bullet** é, nesta ordem de prioridade, o primeiro que se aplicar: (1) cobertura baixa / buraco de dados / ingestão atrasada; (2) se `pct_transbordo ≥ 90`: _"amostra composta por transbordos: o BQS mede a conduta até o transbordo, não a qualidade geral do bot"_; (3) se BQS > 80% e TFC > 40%: _"BQS alto mascara falha de condução real: X% das conversas terminaram em transbordo, abandono ou loop sem pedido do cliente"_; (4) o padrão de maior contato evitável (causa, quantidade estimada e dono).

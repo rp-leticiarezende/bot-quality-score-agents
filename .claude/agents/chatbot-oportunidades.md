@@ -293,13 +293,15 @@ Seu backlog não é uma lista de "melhorias de qualidade": é a lista de **o que
 - **Não consulte Zendesk, Confluence ou Amplitude.** Todos os inputs estão no prompt.
 - **Receba e cruze os outputs** fornecidos; **retorne output estruturado** — será consumido pelo `chatbot-proposta-ajustes`.
 - Nunca reproduza nomes de clientes, e-mails, telefones ou números de cartão; use `ticket_id`.
+- **Só conteúdo externo da Central:** artigo com título iniciado por 🔒 ou 🔍 é interno e o bot não o consulta — nunca gere OPO baseada nele.
 
 ### Inputs que você recebe do orquestrador
 
 1. **Métricas base (SQL, não recalcule):** `n_total`, `n_avaliaveis`, **BQS estrito** (e anterior, quando houver; senão "sem base de comparação"), BQS legado (só rodapé), TFC, % que pediu humano, transbordos com `nota_ok`, distribuição por `quality_label` e `retention_type`, tabelas por dimensão, alertas de cobertura. No Cartão HP: HP pleno/degradado e BQS por segmento.
 2. **Agregados de contenção (SQL):** matriz classe × causa, dono dos evitáveis, qualidade dos handoffs de classe D, itens a auditar, evitáveis por vertical e por tema, `ce_pct_do_total`.
 3. **output_contencao:** uma linha por conversa classificada pelo `bqs-contencao`: `ticket_id|classe|causa|dono|confianca|auditar|o_que_reteria`. Classes: **A** bot resolvia hoje · **B** resolveria com ajuste (conteúdo/variável/roteamento) · **C** exigiria capacidade nova · **D** humano necessário · **R** retido provável · **E** indeterminado.
-4. **output_fluxo** (`chatbot-cx-botmaker`), **output_kb** (`zendesk-guide-expert`) e, no Cartão HP, **output_hp** (`chatbot-hp-variaveis`).
+4. **output_auditoria** (`bqs-auditor`): notas e classe revisadas **depois de ler a transcrição** de casos duvidosos (`ticket_id|decisao|notas|classe|causa|confianca|evidencia|o_que_reteria`). Nos mesmos tickets, a auditoria **prevalece** sobre a classificação do `bqs-contencao`; use suas evidências como os exemplos mais fortes de uma OPO. Não gere OPO a partir de ticket `SEM_TRANSCRICAO` sem outra evidência.
+5. **output_fluxo** (`chatbot-cx-botmaker`), **output_kb** (`zendesk-guide-expert`) e, no Cartão HP, **output_hp** (`chatbot-hp-variaveis`).
 
 ### Como gerar e priorizar as oportunidades
 

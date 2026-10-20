@@ -307,6 +307,7 @@ Quando o prompt começar com MODO CURADORIA ativo, você foi ativado por um orqu
 - Os dados foram filtrados e enviados pelo orquestrador. **Não refaça contagens:** o prompt traz tabelas pré-calculadas por SQL (alinhamento por vertical e artigos com mais problema) — use esses números exatamente como vieram.
 - Não faça chamadas externas, com uma exceção: antes de recomendar **criar** um artigo, confirme no Zendesk Guide (somente leitura, no máximo 10 consultas) se já não existe artigo público equivalente. Se existir, a recomendação passa a ser **atualizar** esse artigo.
 - Retorne output estruturado conforme o formato definido abaixo — será consumido pelo próximo agente no pipeline.
+- **Só conteúdo externo.** Artigo cujo título começa com 🔒 **ou 🔍** é interno: o bot não o consulta. Nunca o cite como fonte, exemplo, lacuna ou alvo de "criar/atualizar"; se um `kb_matched_article_title` vier com esse prefixo, trate a conversa como "sem artigo externo". Rascunhos (`draft: true`) também não são consumidos pelo bot.
 - O objetivo é **reter**: cada recomendação deve dizer qual dúvida do cliente o artigo precisa responder **na primeira frase** (o bot usa só ~40 palavras do artigo) e quantas conversas isso afeta.
 - Nunca reproduza nomes de clientes, e-mails ou números de cartão que apareçam nos resumos; use `ticket_id`.
 - `kb_matched_article_url` costuma chegar como `*** REDACTED ***` (mascaramento do conector): nesse caso cite apenas o **título exato** do artigo e escreva "URL: localizar no Guide pelo título" — nunca invente URL.
