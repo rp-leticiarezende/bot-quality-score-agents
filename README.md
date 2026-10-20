@@ -1,30 +1,44 @@
 # bot-quality-score-agents
 
-Agentes Claude para análise automatizada de qualidade do chatbot de CX da RecargaPay (BQS).
+Agentes Claude para análise automatizada de qualidade do chatbot de CX da RecargaPay (**BQS 2.0**).
 
-Escopo: **somente conversas do bot** e **somente conteúdo externo da Central de Ajuda** (títulos com 🔒 ou 🔍 são internos e ficam fora). Resultados sempre em `#bot-quality-score`.
+Escopo: **somente conversas do bot** e **somente conteúdo externo da Central de Ajuda** (títulos com 🔒 ou 🔍 são internos e ficam fora). Resultados sempre em `#bot-quality-score`. O n8n não é alterado.
+
+## BQS 2.0 em uma frase
+
+Uma conversa conta como boa quando a **conduta** do bot foi boa (nota geral ponderada ≥ 7, resolução > 2, transbordo > 2) **e** o **desfecho** é aceitável: resolvida pelo bot, transferida a pedido do cliente (fluxo esperado) ou abandonada depois de uma resposta boa (resolução ≥ 7). Loop e transbordo **sem pedido do cliente** reprovam, e o transbordo sem pedido é **sinalizado** para análise. Recontato em 24h, TFC e contatos evitáveis são indicadores de acompanhamento, fora da conta. Dashboards e histórico recomeçam em 20/10/2026. Detalhes em `docs/REVISAO-REGRAS-BQS.md`.
 
 ## Estrutura
 
 | Caminho | O que é |
-|---|---|
-| `.claude/agents/orch-*.md` | Quatro orquestradores (aleatório, cartão HP, críticos diário e semanal). **Gerados** por `build.ps1`; não edite à mão. |
+| --- | --- |
+| `.claude/agents/orch-*.md` | Quatro orquestradores (aleatório, agente de cartão de crédito, críticos diário e semanal). **Gerados** por `build.ps1`; não edite à mão. |
 | `.claude/agents/bqs-contencao.md` | Classifica cada conversa em contato evitável × só humano e diz o que teria retido. |
-| `.claude/agents/bqs-auditor.md` | Lê a transcrição dos casos duvidosos e revisa a nota (entra no BQS final). |
+| `.claude/agents/bqs-auditor.md` | Lê a transcrição dos casos duvidosos e revisa a nota (entra no BQS 2.0). |
 | `.claude/agents/chatbot-*.md`, `zendesk-guide-expert.md` | Especialistas de fluxo, HP, oportunidades, propostas, relatório e KB. |
 | `templates/orch.template.md` | Fonte única dos orquestradores (SQL determinístico, passos, subagentes). |
 | `templates/playbook-cartao.md` | Playbook de retenção do cartão, injetado em `bqs-contencao`, `bqs-auditor` e `chatbot-proposta-ajustes`. |
 | `templates/painel-schema.md` | Contrato de dados do painel, injetado em `chatbot-relatorio-cx`. |
-| `artifact/painel.html` | Painel (artefato) "BQS RecargaBot", página fixa que lê `data/<rotina>/latest.json` e `history.json`. |
-| `artifact/data/` | Dados da rodada de teste usados na primeira publicação. |
-| `build.ps1` | Gera os orquestradores e injeta playbook e contrato. Rode: `powershell -ExecutionPolicy Bypass -File .\build.ps1`. |
-| `docs/CHANGES-v2.md` | O que mudou, por quê, achados da auditoria e pendências. |
+| `artifact/painel.html` | Painel (artefato) "BQS 2.0 RecargaBot": lê `data/<chave>/latest.json` e `history.json`. |
+| `artifact/data/` | Dados de teste usados na publicação. |
+| `build.ps1` | Gera os orquestradores e injeta playbook e contrato: `powershell -ExecutionPolicy Bypass -File .\build.ps1` (salvar o script com BOM UTF-8). |
+| `docs/CHANGES-v2.md` | O que mudou, achados do teste de ponta a ponta e pendências. |
+| `docs/REVISAO-REGRAS-BQS.md` | Diagnóstico do cálculo antigo, simulações e a definição do BQS 2.0. |
+
+## Rotinas em nuvem (Claude Code)
+
+Cada rotina clona este repositório e executa o orquestrador correspondente.
+
+| Rotina | Orquestrador | Agenda (BRT) | Chave do painel |
+| --- | --- | --- | --- |
+| Agente de Cartão de Crédito (semanal) | `orch-cartao-hp` | segunda 10:00 | `cartao-hp` |
+| Casos Críticos (diário) | `orch-criticos` | todo dia 09:40 | `criticos-diario` |
+| Casos Críticos (semanal) | `orch-criticos-semanal` | segunda 15:00 (pausada) | `criticos-semanal` |
+| Aleatório (semanal) | `orch-aleatorio` | segunda 14:00 (pausada) | `aleatorio` |
 
 ## Fluxo de cada rotina
 
-1. Orquestrador consulta o Databricks (SQL: BQS, TFC, cobertura, pacotes).
+1. SQL: período, cobertura, BQS 2.0, TFC, recontato 24h e sinalizados.
 2. Subagentes em levas de até 3: fluxo, KB, HP (cartão) e contenção por lotes.
-3. Auditoria pela transcrição dos casos duvidosos; consolidação em SQL (contenção e BQS final).
-4. Oportunidades → propostas → relatório: dados no painel e duas mensagens no Slack.
-
-O n8n não é alterado: tudo o que dependeria dele é resolvido na rotina, com SQL e conectores.
+3. Auditoria pela transcrição dos casos duvidosos; consolidação em SQL (contenção e BQS 2.0).
+4. Oportunidades → propostas → relatório: dados no painel (artefato) e **uma mensagem curta, só texto** no Slack, com o link do painel uma vez.
