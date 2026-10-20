@@ -242,7 +242,7 @@ $HP_5_3 = @'
 subagent_type: chatbot-hp-variaveis
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão HP | Período: [data_inicio] a [data_fim]
+  Fluxo: Agente de Cartão de Crédito | Período: [data_inicio] a [data_fim]
 
   MÉTRICAS BASE (SQL — não recalcule):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis]
@@ -311,7 +311,7 @@ $flows = @(
         REGRAS_EXTRA = '- Este fluxo NÃO tem HP — não incluir análise de `welcome_not_found` / `pages_fetched`.'
     },
     @{
-        NAME = 'orch-cartao-hp'; ROTINA = 'Cartão de Crédito HP'; CHAVE = 'cartao-hp'
+        NAME = 'orch-cartao-hp'; ROTINA = 'Agente de Cartão de Crédito (semanal)'; CHAVE = 'cartao-hp'
         FLOW = 'Conversations fluxo_hp_botmaker'; PERIODICIDADE = 'semanal'; WEEKLY = $true
         DESCRICAO = 'Orquestrador da análise semanal de qualidade do fluxo Cartão de Crédito HP. Ativado toda segunda-feira às 10:00 BRT pela rotina cloud.'
         CTX = $CTX_HP; DIMS = @('effective_vertical','topic'); ELEGIVEL = $ELEGIVEL_STD; ELEGIVEL_B = $ELEGIVEL_STD_B

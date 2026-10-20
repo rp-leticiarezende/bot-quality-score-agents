@@ -1,0 +1,24 @@
+{
+  "schema": "bqs-run/1",
+  "chave": "aleatorio-mensal",
+  "rotina": "Aleatório (mensal)",
+  "meta": { "origem": "teste", "nota": "Visão mensal de teste: métricas do Databricks para outubro até 20/10/2026, sem classificação nem auditoria." },
+  "periodo": { "tipo": "mensal", "inicio": "2026-10-01", "fim": "2026-10-20", "label": "Outubro/2026 (até 20/10)" },
+  "gerado_em": "2026-10-20T14:10:00-03:00",
+  "cobertura": { "baixa": true, "comparacao_indisponivel": false, "texto": "mês parcial: dados em 4 dias (15, 16, 19 e 20/10); setembro tem só 10 dias, por causa do hiato." },
+  "metricas": {
+    "n_total": 120, "n_avaliaveis": 120, "n_ok": 96,
+    "bqs": 80.0, "bqs_anterior": 84.9, "ultimo_ponto_anterior": null,
+    "prompt_version": "v1",
+    "tfc": 4.2, "pct_pediu_humano": 95.8, "pct_transbordo": 100.0, "n_transbordo_nota_ok": 96,
+    "labels": { "excelente": 42, "bom": 54, "regular": 9, "ruim": 15, "critico": 0 },
+    "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 120, "loop": 0 },
+    "criterios": { "understanding": 7.19, "resolution": 6.94, "clarity": 7.14, "tone": 8.12, "efficiency": 6.59, "escalation": 9.79 }
+  },
+  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
+  "pontos_atencao": [
+    { "tipo": "info", "texto": "Todas as 120 conversas da amostra terminaram em transbordo e 95,8% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot." }
+  ],
+  "oportunidades": [],
+  "artigos": []
+}

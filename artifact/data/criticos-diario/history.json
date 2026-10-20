@@ -1,1 +1,5 @@
-[]
+[
+  {"inicio":"2026-10-15","fim":"2026-10-15","periodo_label":"15/10/2026","bqs":75.0,"tfc":7.7,"ce_pct_total":null,"n_total":13,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-10-16","fim":"2026-10-16","periodo_label":"16/10/2026","bqs":55.6,"tfc":0.0,"ce_pct_total":null,"n_total":9,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-10-19","fim":"2026-10-19","periodo_label":"19/10/2026","bqs":45.8,"tfc":24.0,"ce_pct_total":null,"n_total":25,"cobertura_baixa":false,"prompt_version":"v1"}
+]

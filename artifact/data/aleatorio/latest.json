@@ -1,7 +1,7 @@
 {
   "schema": "bqs-run/1",
   "chave": "aleatorio",
-  "rotina": "Aleatório (cross-vertical)",
+  "rotina": "Aleatório (semanal)",
   "meta": {
     "origem": "teste",
     "nota": "Só métricas reais do Databricks (20/10/2026). A classificação de contatos evitáveis, a auditoria e as oportunidades ainda não rodaram para esta rotina."
@@ -27,6 +27,6 @@
     "criterios": { "understanding": 7.15, "resolution": 6.88, "clarity": 7.04, "tone": 8.08, "efficiency": 6.54, "escalation": 9.77 }
   },
   "pontos_atencao": [
-    { "tipo": "info", "texto": "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot; os contatos evitáveis são o número principal desta rotina." }
+    { "tipo": "info", "texto": "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot. Exemplos de transbordos com resolução baixa: os contatos evitáveis são o número principal desta rotina.", "tickets": [46607730, 46608607, 46609156] }
   ]
 }

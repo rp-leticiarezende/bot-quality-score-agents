@@ -1,0 +1,45 @@
+{
+  "schema": "bqs-run/1",
+  "chave": "cartao-hp-mensal",
+  "rotina": "Agente de Cartão de Crédito (mensal)",
+  "meta": { "origem": "teste", "nota": "Visão mensal de teste: métricas do Databricks para outubro até 20/10/2026, sem a revisão do auditor. Contatos evitáveis, oportunidades e artigos serão consolidados a partir das rodadas semanais." },
+  "periodo": { "tipo": "mensal", "inicio": "2026-10-01", "fim": "2026-10-20", "label": "Outubro/2026 (até 20/10)" },
+  "gerado_em": "2026-10-20T14:10:00-03:00",
+  "cobertura": { "baixa": true, "comparacao_indisponivel": false, "texto": "mês parcial: dados em 4 dias (15, 16, 19 e 20/10); setembro também tem só 9 dias, por causa do hiato." },
+  "metricas": {
+    "n_total": 673, "n_avaliaveis": 660, "n_ok": 477,
+    "bqs": 72.3, "bqs_anterior": 68.9, "ultimo_ponto_anterior": null,
+    "prompt_version": "v1",
+    "tfc": 45.5, "pct_pediu_humano": 25.0, "pct_transbordo": 33.7, "n_transbordo_nota_ok": 197,
+    "labels": { "excelente": 307, "bom": 170, "regular": 88, "ruim": 69, "critico": 26 },
+    "retention": { "resolutiva": 196, "abandono": 234, "transbordo": 227, "loop": 12 },
+    "criterios": { "understanding": 7.69, "resolution": 6.78, "clarity": 7.38, "tone": 8.30, "efficiency": 6.82, "escalation": 7.84 },
+    "qualidade_dado": null
+  },
+  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
+  "dimensoes": {
+    "effective_vertical": [
+      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 556, "pct_volume": 82.6, "bqs": 70.6, "tfc": 45.5, "pct_pediu_humano": 26.3 },
+      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 117, "pct_volume": 17.4, "bqs": 80.4, "tfc": 45.3, "pct_pediu_humano": 18.8 }
+    ],
+    "topic": [
+      { "valor": "cartao-recargapay", "n": 408, "pct_volume": 60.6, "bqs": 80.3, "tfc": 41.9, "pct_pediu_humano": 24.5 },
+      { "valor": "recargapay-cards", "n": 32, "pct_volume": 4.8, "bqs": 64.5, "tfc": 31.3, "pct_pediu_humano": 15.6 },
+      { "valor": "pix", "n": 24, "pct_volume": 3.6, "bqs": 50.0, "tfc": 50.0, "pct_pediu_humano": 29.2 },
+      { "valor": "pix-payment", "n": 12, "pct_volume": 1.8, "bqs": 58.3, "tfc": 41.7, "pct_pediu_humano": 33.3 },
+      { "valor": "roubaram-meu-cartão", "n": 11, "pct_volume": 1.6, "bqs": 72.7, "tfc": 81.8, "pct_pediu_humano": 9.1 },
+      { "valor": "roubaram-meu-cartao", "n": 10, "pct_volume": 1.5, "bqs": 60.0, "tfc": 70.0, "pct_pediu_humano": 20.0 },
+      { "valor": "por-que-recebi-uma-fatura", "n": 10, "pct_volume": 1.5, "bqs": 50.0, "tfc": 50.0, "pct_pediu_humano": 40.0 },
+      { "valor": "fatura", "n": 9, "pct_volume": 1.3, "bqs": 55.6, "tfc": 66.7, "pct_pediu_humano": 22.2 },
+      { "valor": "faturas-e-limite", "n": 9, "pct_volume": 1.3, "bqs": 77.8, "tfc": 66.7, "pct_pediu_humano": 33.3 },
+      { "valor": "cashback-e-rendimento", "n": 6, "pct_volume": 0.9, "bqs": 50.0, "tfc": 33.3, "pct_pediu_humano": 33.3 },
+      { "valor": "tap-to-pay", "n": 6, "pct_volume": 0.9, "bqs": 50.0, "tfc": 50.0, "pct_pediu_humano": 33.3 },
+      { "valor": "investimentos", "n": 6, "pct_volume": 0.9, "bqs": 50.0, "tfc": 66.7, "pct_pediu_humano": 16.7 }
+    ]
+  },
+  "pontos_atencao": [
+    { "tipo": "info", "texto": "Visão mensal de teste: sem classificação de contatos evitáveis nem auditoria. Para os casos concretos e o que mudar, abra a visão semanal." }
+  ],
+  "oportunidades": [],
+  "artigos": []
+}

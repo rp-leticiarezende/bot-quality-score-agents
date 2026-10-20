@@ -1,0 +1,24 @@
+{
+  "schema": "bqs-run/1",
+  "chave": "criticos-mensal",
+  "rotina": "Casos críticos (mensal)",
+  "meta": { "origem": "teste", "nota": "Visão mensal de teste: métricas do Databricks para outubro até 20/10/2026, sem classificação nem auditoria." },
+  "periodo": { "tipo": "mensal", "inicio": "2026-10-01", "fim": "2026-10-20", "label": "Outubro/2026 (até 20/10)" },
+  "gerado_em": "2026-10-20T14:10:00-03:00",
+  "cobertura": { "baixa": true, "comparacao_indisponivel": false, "texto": "mês parcial: dados em 4 dias (15, 16, 19 e 20/10); em agosto eram 852 conversas no mês." },
+  "metricas": {
+    "n_total": 52, "n_avaliaveis": 50, "n_ok": 27,
+    "bqs": 54.0, "bqs_anterior": 50.0, "ultimo_ponto_anterior": null,
+    "prompt_version": "v1",
+    "tfc": 15.4, "pct_pediu_humano": 13.5, "pct_transbordo": 5.8, "n_transbordo_nota_ok": 2,
+    "labels": { "excelente": 19, "bom": 8, "regular": 5, "ruim": 6, "critico": 12 },
+    "retention": { "resolutiva": 40, "abandono": 8, "transbordo": 3, "loop": 0 },
+    "criterios": { "understanding": 6.12, "resolution": 5.50, "clarity": 6.46, "tone": 6.94, "efficiency": 5.77, "escalation": 5.67 }
+  },
+  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
+  "pontos_atencao": [
+    { "tipo": "warn", "texto": "40 das 52 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. A resolução é o critério mais baixo (5,50)." }
+  ],
+  "oportunidades": [],
+  "artigos": []
+}

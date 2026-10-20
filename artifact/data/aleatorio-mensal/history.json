@@ -1,0 +1,6 @@
+[
+  {"inicio":"2026-07-20","fim":"2026-07-31","periodo_label":"Jul/2026","bqs":41.5,"tfc":97.9,"ce_pct_total":null,"n_total":193,"cobertura_baixa":true,"prompt_version":"v1"},
+  {"inicio":"2026-08-01","fim":"2026-08-31","periodo_label":"Ago/2026","bqs":80.4,"tfc":18.5,"ce_pct_total":null,"n_total":1424,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-09-01","fim":"2026-09-30","periodo_label":"Set/2026","bqs":84.9,"tfc":17.3,"ce_pct_total":null,"n_total":502,"cobertura_baixa":true,"prompt_version":"v1"},
+  {"inicio":"2026-10-01","fim":"2026-10-20","periodo_label":"Out/2026 (até 20/10)","bqs":80.0,"tfc":4.2,"ce_pct_total":null,"n_total":120,"cobertura_baixa":true,"prompt_version":"v1"}
+]

@@ -1,0 +1,24 @@
+{
+  "schema": "bqs-run/1",
+  "chave": "criticos-diario",
+  "rotina": "Casos críticos (diário)",
+  "meta": { "origem": "teste", "nota": "Dia 19/10/2026: métricas do Databricks, sem classificação nem auditoria." },
+  "periodo": { "tipo": "diario", "inicio": "2026-10-19", "fim": "2026-10-19", "label": "19/10/2026" },
+  "gerado_em": "2026-10-20T14:10:00-03:00",
+  "cobertura": { "baixa": false, "comparacao_indisponivel": true, "texto": "18/10 foi domingo, sem registros; o dia anterior com dado é 16/10." },
+  "metricas": {
+    "n_total": 25, "n_avaliaveis": 24, "n_ok": 11,
+    "bqs": 45.8, "bqs_anterior": null, "ultimo_ponto_anterior": { "bqs": 55.6, "fim": "2026-10-16" },
+    "prompt_version": "v1",
+    "tfc": 24.0, "pct_pediu_humano": 8.0, "pct_transbordo": 8.0, "n_transbordo_nota_ok": 2,
+    "labels": { "excelente": 7, "bom": 4, "regular": 1, "ruim": 5, "critico": 7 },
+    "retention": { "resolutiva": 16, "abandono": 6, "transbordo": 2, "loop": 0 },
+    "criterios": { "understanding": 5.40, "resolution": 4.60, "clarity": 5.84, "tone": 6.64, "efficiency": 5.04, "escalation": 4.80 }
+  },
+  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
+  "pontos_atencao": [
+    { "tipo": "warn", "texto": "Dia 19/10: 7 das 25 conversas foram classificadas como críticas, a resolução média é 4,6 e 6 conversas terminaram em abandono. Exemplos com resolução 0:", "tickets": [46625592, 46625677, 46626567] }
+  ],
+  "oportunidades": [],
+  "artigos": []
+}

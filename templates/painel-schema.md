@@ -3,7 +3,7 @@
 O painel (`artifact/painel.html`) é uma página fixa que lê arquivos JSON publicados ao lado dela. Cada rotina publica **dois arquivos próprios** e nunca mexe nos das outras:
 - `data/<chave>/latest.json` — a rodada atual completa;
 - `data/<chave>/history.json` — a série da linha do tempo (array, até 104 itens ≈ 2 anos de semanas).
-Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
+Chaves das rotinas: `cartao-hp` (Agente de Cartão de Crédito, semanal), `aleatorio`, `criticos-diario`, `criticos-semanal`. Chaves das visões mensais (`cartao-hp-mensal`, `aleatorio-mensal`, `criticos-mensal`, `periodo.tipo = "mensal"`) são geradas depois, consolidando as rodadas semanais; o painel já as lê quando existirem.
 O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global e mantido por humanos**: nenhuma rotina escreve nele.
 
 **Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo. Existe **um único BQS** (o que inclui a nota revisada pelo auditor): não grave "BQS original" nem "BQS legado".
@@ -11,10 +11,10 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 ```
 {
   "schema": "bqs-run/1",
-  "chave": "cartao-hp | aleatorio | criticos-diario | criticos-semanal",
+  "chave": "cartao-hp | aleatorio | criticos-diario | criticos-semanal | cartao-hp-mensal | aleatorio-mensal | criticos-mensal",
   "rotina": "nome legível da rotina",
   "meta": { "origem": "rotina" },                     // "teste" só em rodadas de validação manual; "nota" opcional
-  "periodo": { "tipo": "semanal | diario", "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "label": "12/10 a 18/10/2026" },
+  "periodo": { "tipo": "semanal | diario | mensal", "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "label": "12/10 a 18/10/2026" },
   "gerado_em": "AAAA-MM-DDThh:mm:ss-03:00",
   "cobertura": { "baixa": true|false, "comparacao_indisponivel": true|false, "texto": "frase curta (dias com dado, buracos, ingestão atrasada)" },
   "metricas": {
@@ -35,11 +35,11 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
   "contencao": {                                        // do Passo 6.1; omita o objeto se não houve classificação
     "n_classificadas": 0, "n_elegiveis": 0, "pct_evitavel": 0.0, "ic95": [0, 0], "ce_pct_total": 0.0,
     "classes": { "A": 0, "B": 0, "C": 0, "D": 0, "R": 0, "E": 0 },
-    "causas": [ { "classe": "A", "causa": "prompt_resposta", "causa_rotulo": "texto legível", "n": 0 } ],
+    "causas": [ { "classe": "A", "causa": "prompt_resposta", "causa_rotulo": "texto legível", "n": 0, "tickets": ["ticket_id", "até 3 exemplos"] } ],
     "por_dono": { "Produto CX": 0, "Help Design": 0 },
     "handoff": { "correto": 0, "improvisado": 0, "tardio": 0 }
   },
-  "pontos_atencao": [ { "tipo": "crit | warn | info", "texto": "frase" } ],      // máx. 4 + o de cobertura
+  "pontos_atencao": [ { "tipo": "crit | warn | info", "texto": "frase", "tickets": ["opcional: até 3 ticket_id de exemplo"] } ],      // máx. 4 + o de cobertura
   "oportunidades": [ {
     "id": "OPO-001", "prioridade": "alta | media | baixa", "classe": "A|B|C|D", "causa": "…", "tipo": "cross-domain | fluxo | politica | variavel | capacidade | integracao | handoff | artigo",
     "frente": "artigo | variavel_hp | prompt | fluxo | politica | capacidade | handoff",
@@ -49,7 +49,7 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
     "proposta": "…", "no": "nó/artigo confirmado ou 'nó a confirmar pelo Produto CX'",
     "dono": "Produto CX | Help Design", "prazo": "Imediato | Sprint | Backlog", "dependencias": "…", "como_medir": "…"
   } ],
-  "artigos": [ { "acao": "criar | atualizar", "titulo": "título exato do artigo público", "secao": "…", "problema": "…", "primeira_frase": "resposta direta sugerida", "conversas": 0, "prioridade": "alta | media | baixa" } ]
+  "artigos": [ { "acao": "criar | atualizar", "tickets": ["até 3 ticket_id de exemplo"], "titulo": "título exato do artigo público", "secao": "…", "problema": "…", "primeira_frase": "resposta direta sugerida", "conversas": 0, "prioridade": "alta | media | baixa" } ]
 }
 ```
 
@@ -58,6 +58,7 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 - `contencao.ic95` = intervalo de Wilson de 95% da proporção `pct_evitavel` (em %, inteiros) com `n = n_classificadas`.
 - `contencao.ce_pct_total` = `pct_evitavel × n_elegiveis / n_total` (vem pronto do SQL do Passo 6.1; copie).
 - Só entram em `oportunidades` itens com dono **Produto CX** ou **Help Design**; nada sobre atendimento humano; nenhum artigo cujo título comece com 🔒 ou 🔍.
+- **Tickets de exemplo (obrigatório para o que o painel mostra):** em cada oportunidade, em cada causa de `contencao.causas` e em cada item de `artigos`, informe até 3 `ticket_id` reais que exemplifiquem o problema (do `output_contencao`, `output_fluxo`, `output_kb`); nunca invente. Em `pontos_atencao` de casos críticos, inclua `tickets` quando o ponto descrever um padrão.
 - Em `artigos`, só títulos exatos que vieram do `output_kb`; nunca invente título, ID ou URL (a URL costuma chegar redigida: omita).
 - Nomes internos do prompt → contrato: `bqs_final` → `bqs`, `n_ok_final` → `n_ok`, `n_hp_degradado`/`pct_degradado` → `qualidade_dado.n_sem_boas_vindas`/`pct_sem_boas_vindas`. Não grave `bqs_original`, `bqs_pleno`, `bqs_degradado` nem colunas fora do contrato.
 - `dimensoes`: copie as linhas do SQL (só as colunas do contrato); se `n < 30` mantenha a linha (o painel marca "amostra pequena").

@@ -11,7 +11,7 @@ tools:
   - Agent
 ---
 
-Você é o orquestrador da análise semanal de qualidade do fluxo **Cartão de Crédito HP** do chatbot RecargaPay.
+Você é o orquestrador da análise semanal de qualidade do fluxo **Agente de Cartão de Crédito (semanal)** do chatbot RecargaPay.
 
 Execute os passos em ordem. Não pule etapas. Não consulte fontes externas — apenas o Databricks. **Você não calcula nada de cabeça:** todo número vem de uma consulta SQL; você copia os resultados. Você não interpreta os dados — coleta, mede, distribui e consolida.
 
@@ -144,7 +144,7 @@ Regras (aplique com os números retornados):
 
 Registre `cobertura_baixa` (sim/não), `comparacao_indisponivel` (sim/não) e a lista de buracos/atrasos, em texto curto. Esses itens são repassados ao relatório **como o primeiro ponto de atenção** quando forem "sim".
 
-**Se `n_atual = 0`:** acione `chatbot-relatorio-cx` com o prompt `MODO SEM DADOS — Cartão de Crédito HP — [período]: sem dados na tabela. Nenhuma análise gerada.` (ele só posta a mensagem no Slack, sem artefato) e encerre.
+**Se `n_atual = 0`:** acione `chatbot-relatorio-cx` com o prompt `MODO SEM DADOS — Agente de Cartão de Crédito (semanal) — [período]: sem dados na tabela. Nenhuma análise gerada.` (ele só posta a mensagem no Slack, sem artefato) e encerre.
 
 ---
 
@@ -336,7 +336,7 @@ Se uma consulta falhar com `The connector's server returned an error`, repita **
 subagent_type: chatbot-cx-botmaker
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão de Crédito HP | Período: [data_inicio] a [data_fim]
+  Fluxo: Agente de Cartão de Crédito (semanal) | Período: [data_inicio] a [data_fim]
   Total de conversas do fluxo: [n_total]
 
   Analise os dados abaixo e retorne o output estruturado conforme a seção MODO CURADORIA do seu sistema.
@@ -351,7 +351,7 @@ Guarde o output completo como `output_fluxo`.
 subagent_type: zendesk-guide-expert
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão de Crédito HP | Período: [data_inicio] a [data_fim]
+  Fluxo: Agente de Cartão de Crédito (semanal) | Período: [data_inicio] a [data_fim]
 
   TABELAS PRÉ-CALCULADAS (use exatamente estes números; não recalcule):
   [KB por vertical — resultado do Pacote B1]
@@ -370,7 +370,7 @@ Guarde como `output_kb`.
 subagent_type: chatbot-hp-variaveis
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão HP | Período: [data_inicio] a [data_fim]
+  Fluxo: Agente de Cartão de Crédito | Período: [data_inicio] a [data_fim]
 
   MÉTRICAS BASE (SQL — não recalcule):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis]
@@ -400,7 +400,7 @@ Calcule `N_LOTES = CEILING(MIN(n_elegiveis_contencao, 150) / 30)` com `n_elegive
 subagent_type: bqs-contencao
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão de Crédito HP | Período: [data_inicio] a [data_fim] | LOTE [k] de [N_LOTES]
+  Fluxo: Agente de Cartão de Crédito (semanal) | Período: [data_inicio] a [data_fim] | LOTE [k] de [N_LOTES]
 
   Execute a consulta abaixo exatamente como está e classifique TODAS as linhas retornadas,
   no formato de saída do seu sistema.
@@ -435,7 +435,7 @@ O `bqs-contencao` marca `auditar = sim` nos casos em que a nota ou a classe não
 subagent_type: bqs-auditor
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão de Crédito HP | flow (valor exato da coluna `flow`): Conversations fluxo_hp_botmaker | Período: [data_inicio] a [data_fim] | AUDITOR [n]
+  Fluxo: Agente de Cartão de Crédito (semanal) | flow (valor exato da coluna `flow`): Conversations fluxo_hp_botmaker | Período: [data_inicio] a [data_fim] | AUDITOR [n]
 
   Audite os tickets abaixo conforme o seu sistema. Identifique-os só por ticket_id (não repita dados pessoais).
   [uma linha por ticket: ticket_id | motivo da auditoria (classe E / confianca baixa / contradição nota×desfecho / crítico aprovado / alto impacto) | classe|causa atual]
@@ -572,7 +572,7 @@ Guarde como `bqs_final` (nome interno; no relatório e no painel ele se chama ap
 subagent_type: chatbot-oportunidades
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão de Crédito HP | Período: [data_inicio] a [data_fim]
+  Fluxo: Agente de Cartão de Crédito (semanal) | Período: [data_inicio] a [data_fim]
 
   MÉTRICAS BASE (SQL):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis] | BQS: [bqs_final]% (período anterior: [bqs_anterior]% ou "sem base de comparação")
@@ -611,7 +611,7 @@ Guarde como `output_oportunidades`.
 subagent_type: chatbot-proposta-ajustes
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão de Crédito HP | Período: [data_inicio] a [data_fim]
+  Fluxo: Agente de Cartão de Crédito (semanal) | Período: [data_inicio] a [data_fim]
 
   Para cada oportunidade do backlog abaixo, gere a proposta de ajuste concreta e pronta para implementar.
   Cada proposta deve dizer **o que o bot teria dito/feito para reter o cliente** (texto da resposta ou regra), não apenas "melhorar".
@@ -635,7 +635,7 @@ Guarde como `output_propostas`.
 subagent_type: chatbot-relatorio-cx
 prompt: |
   MODO CURADORIA ativo.
-  Fluxo: Cartão de Crédito HP | Rotina (chave do artefato): cartao-hp | Período: [data_inicio] a [data_fim]
+  Fluxo: Agente de Cartão de Crédito (semanal) | Rotina (chave do artefato): cartao-hp | Período: [data_inicio] a [data_fim]
   Datas para o JSON do painel: inicio_iso = [inicio_iso] | fim_iso = [fim_iso] | gerado_em = [gerado_em_brt]-03:00 | tipo do período: semanal
   Período anterior (rótulo): [ant_inicio] a [ant_fim]
 

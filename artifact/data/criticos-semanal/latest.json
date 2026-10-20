@@ -27,6 +27,6 @@
     "criterios": { "understanding": 6.95, "resolution": 6.64, "clarity": 7.23, "tone": 7.32, "efficiency": 6.59, "escalation": 6.86 }
   },
   "pontos_atencao": [
-    { "tipo": "warn", "texto": "20 das 22 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. O padrão mais recorrente a investigar é a resposta que encerra sem resolver." }
+    { "tipo": "warn", "texto": "20 das 22 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. O padrão mais recorrente a investigar é a resposta que encerra sem resolver. Exemplos com resolução 0 ou 1:", "tickets": [46609212, 46611706, 46604540] }
   ]
 }
