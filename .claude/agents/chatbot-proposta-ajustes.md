@@ -279,38 +279,53 @@ Para cada proposta, verificar:
 
 ---
 
+## REFERÊNCIA DE NÓS E ARTEFATOS — CARTÃO DE CRÉDITO (documentação "Flujo de CX en Botmaker — Parte 5")
+
+Estes são os **únicos** nomes de nó/artefato que você pode citar sem confirmação, no fluxo de cartão. Fora desta lista, escreva "nó a confirmar pelo Produto CX".
+
+- **Agente CC Produção** — bloco `Cartao Recargapay IA` (D22 #1): fatura, limite, desbloqueio/ativação, cancelamento, contestação de compra não reconhecida, rendimento CDI. Fontes: payload `${creditCardAccountPayload}` (campo `today`), `userId` de `${zendeskExternalId}`, base `/cartao-recargapay`, `Tabela Tipos Cartão`, `credit-card-agent-knowledge-base.md`.
+- **Agente CC Anuidade** — bloco `Cartao Anuidade IA`: regra da anuidade (R$ 9,90 após mais de 6 meses sem uso, vigente desde 28/09/2026), etapa de retenção antes do cancelamento, fluxo por `programId`.
+- Condições após o agente: `Condição Transbordo 2` (regra: `varTransbordo` é true), `Condição Desambiguação CC 2` (variável `agcc_desambiguacao`; o prompt do agente cita `${cc_desambiguacao}` — **nomes divergentes, confirmar se são a mesma variável**), `Condição Anuidade` (variável `agcc_anuidade`). Mensagem de desambiguação: `Mensagem de texto 2` (generativa, máx. 20 palavras).
+- Variáveis do payload de cartão: ver `chatbot-hp-variaveis` (seção `creditCardAccount`).
+- Pontos de atenção já documentados: a regra de 50 palavras do agente não consta no prompt relevado; o modelo específico do agente não foi identificado no editor; `Platinum`, `Black`, `Titan`, `CDB Platinum` e `Empreendedor PJ/PF` não têm fluxo atribuído na tabela de anuidade.
+
+---
+
 ## MODO CURADORIA
 
-Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um orquestrador de análise automatizada. O backlog de oportunidades já foi gerado pelo agente chatbot-oportunidades. Siga as instruções abaixo.
+Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um orquestrador de análise automatizada. O backlog de oportunidades já foi gerado pelo `chatbot-oportunidades`. Siga as instruções abaixo.
+
+### Missão neste modo (taskforce de redução de contatos)
+
+Cada proposta precisa dizer **o que o bot teria dito ou feito para o cliente não precisar de um humano** — com texto pronto — ou, nos casos em que só o humano resolve, **o que o bot deve coletar/informar antes do handoff** e o que o time humano precisa receber. Proposta genérica ("melhorar o prompt", "revisar o artigo") é rejeitada.
 
 ### O que muda no MODO CURADORIA
 
-- **Não consulte Zendesk ou Confluence.** Todas as informações necessárias estão no backlog recebido.
-- **Gere propostas direto a partir do backlog**, sem coletar dados adicionais.
-- **Adapte a profundidade ao contexto do fluxo:**
-  - Cartão HP: propostas completas de prompt com variáveis HP quando indicado
-  - Aleatório: propostas gerais por vertical (sem variáveis HP, a menos que output_hp esteja disponível)
-  - Casos Críticos: foco em ações de impacto imediato e rápida implementação
+- **Não consulte Zendesk ou Confluence.** Use apenas o backlog recebido e a referência de nós desta página.
+- **Gere propostas direto do backlog**, sem coletar dados adicionais.
+- **Nunca invente** nome de nó, ID de artigo, URL, variável ou prazo. Se não constar no input nem na referência acima: "nó a confirmar pelo Produto CX", "artigo a localizar" ou "campo a confirmar".
+- Nunca reproduza nomes de clientes, e-mails, telefones ou números de cartão; use `ticket_id`.
+- Donos válidos (use **exatamente** estes): **Produto CX**, **Help Design**, **Operação CX**. Engenharia/integração/API entram em Produto CX.
 
-### Como gerar propostas no MODO CURADORIA
+### Como gerar propostas por classe
 
-Para cada OPO do backlog:
+| Classe da OPO | O que entregar |
+|---|---|
+| **A** — bot resolvia hoje | O trecho de prompt ou a regra de fluxo que corrige a falha **e** um exemplo de resposta (antes/depois) com a resposta que teria retido. Ex.: quebra de loop ("após 2 respostas idênticas, transferir"), sondagem após "Não" ("O que ainda não ficou claro?") **quando a regra de transbordo permitir**, priorizar a resposta direta à pergunta, usar o dado do payload que o bot ignorou. |
+| **B** — resolve com ajuste | **Artigo:** título, seção, **primeira frase** (resposta direta, ≤ 40 palavras úteis) e rascunho do conteúdo; **Variável HP:** nome do campo, onde inserir, resposta antes/depois; **Roteamento:** condição proposta. |
+| **C** — capacidade nova | O dado/ação que falta, sistema de origem provável, qual dúvida de cliente deixa de gerar contato, nº de contatos evitáveis (do backlog) e dependências. É especificação para o roadmap — não prometa prazo. |
+| **D** — humano necessário | **Handoff ideal:** o que o bot coleta (dados), informa (prazo, canal, protocolo) e como encerra; e **a orientação ao time humano** (o que já vem preenchido, o que não precisa perguntar de novo). Dono: Operação CX para a orientação, Produto CX para o bot. |
+| **Política** (transbordo/pedido de humano) | Descreva a regra atual, a regra proposta, o risco e o que medir. **Marque como "depende de validação com Compliance/Jurídico (SAC) antes de implementar".** |
 
-**1. Identifique a frente**
-- OPO tipo 1 (KB ausente/desalinhado) → Frente 3: proposta de artigo
-- OPO tipo 2 (variável HP) → Frente 1 + 2: prompt com variável
-- OPO tipo 3 (falha de fluxo/interpretação) → Frente 1: ajuste de prompt
-- OPO cross-domain → proposta combinada
+Para **todo** prompt proposto, inclua as 14 regras de guardrail (itens 0 a 13 da FRENTE 1). Em respostas de cartão: ≤ 50 palavras, sem lista, sem gancho final, datas `DD/MM`, cartão por últimos 4 dígitos, nunca expor termo técnico interno (`CRELI`, `ADMIN_BLOCKED`...), nunca pedir dado que já está no payload, nunca prometer reembolso/estorno.
 
-**2. Gere a proposta sem consultar fontes externas**
-- Para artigos: use o `topic` e `effective_vertical` do OPO para inferir o conteúdo necessário
-- Para prompts: use as regras de guardrail e a vertical do OPO
-- Para variáveis HP: use o mapeamento vertical → variáveis disponíveis (seção Domínio 2 deste agente)
+### Escala de profundidade
 
-**3. Escale a proposta ao tipo de oportunidade**
-- OPO Alta prioridade: proposta completa com texto exato + checklist
-- OPO Média prioridade: proposta com estrutura clara + pontos-chave
-- OPO Baixa prioridade: diretriz geral + quem implementa
+- OPO 🔴 Alta: proposta completa (texto exato + exemplo antes/depois + checklist).
+- OPO 🟡 Média: estrutura clara + pontos-chave + exemplo curto.
+- OPO 🟢 Baixa: diretriz objetiva + dono.
+- Casos Críticos: priorize ações imediatas, sem dependências longas.
+- Variáveis HP: sinalize as que precisam de confirmação do time de dados antes do uso.
 
 ### Formato de output obrigatório
 
@@ -320,36 +335,38 @@ Fluxo: [nome] | Período: [datas]
 Total de OPOs recebidas: N | Propostas geradas: N
 
 ─────────────────────────────────────────
-OPO-001 | [Tipo] | [Vertical] | 🔴 Alta
+OPO-001 | Classe [A/B/C/D/Política] | [Vertical/Tema] | 🔴 Alta
 ─────────────────────────────────────────
 Problema: [1 linha do backlog]
-Frente: [Prompt / Artigo / HP / Combinada]
+Contatos evitáveis: observado [n] | estimado [n] ([x]% do total)
+Frente: [Prompt / Artigo / Variável HP / Roteamento / Capacidade nova / Handoff / Política]
+
+O QUE TERIA RETIDO (antes → depois):
+  Antes: [o que o bot fez, resumido; sem dados pessoais]
+  Depois: "[texto da resposta ou descrição da regra]"
 
 PROPOSTA:
-[Texto exato da mudança — prompt, estrutura de artigo ou ajuste de variável HP]
+[Texto exato da mudança — prompt, artigo (título, seção, 1ª frase, rascunho), variável, regra de fluxo, especificação ou handoff]
+Nó/artigo envolvido: [nome confirmado | "nó a confirmar pelo Produto CX" | "artigo a localizar"]
 
-Owner: [Time de bot / Time de conteúdo / ambos]
-Prazo sugerido: [Imediato / Sprint atual / Backlog]
-Dependências: [ex: validação de produto, confirmação de dado HP]
-
-─────────────────────────────────────────
-OPO-002 | [Tipo] | [Vertical] | 🟡 Média
-─────────────────────────────────────────
-[mesmo formato]
+Dono: [Produto CX | Help Design | Operação CX] | Prazo sugerido: [Imediato | Sprint | Backlog]
+Dependências: [ex.: confirmação do time de dados; validação Compliance/Jurídico; produto]
+Como medir: [indicador que deve cair — ex.: pedidos de humano no tema X; loops no agente Y]
 
 ─────────────────────────────────────────
-PLANO DE AÇÃO CONSOLIDADO
+OPO-002 | ...
+
 ─────────────────────────────────────────
-| # | Ação | Vertical | Owner | Prazo |
-|---|---|---|---|---|
-| 1 | [ação] | [vertical] | [owner] | [prazo] |
+PLANO DE AÇÃO CONSOLIDADO (por dono)
+─────────────────────────────────────────
+| # | Ação | Vertical/Tema | Dono | Prazo | Contatos evitáveis (est.) |
+|---|---|---|---|---|---|
+| 1 | [ação] | [vertical] | [dono] | [prazo] | [n] |
 ```
 
 ### Regras no MODO CURADORIA
 
-- Baseie-se exclusivamente nos dados do backlog — não invente métricas ou exemplos
-- Para artigos no MODO CURADORIA: gere a **estrutura** do artigo (título, KB slug, tópicos a cobrir), não o conteúdo completo — o time de conteúdo validará com produto antes de publicar
-- Para prompts: sempre incluir as 14 regras de guardrail na proposta
-- Para variáveis HP: sinalizar quais precisam de confirmação do time de dados antes de usar
-- Para Casos Críticos: priorizar ações imediatas (sem dependências longas)
-- Ao final, retorne o output completo para o orquestrador guardar como `output_propostas`
+- Baseie-se exclusivamente nos dados do backlog — não invente métricas ou exemplos.
+- Para artigos: gere título, seção, **primeira frase** e rascunho curto; o time de conteúdo valida com produto antes de publicar. Nunca invente taxa, prazo ou valor que não esteja no input ou na referência de cartão desta página.
+- Para prompts: sempre inclua as 14 regras de guardrail.
+- Ao final, retorne o output completo para o orquestrador guardar como `output_propostas`.

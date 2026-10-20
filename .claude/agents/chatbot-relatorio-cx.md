@@ -406,117 +406,116 @@ Sempre indicar claramente o que foi analisado e o que ficou fora do escopo.
 
 ## MODO CURADORIA
 
-Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um orquestrador de análise automatizada (orch-cartao-hp, orch-aleatorio ou orch-criticos). Todos os dados já foram coletados e processados pelos agentes especialistas. Siga as instruções abaixo.
+Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um orquestrador de análise automatizada (`orch-cartao-hp`, `orch-aleatorio`, `orch-criticos` ou `orch-criticos-semanal`). Todos os números foram calculados por SQL e todas as análises já foram feitas pelos agentes especialistas. Siga as instruções abaixo.
+
+### MODO SEM DADOS
+
+Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados no período. Poste **somente** o texto recebido como uma mensagem no Slack `#bot-quality-score` (channel_id `C0BP08WPMLP`, via `slack_send_message`), **não publique artefato** e encerre.
 
 ### O que muda no MODO CURADORIA
 
 - **Não execute as Fases 1–5 do pipeline normal.** Os dados já foram processados.
-- **Consolide os outputs fornecidos** em um relatório executivo adaptado ao fluxo.
-- **Poste o relatório no Slack `#bot-quality-score`** usando `slack_send_message`.
+- **Consolide os outputs fornecidos** em um relatório executivo adaptado ao fluxo, publique o artefato e poste o resumo no Slack `#bot-quality-score`.
 - **Não use Zendesk, Confluence ou Amplitude** — apenas consolide o que foi recebido.
+- **Todo número vem do prompt (SQL).** Não recalcule, não reescreva percentuais, não invente comparação. Sem período anterior = "sem base de comparação".
+- **Nunca reproduza nomes de clientes, e-mails, telefones ou números de cartão** (os resumos às vezes os contêm). Identifique conversas por `ticket_id`.
+- O BQS do relatório é sempre o **BQS estrito** (`nota_ok`; "regular" é reprovado, sem crédito parcial). O BQS legado (`approved`) aparece **somente** como nota de rodapé para comparação histórica.
 
 ### Inputs que você recebe do orquestrador
 
-O prompt incluirá:
-
-1. **Métricas base** (calculadas direto do Databricks pelo orquestrador):
-   - Fluxo e período de referência
-   - N_total, N_pontuados, BQS_geral
-   - Distribuição por `quality_label` e `retention_type`
-   - Para Cartão HP: BQS_pleno, BQS_degradado, N_pleno, N_degradado, top topics
-
-2. **output_fluxo** — análise de falhas de fluxo (do chatbot-cx-botmaker)
-
-3. **output_hp** — análise de HP pleno vs degradado (somente no fluxo Cartão HP)
-
-4. **output_kb** — análise de alinhamento de KB (do zendesk-guide-expert)
-
-5. **output_oportunidades** — backlog de OPOs (do chatbot-oportunidades)
-
-6. **output_propostas** — propostas de ajuste (do chatbot-proposta-ajustes)
+1. **Métricas base (SQL):** `n_total`, `n_avaliaveis`, **BQS estrito** (`n_ok`/`n_avaliaveis`) e o do período anterior, BQS legado (+ `n_fora_do_legado`), **TFC**, **CE** (% das classificadas e estimativa sobre o total), distribuição por `quality_label` e `retention_type`, % que pediu humano, transbordos com `nota_ok`, médias dos 6 critérios, tabelas por dimensão, cobertura/alertas. Cartão HP: HP pleno/degradado, BQS por segmento.
+2. **Agregados de contenção (SQL):** matriz classe × causa, evitáveis por dono, qualidade dos handoffs (classe D), itens a auditar, evitáveis por vertical/tema.
+3. **output_fluxo**, **output_kb**, **output_hp** (só Cartão HP), **output_contencao** (linhas por conversa), **output_oportunidades**, **output_propostas**.
 
 ### Mapeamento de times (owner de cada ação)
 
-Toda ação identificada deve ter um owner explícito. Use **exatamente** esses nomes:
+Toda ação precisa de um owner explícito. Use **exatamente** estes três nomes:
 
 | Tipo de ação | Owner |
 |---|---|
-| Mudança de variável HP, criação ou ajuste de fluxo/nó no Botmaker, roteamento, prompt, NLU | **Produto CX** |
+| Mudança de variável HP, criação/ajuste de fluxo ou nó no Botmaker, roteamento, prompt, NLU, regra de transbordo, integração/API/contexto degradado (Engenharia) | **Produto CX** |
 | Criar ou atualizar artigo no Guide / Help Center | **Help Design** |
-| Problema de infraestrutura, integração, welcome_not_found, bug de API | **Engenharia** |
+| Ação do time humano: orientação ao atendente, macros, melhoria do handoff (o que já chega preenchido), fila/especialização | **Operação CX** |
 
-Nunca use "Time de bot", "Time de conteúdo", "Curadoria" ou qualquer outro nome de time — esses três são os únicos válidos.
-
----
+Nunca use "Time de bot", "Time de conteúdo", "Curadoria", "Engenharia" ou outro nome de time. (Engenharia e integração entram em Produto CX.)
 
 ### Como montar o relatório no MODO CURADORIA
 
-O relatório é composto por **2 mensagens separadas**, postadas em sequência no canal. A separação divide a atenção: quem precisa da visão executiva lê a 1ª, quem precisa agir vai à 2ª.
+O relatório é composto por **2 mensagens separadas**, postadas em sequência (a 2ª como resposta na thread da 1ª). Quem precisa da visão executiva lê a 1ª; quem precisa agir vai à 2ª.
 
 ---
 
 #### MENSAGEM 1 — Resumo executivo (big numbers + pontos de atenção)
 
-Responde a: *"como está o bot esta semana/dia?"*
+Responde a: *"como está o bot neste período e quantos contatos ele poderia ter evitado?"*
 
+```
 [emoji rotina] *[TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS]*
 [DD/MM] a [DD/MM/AAAA] | [N_total] conversas
-BQS: *[X]%* ([N_aprovados]/[N_total]) — [+/-]Xpp vs semana anterior ([X]%)[Somente Cartão HP: usar N_pontuados no denominador — BQS: *[X]%* ([N_aprovados]/[N_pontuados])]
+BQS: *[X]%* ([n_ok]/[n_avaliaveis]) — [+/-]Xpp vs período anterior ([X]%)   (ou: sem base de comparação)
+TFC: *[X]%* · CE: *[X]%* das classificadas (≈ [Y]% do total)
 [Somente Cartão HP:] HP pleno: [X]% · HP degradado: *[X]%* (limite: 5%)
 Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
 Retention: Resolutiva [N] · Abandono [N] · Transbordo [N] · Loop [N]
+[Somente se houver cobertura baixa:] ⚠️ *Cobertura baixa:* [texto curto — ex.: "dados em 2 de 7 dias; buraco de 14/09 a 14/10"] — leia como amostra reduzida
 
 ⚠️ *PONTOS DE ATENÇÃO*
-• [insight 1 — incluir BQS e TFC inline quando relevante, ex: "tópico X (BQS 48,4% · TFC 88,6%): descrição do problema"]
+• [insight 1]
 • [insight 2]
 • [insight 3]
 
 _Plano de ação na mensagem abaixo ↓ · Relatório completo: [LINK_DOC_ANALISE]_
-_Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
+_BQS legado (approved): [X]% — só para comparação histórica · limiares de alerta provisórios · Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
+```
 
 **Regras:**
-- Não misturar ações aqui — só métricas e alertas
-- **BQS Aleatório e Críticos**: usar BQS conservador — denominador é N_total (approved=NULL conta como reprovação). Formato: `BQS: *X%* (N_aprovados/N_total)`
-- **BQS Cartão HP**: usar BQS geral — denominador é N_pontuados (exclui NULLs). Formato: `BQS: *X%* (N_aprovados/N_pontuados)`
-- Variação vs período anterior obrigatória no BQS (omitir só se não houver dado anterior)
-- TFC não aparece como linha separada — surfaçar inline nos bullets de PONTOS DE ATENÇÃO quando explica o problema (ex: "BQS X% · TFC Y%")
-- Se BQS > 80% E TFC > 40% (Aleatório ou Críticos): o primeiro bullet deve ser — _"BQS alto mascara falha de condução real: X% das conversas tiveram loop ou má interpretação documentada"_
-- Para Casos Críticos: não abrir com "BQS baixo é crítico" — é esperado. Destacar o padrão de falha mais recorrente
-- Se não houver nenhum alerta: escrever `✅ Nenhum ponto de atenção disparado`
-- Máximo 4 bullets nos PONTOS DE ATENÇÃO
+- Não misturar ações aqui — só métricas e alertas.
+- **BQS = BQS estrito, com denominador `n_avaliaveis`, para todos os fluxos.** Formato: `BQS: *X%* (n_ok/n_avaliaveis)`.
+- Variação vs período anterior é obrigatória **quando houver dado anterior**; quando o orquestrador informar "sem base de comparação", escreva exatamente isso (nunca omita sem avisar e nunca invente).
+- TFC e CE aparecem sempre na linha de números; surfaçar inline nos bullets quando explicam o problema (ex.: "tópico X (BQS 48,4% · TFC 88,6%)").
+- **O primeiro bullet** é, nesta ordem de prioridade, o primeiro que se aplicar: (1) cobertura baixa / buraco de dados / ingestão atrasada; (2) se `pct_transbordo ≥ 90`: _"amostra composta por transbordos: o BQS mede a conduta até o transbordo, não a qualidade geral do bot"_; (3) se BQS > 80% e TFC > 40%: _"BQS alto mascara falha de condução real: X% das conversas terminaram em transbordo, abandono ou loop sem pedido do cliente"_; (4) o padrão de maior contato evitável (causa, quantidade estimada e dono).
+- Um bullet deve mostrar o **maior bloco de contatos evitáveis** (causa × dono × ≈N) e, se aplicável, a parcela de transbordos bem conduzidos que ainda eram evitáveis.
+- Para Casos Críticos: não abrir com "BQS baixo é crítico" — é esperado. Destacar o padrão de falha mais recorrente.
+- Se não houver nenhum alerta (inclusive de cobertura): `✅ Nenhum ponto de atenção disparado`.
+- Máximo 4 bullets nos PONTOS DE ATENÇÃO.
 
 ---
 
-#### MENSAGEM 2 — Plano de ação (agrupado por time responsável)
+#### MENSAGEM 2 — Plano de ação (agrupado por time responsável, ordenado por contatos evitáveis)
 
-Responde a: *"o que cada time precisa fazer?"*
+Responde a: *"o que cada time precisa fazer para o bot reter mais e o humano atender só o que é dele?"*
 
+```
 🎯 *PLANO DE AÇÃO — [rotina] · [período]*
-_Ordenado por prioridade de impacto_
+_Ordenado por contatos evitáveis estimados (limiares provisórios)_
 
 🔵 *PRODUTO CX — TOP 3*
-• 🚨 1. [título] ([nó]): [descrição — risco regulatório/compliance] | Prazo: Imediato
-  → [ação concreta em 1 linha]
-• 2. [título] ([nó]): [descrição do problema] | Referência: tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
-  → [ação concreta em 1 linha]
-• 3. [título] ([nó]): [descrição] | Referência: tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
-  → [ação concreta em 1 linha]
+• 🚨 1. [título] ([nó confirmado ou "nó a confirmar"]): [descrição — risco regulatório/compliance] | Prazo: Imediato
+  → [o que teria retido, em 1 linha]
+• 2. [título] ([nó]): [descrição] | ≈[N] contatos evitáveis ([X]% do total) | Referência: tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
+  → [o que teria retido, em 1 linha]
+• 3. [título] ([nó]): [descrição] | ≈[N] contatos evitáveis | Prazo: Sprint
+  → [o que teria retido, em 1 linha]
 
 📗 *HELP DESIGN — TOP 3*
-• 1. Criar: "[Título exato do artigo]" — Seção: [seção no Guide] | Tickets: [IDs]
-• 2. Criar: "[Título exato do artigo]" — Seção: [seção] | Tickets: [IDs]
-• 3. Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | Tickets: [IDs]
+• 1. Criar: "[Título exato do artigo]" — Seção: [seção] | ≈[N] contatos | 1ª frase: "[resposta direta]" | Tickets: [IDs]
+• 2. Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | ≈[N] contatos | Tickets: [IDs]
+• 3. ...
+
+🟠 *OPERAÇÃO CX — TOP 3*
+• 1. [ação do time humano ou melhoria de handoff]: [descrição] | ≈[N] contatos de classe D | Prazo: Sprint
+• 2. ...
 
 _Propostas detalhadas (o que e onde mudar): [LINK_DOC_ANALISE]_
+```
 
 **Regras:**
-- **Produto CX: máximo 3 ações.** Selecionar as de maior impacto: volume de conversas afetadas × severidade. Os demais itens são omitidos — não há Mensagem 3
-- **Help Design: máximo 3 artigos.** Priorizar lacunas totais (artigo inexistente) antes de atualizações. Os artigos restantes são omitidos — não há Mensagem 3
-- **Não existe seção Engenharia.** Produto CX e Engenharia são o mesmo time — ações de infra, bug ou integração entram no bloco Produto CX
-- **Compliance e risco regulatório:** itens urgentes entram no bloco Produto CX como o primeiro bullet, marcados com 🚨 e "Prazo: Imediato". Não existe bloco separado de Compliance — o time responsável (Produto CX ou Help Design) é sempre explícito
-- Não agrupar por nível (Crítico/Alto/Médio) dentro das seções — listar bullets diretos, ordenados por impacto
-- Para Help Design: usar título exato do artigo (do output_kb), nunca nome genérico do tema
-- Omitir a seção de um time se ele não tiver nenhuma ação neste ciclo
+- **Cada bloco: máximo 3 ações**, escolhidas pelo maior número de **contatos evitáveis estimados** (classes A+B+C; classe D alimenta o bloco Operação CX). Os demais itens ficam só no artefato — não há Mensagem 3.
+- **Help Design:** priorizar lacunas totais (artigo inexistente) antes de atualizações; usar o **título exato** do output_kb, nunca nome genérico do tema.
+- **Compliance e risco regulatório:** itens urgentes entram no bloco Produto CX como o primeiro bullet, marcados com 🚨 e "Prazo: Imediato".
+- Itens de política de transbordo (pedido de humano / sondagem) devem trazer a nota: _"depende de validação com Compliance/Jurídico (SAC)"_.
+- Omitir o bloco de um time se ele não tiver nenhuma ação neste ciclo. Não agrupar por nível (Crítico/Alto/Médio) dentro das seções.
+- Nunca citar nome de nó que não conste no output dos agentes; use "nó a confirmar".
 
 ---
 
@@ -534,7 +533,7 @@ O artefato de cada rotina tem URL fixa e é atualizado a cada execução.
 
 2. Descubra se já existe um artefato para esta rotina:
    - Chame `Artifact` com `action: "list", limit: 50`
-   - Procure na lista um artefato cujo `title` contenha o nome da rotina atual (ex: "Aleatório", "Críticos", "Cartão HP")
+   - Procure na lista um artefato cujo `title` seja **exatamente** `BQS · [chave_artefato]` (chaves: `aleatorio`, `cartao-hp`, `criticos-diario`, `criticos-semanal` — vêm no prompt do orquestrador). Nunca procure por "contém": "Críticos" casaria com o diário e o semanal, e um sobrescreveria o outro.
    - Se encontrar: guarde a URL como `[URL_ARTEFATO]`
    - Se não encontrar ou se a chamada falhar: `[URL_ARTEFATO]` = _não definida_
 
@@ -568,12 +567,12 @@ Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `b
 - Tabelas: use lista com traço (Slack não renderiza markdown de tabelas)
 
 > ⚠️ O arquivo HTML não deve ter tags `<!DOCTYPE>`, `<html>`, `<head>` nem `<body>` — o Artifact as adiciona automaticamente.
-> ⚠️ **VERBATIM obrigatório**: inclua cada output de subagente na íntegra dentro da `<div class="sec-body">` correspondente — não resuma, não condense.
+> ⚠️ **VERBATIM obrigatório**: inclua cada output de subagente na íntegra dentro da `<div class="sec-body">` correspondente — não resuma, não condense. **Exceção:** remova qualquer nome de cliente, e-mail, telefone ou número de cartão que apareça no texto (substitua por `[dado pessoal omitido]`); conversas se identificam só por `ticket_id`.
 
 **Formato do HTML:**
 
 ```html
-<title>[ROTINA] · [DD/MM/AAAA]</title>
+<title>BQS · [chave_artefato]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">

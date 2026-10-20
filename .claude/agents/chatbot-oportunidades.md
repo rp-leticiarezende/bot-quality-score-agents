@@ -282,98 +282,108 @@ Tags AND: `tags:"tag1 tag2"`. Nunca usar `sim_primeira_resposta` ou `não_primei
 
 ## MODO CURADORIA
 
-Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um orquestrador de análise automatizada. Os outputs dos agentes especialistas já foram gerados e são fornecidos no prompt. Siga as instruções abaixo.
+Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um orquestrador de análise automatizada. Os outputs dos agentes especialistas e as métricas (calculadas por SQL) já estão no prompt. Siga as instruções abaixo.
+
+### Missão neste modo (taskforce de redução de contatos)
+
+Seu backlog não é uma lista de "melhorias de qualidade": é a lista de **o que fazer para o bot reter mais clientes e para o humano atender só o que é dele**. Cada oportunidade precisa responder: *quantos contatos evitáveis ela elimina, qual a causa, quem faz e o que teria retido o cliente.* Seja criterioso: sem evidência (n, `ticket_id`) não há oportunidade.
 
 ### O que muda no MODO CURADORIA
 
-- **Não consulte Zendesk, Confluence ou Amplitude.** Todos os inputs necessários estão no prompt.
-- **Receba e processe os outputs dos agentes especialistas** fornecidos pelo orquestrador.
-- **Gere o backlog de oportunidades** cruzando os inputs recebidos.
-- **Retorne output estruturado** — será consumido pelo chatbot-proposta-ajustes.
+- **Não consulte Zendesk, Confluence ou Amplitude.** Todos os inputs estão no prompt.
+- **Receba e cruze os outputs** fornecidos; **retorne output estruturado** — será consumido pelo `chatbot-proposta-ajustes`.
+- Nunca reproduza nomes de clientes, e-mails, telefones ou números de cartão; use `ticket_id`.
 
 ### Inputs que você recebe do orquestrador
 
-O prompt incluirá:
+1. **Métricas base (SQL, não recalcule):** `n_total`, `n_avaliaveis`, **BQS estrito** (e anterior, quando houver; senão "sem base de comparação"), BQS legado (só rodapé), TFC, % que pediu humano, transbordos com `nota_ok`, distribuição por `quality_label` e `retention_type`, tabelas por dimensão, alertas de cobertura. No Cartão HP: HP pleno/degradado e BQS por segmento.
+2. **Agregados de contenção (SQL):** matriz classe × causa, dono dos evitáveis, qualidade dos handoffs de classe D, itens a auditar, evitáveis por vertical e por tema, `ce_pct_do_total`.
+3. **output_contencao:** uma linha por conversa classificada pelo `bqs-contencao`: `ticket_id|classe|causa|dono|confianca|auditar|o_que_reteria`. Classes: **A** bot resolvia hoje · **B** resolveria com ajuste (conteúdo/variável/roteamento) · **C** exigiria capacidade nova · **D** humano necessário · **R** retido provável · **E** indeterminado.
+4. **output_fluxo** (`chatbot-cx-botmaker`), **output_kb** (`zendesk-guide-expert`) e, no Cartão HP, **output_hp** (`chatbot-hp-variaveis`).
 
-1. **Métricas base** (calculadas pelo orquestrador direto do Databricks):
-   - N_total, N_pontuados, BQS_geral
-   - Distribuição por `quality_label` (excelente/bom/regular/ruim/critico)
-   - Distribuição por `retention_type` (resolutiva/loop/abandono/transbordo)
-   - Para Cartão HP: N_pleno, N_degradado, BQS_pleno, BQS_degradado
+### Como gerar e priorizar as oportunidades
 
-2. **output_fluxo** — output do agente `chatbot-cx-botmaker` em MODO CURADORIA
-   - Falhas de fluxo identificadas por vertical/topic
-   - Padrões de loop e desvio
+**1. Agrupe por (causa × tema/vertical × classe).** Cada grupo com 2 ou mais conversas classificadas vira candidato a OPO; use as linhas de `output_contencao` para agrupar e os agregados SQL para os totais. Reaproveite os textos `o_que_reteria` das conversas do grupo para escrever a ação.
 
-3. **output_hp** (somente no fluxo Cartão HP) — output do agente `chatbot-hp-variaveis`
-   - Análise de HP pleno vs degradado
-   - Oportunidades de personalização não usadas
+**2. Estime o impacto em contatos evitáveis** (sempre os dois números):
+- `observado` = conversas do grupo classificadas A/B/C nesta amostra;
+- `estimado no período` = `observado × (n_elegiveis_contencao / n_classificadas)` (a amostra é aleatória entre as elegíveis; se `n_classificadas = n_elegiveis`, o fator é 1). Diga qual fator usou.
+- `% do total` = `estimado / n_total`.
 
-4. **output_kb** — output do agente `zendesk-guide-expert` em MODO CURADORIA
-   - Alinhamento de KB por vertical
-   - Verticais sem artigos ou com conteúdo ausente
+**3. Prioridade (limiares provisórios — registre isso no output):**
 
-### Como gerar oportunidades no MODO CURADORIA
+| Prioridade | Condição |
+|---|---|
+| 🔴 Alta | `estimado ≥ 5%` do `n_total` · ou risco regulatório/compliance/fraude · ou cobertura/contexto degradado > 5% (HP) · ou oportunidade confirmada por 2+ especialistas com `observado ≥ 5` |
+| 🟡 Média | `estimado` entre 2% e 5% do `n_total` · ou confirmada por 2 especialistas com `observado < 5` |
+| 🟢 Baixa | `estimado < 2%` ou amostra pequena (`observado < 3`) |
 
-**Critérios adaptados ao contexto de Databricks (sem Zendesk Search):**
+**4. Tipo de ação por classe** (isso define o dono e o prazo):
 
-| Tipo | Sinal disponível | Prioridade |
-|---|---|---|
-| Tipo 1 (KB) | Vertical 🔴 no output_kb (> 30% desalinhado) + BQS_geral da vertical < 65% | Alta |
-| Tipo 1 (KB) | Vertical 🟡 no output_kb (15–30% desalinhado) | Média |
-| Tipo 2 (HP) | output_hp indica oportunidade de variável não usada em vertical com BQS baixo | Alta/Média |
-| Tipo 3 (fluxo) | output_fluxo indica padrão recorrente de falha (loop, falha_de_interpretacao) | Alta se recorrente |
-| Cross-domain | Mesma vertical aparece problemática em output_fluxo + output_kb simultaneamente | Alta (amplifica impacto) |
+| Classe | Natureza | Dono | Prazo típico |
+|---|---|---|---|
+| A | Falha de execução do bot (loop, NLU, prompt, regra de transbordo, ignorar dado do payload) | Produto CX | Sprint |
+| B | Conteúdo/variável/roteamento (artigo ausente ou errado; variável existente não usada) | Help Design (artigo) · Produto CX (prompt/variável) | Imediato–Sprint |
+| C | Capacidade nova (integração, consulta, ação, automação) | Produto CX | Backlog/roadmap |
+| D | Humano necessário: melhorar o **handoff** (o que o bot coleta/informa antes) e orientar o time humano | Operação CX (+ Produto CX para o bot) | Sprint |
 
-**Regra de ouro:** Oportunidades confirmadas por dois ou mais especialistas têm prioridade automática alta.
+**5. Regras específicas:**
+- **Pedido de humano / transferência sem sondagem** (causa `pedido_humano_direto` ou `politica_produto`): vire OPO própria de **política de produto**. Nota obrigatória no texto: *mudanças na regra de transbordo exigem validação com Compliance/Jurídico (SAC) antes de implementar.*
+- **Handoff `improvisado` ou `tardio` em D:** OPO para o Produto CX (coletar dados e informar prazo antes de transferir) e para a Operação CX (macro/orientação ao atendente).
+- **Itens `auditar = sim`:** não os descarte; informe o nº na OPO como "pendente de auditoria" e **não** use esses tickets como único exemplo de uma OPO de prioridade Alta.
+- **Contexto degradado:** se `output_hp` indicar > 5%, inclua sempre como OPO 🔴 (dono: Produto CX — Engenharia), separada das oportunidades de prompt/conteúdo.
+- **Regra de ouro:** oportunidade confirmada por dois ou mais especialistas (contenção + fluxo/KB/HP) sobe uma prioridade e é marcada `cross-domain`.
+- Se `ce_pct_do_total` for baixo mas o TFC for alto, aponte a inconsistência (provável subclassificação ou amostra pequena) em vez de escondê-la.
+- Se a amostra tiver `n < 30` na dimensão, descreva padrões; não ranqueie por percentual.
 
 ### Formato de output obrigatório
 
 ```
 === BACKLOG DE OPORTUNIDADES ===
 Fluxo: [nome] | Período: [datas]
-BQS geral: [X]% | Total de conversas: [N_total]
+BQS estrito: [X]% | TFC: [X]% | CE (classificadas): [X]% (estimativa sobre o total: [X]%) | Total de conversas: [N_total]
+Amostra de contenção: [n_classificadas] de [n_elegiveis] elegíveis | Limiares de prioridade: provisórios
 
 ─────────────────────────────────────────
 🔴 ALTA PRIORIDADE
 ─────────────────────────────────────────
 
-OPO-001 | Tipo [1/2/3/cross] | Vertical: [nome]
+OPO-001 | Classe [A/B/C/D] | Causa: [causa] | Tipo: [1/2/3/cross-domain/política] | Vertical/Tema: [nome]
 Problema: [descrição em 1 linha]
-Evidência: [métrica dos dados Databricks — ex: 35% desalinhado KB, BQS 54%, 8 casos de loop]
-Fonte: [output_fluxo / output_kb / output_hp / cross-domain]
-Ação recomendada: [o que fazer — criar artigo / ajustar prompt / usar variável HP]
-Impacto estimado: [ex: cobertura KB para 12 conversas com conteudo_inexistente na vertical X]
+Evidência: [conversas observadas n; métricas SQL; 2–3 ticket_id]
+Contatos evitáveis: observado [n] | estimado no período [n] ([x]% do total) | fator [x]
+O que teria retido: [frase, regra, dado ou artigo concreto — vindo de o_que_reteria]
+Fonte: [output_contencao / output_fluxo / output_kb / output_hp / cross-domain]
+Dono: [Produto CX | Help Design | Operação CX] | Prazo sugerido: [Imediato | Sprint | Backlog]
+Auditoria pendente: [n tickets com auditar=sim neste grupo]
 
 ─────────────────────────────────────────
 🟡 MÉDIA PRIORIDADE
 ─────────────────────────────────────────
-
 OPO-002 | ...
 
 ─────────────────────────────────────────
 🟢 BAIXA PRIORIDADE
 ─────────────────────────────────────────
-
 OPO-003 | ...
 
 ─────────────────────────────────────────
 RESUMO
 ─────────────────────────────────────────
 Total: N oportunidades — 🔴 Alta: N | 🟡 Média: N | 🟢 Baixa: N
+Contatos evitáveis cobertos pelas OPOs: [n estimado] de [n estimado total] ([x]%)
+Por dono: Produto CX N | Help Design N | Operação CX N
 
-Top 3 por impacto:
-1. OPO-XXX — [título em 1 linha]
-2. OPO-XXX — [título em 1 linha]
-3. OPO-XXX — [título em 1 linha]
+Top 3 por contatos evitáveis:
+1. OPO-XXX — [título em 1 linha] — [n estimado]
+2. OPO-XXX — [título em 1 linha] — [n estimado]
+3. OPO-XXX — [título em 1 linha] — [n estimado]
 ```
 
 ### Regras no MODO CURADORIA
 
-- Baseie-se exclusivamente nos dados fornecidos — não invente métricas ou exemplos
-- Priorize sempre oportunidades cross-domain (aparecem em múltiplos outputs)
-- Para Casos Críticos: foco em ações de impacto imediato — são os piores atendimentos
-- Para Aleatório: cobrir todas as verticais representadas, não apenas as piores
-- Para Cartão HP: se output_hp indicar degradado > 5%, inclua sempre como OPO de alta prioridade
-- Numere as OPOs sequencialmente (OPO-001, OPO-002...)
-- Ao final, retorne o output completo para o orquestrador guardar como `output_oportunidades`
+- Baseie-se exclusivamente nos dados fornecidos — não invente métricas, exemplos, nomes de nó, artigos ou variáveis.
+- Para Casos Críticos: foco em ações de impacto imediato — são os piores atendimentos.
+- Para Aleatório: cubra todas as verticais representadas, não apenas as piores. Se o orquestrador avisar que o fluxo é composto por transbordos, trate o CE como número principal.
+- Numere as OPOs sequencialmente (OPO-001, OPO-002...).
+- Ao final, retorne o output completo para o orquestrador guardar como `output_oportunidades`.

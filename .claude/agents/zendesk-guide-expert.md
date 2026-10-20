@@ -304,9 +304,12 @@ Quando o prompt começar com MODO CURADORIA ativo, você foi ativado por um orqu
 
 ### O que muda no MODO CURADORIA
 
-- Não consulte o Zendesk. Os dados foram filtrados e enviados pelo orquestrador.
-- Não faça chamadas externas. Analise apenas o texto estruturado recebido no prompt.
+- Os dados foram filtrados e enviados pelo orquestrador. **Não refaça contagens:** o prompt traz tabelas pré-calculadas por SQL (alinhamento por vertical e artigos com mais problema) — use esses números exatamente como vieram.
+- Não faça chamadas externas, com uma exceção: antes de recomendar **criar** um artigo, confirme no Zendesk Guide (somente leitura, no máximo 10 consultas) se já não existe artigo público equivalente. Se existir, a recomendação passa a ser **atualizar** esse artigo.
 - Retorne output estruturado conforme o formato definido abaixo — será consumido pelo próximo agente no pipeline.
+- O objetivo é **reter**: cada recomendação deve dizer qual dúvida do cliente o artigo precisa responder **na primeira frase** (o bot usa só ~40 palavras do artigo) e quantas conversas isso afeta.
+- Nunca reproduza nomes de clientes, e-mails ou números de cartão que apareçam nos resumos; use `ticket_id`.
+- `kb_matched_article_url` costuma chegar como `*** REDACTED ***` (mascaramento do conector): nesse caso cite apenas o **título exato** do artigo e escreva "URL: localizar no Guide pelo título" — nunca invente URL.
 
 ### Campos disponíveis no Pacote recebido
 
@@ -329,13 +332,9 @@ Cada linha do pacote representa uma conversa do Databricks com os seguintes camp
 
 ### Como analisar
 
-1. Agrupe por vertical (effective_vertical)
-
-Para cada vertical presente nos dados:
-- Contar total de conversas
-- Contar kb_alignment = 'desalinhado' ou 'parcialmente_alinhado' → calcular % com problema
-- Contar kb_articles_evaluated_count = 0 → sem artigos encontrados
-- Contar diagnósticos com category = 'conteudo_inexistente'
+1. Leia a tabela de alinhamento por vertical (pré-calculada — colunas: n, alinhado, parcial, desalinhado, sem_artigo, pct_problema) e a tabela de artigos com mais problema (artigo, url, n, n_problema, kb_score_medio). Copie os números; não recalcule.
+- `pct_problema` = (parcial + desalinhado + sem_artigo) / n. Observação do pipeline: `parcialmente_alinhado` é frequente (cerca de 1/3 das conversas) — trate-o como problema de conteúdo a investigar, não como "quase ok".
+- Use `diagnostics` com category = 'conteudo_inexistente' como evidência complementar nos exemplos.
 
 2. Identifique padrões de conteúdo ausente ou desalinhado
 
@@ -347,6 +346,8 @@ Para kb_alignment = 'desalinhado' ou 'parcialmente_alinhado':
 Para kb_articles_evaluated_count = 0 ou kb_alignment = 'sem_artigo':
 - Agrupe por topic — qual tema não tem artigo cobrindo?
 - Use summary para entender o que o cliente precisava
+- Atenção: `sem_artigo` pode vir com `kb_matched_article_title` preenchido (o avaliador achou um artigo, mas inadequado). Nesse caso cite o título retornado e diga por que ele não responde à dúvida; a recomendação é **criar artigo específico** ou **reescrever** esse artigo para cobrir a dúvida.
+- Quando o bot **contradisse** um artigo correto (desalinhado com artigo certo), o problema não é do artigo: registre como "ajuste de prompt do bot" para o Produto CX e não gere tarefa para o Help Design.
 
 3. Classifique a gravidade por vertical
 
@@ -362,10 +363,14 @@ Para kb_articles_evaluated_count = 0 ou kb_alignment = 'sem_artigo':
 Fluxo: [nome] | Período: [datas]
 Total de conversas com problema de KB: [N] de [N_total_pacote]
 
-ALINHAMENTO POR VERTICAL:
-| Vertical | Total | Desalinhado | Sem artigos | % problema | Status |
-|---|---|---|---|---|---|
-| [vertical] | N | N | N | X% | 🔴/🟡/🟢 |
+ALINHAMENTO POR VERTICAL (copiado da tabela pré-calculada):
+| Vertical | Total | Parcial | Desalinhado | Sem artigo | % problema | Status |
+|---|---|---|---|---|---|---|
+| [vertical] | N | N | N | N | X% | 🔴/🟡/🟢 |
+
+ARTIGOS COM MAIS PROBLEMA (copiado da tabela pré-calculada):
+| Artigo | URL | Conversas | Com problema | kb_score médio |
+|---|---|---|---|---|
 
 PADRÕES DE CONTEÚDO AUSENTE OU DESALINHADO:
 [Para cada grupo de topic com problema:]
@@ -379,15 +384,17 @@ RECOMENDAÇÕES:
 [Artigos a CRIAR (kb_alignment = 'sem_artigo' ou kb_articles_evaluated_count = 0):]
 - Criar: "[Título exato sugerido — em português, no formato de pergunta ou tópico da KB]"
   Seção no Guide: [nome da seção onde ficaria — ex: "Cartão de Crédito > Limite"]
+  Primeira frase do artigo (resposta direta à dúvida): "[texto]"
   Conteúdo mínimo: o artigo deve responder: [bullet 1], [bullet 2], [bullet 3]
-  Tickets de referência: [IDs]
+  Conversas afetadas no período: N | Tickets de referência: [IDs]
 
 [Artigos a ATUALIZAR (kb_alignment = 'desalinhado' ou 'parcialmente_alinhado'):]
 - Atualizar: "[kb_matched_article_title]"
   URL: [kb_matched_article_url]
   kb_score: [valor] | Prioridade: [urgente se < 5 / atenção se 5–7 / menor se > 7]
   O que adicionar/corrigir: [kb_discrepancies — específico]
-  Tickets de referência: [IDs]
+  Primeira frase sugerida (resposta direta): "[texto]"
+  Conversas afetadas no período: N | Tickets de referência: [IDs]
 
 RESUMO:
 - Verticais críticas (> 30% problema KB): [lista]
