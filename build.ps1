@@ -335,8 +335,21 @@ $flows = @(
     }
 )
 
-# ---------------------------------------------------------------- geracao
+# ---------------------------------------------------------------- injecao do playbook (fonte unica: templates/playbook-cartao.md)
 $outDir = Join-Path $root '.claude\agents'
+$playbook = [System.IO.File]::ReadAllText((Join-Path $root 'templates\playbook-cartao.md'), [System.Text.Encoding]::UTF8).Replace("`r`n", "`n").Trim()
+foreach ($name in @('bqs-contencao', 'chatbot-proposta-ajustes')) {
+    $path = Join-Path $outDir ($name + '.md')
+    $txt = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8).Replace("`r`n", "`n")
+    $pattern = '(?s)<!-- PLAYBOOK_CARTAO:START -->.*?<!-- PLAYBOOK_CARTAO:END -->'
+    if ($txt -notmatch $pattern) { throw "Marcadores do playbook ausentes em $name" }
+    $new = "<!-- PLAYBOOK_CARTAO:START -->`n" + $playbook + "`n<!-- PLAYBOOK_CARTAO:END -->"
+    $txt = [regex]::Replace($txt, $pattern, { param($m) $new })
+    [System.IO.File]::WriteAllText($path, $txt, $utf8)
+    Write-Host ("playbook injetado em {0}" -f $name)
+}
+
+# ---------------------------------------------------------------- geracao
 foreach ($f in $flows) {
     $map = [ordered]@{}
     $map['NAME'] = $f.NAME

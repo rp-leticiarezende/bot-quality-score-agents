@@ -71,5 +71,19 @@ Teste real: 30 conversas HP não-sucesso (semana 12–18/10) → A 16 · B 4 · 
 - Os agentes de rotina em nuvem precisam enxergar `bqs-contencao` (está em `.claude/agents`) e ter o MCP de dados disponível para subagentes.
 - Atualizar a página do Confluence do BQS (fórmula, campos, agentes) depois da validação.
 
+## Passo 3 — Playbook de retenção do cartão
+
+`templates/playbook-cartao.md` é a **fonte única** (17 temas); o `build.ps1` o injeta entre os marcadores `PLAYBOOK_CARTAO` de `bqs-contencao.md` e `chatbot-proposta-ajustes.md`. Cada tema traz: indicadores do fluxo (15–20/10), fatos do artigo oficial (prazos, caminhos), variáveis do payload, **resposta que retém** (rascunho para o Produto CX validar), lacunas (B/C) e quando é `D` com o handoff correto do bot. Cobre os dois agentes (`Agente CC Produção` e `Agente CC Anuidade`).
+Fontes: Parte 5 do Confluence, API de Contexto v2, 12 artigos públicos (4 via Zendesk, 8 via site público; 4 temas ficaram sem leitura: acessar/pagar fatura, cancelar transação, resgatar saldo, aumentar limite — o conector Zendesk não busca por título e o site devolveu 429).
+Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a citar prazo, caminho e artigo concretos (ex.: "1 dia útil, não 30 minutos"). Distribuição A/B/C/D/R/E: de 16/4/0/4/4/2 para 18/1/3/3/3/2; evitáveis 67% → 73% (amostra só de não-sucessos, não representativa). `auditar` veio alto (14 de 30), então os gatilhos ficaram seletivos (~20% do lote) — **reteste pendente** dessa mudança.
+
+**Achados de conteúdo para o Help Design (independem do bot):**
+- Dois artigos públicos têm marcações internas **`[VALIDAR: …]`** no texto: 51856715765267 (compra não reconhecida) e 51706375319827 (compra recusada).
+- O passo a passo de "Encerrar relacionamento com cartão" só existe em artigo **interno** (54888224369043); o público de cancelar físico (54886179457427) termina em "conforme detalhado abaixo" sem conteúdo e tem HTML sujo de colagem.
+- "Roubaram meu cartão" (43654947527443): a 1ª frase não responde e 93% das conversas do tema têm problema de KB, com TFC 73%.
+- Cashback em 7 cópias e anuidade de limite garantido em 2 cópias.
+- O artigo de limite pré-aprovado está em rascunho.
+- Taxonomia de `topic` com variantes de grafia (`roubaram-meu-cartão` × `roubaram-meu-cartao`).
+
 ## Próximos passos
-3. Playbook de retenção por tema de cartão · 4. Subagente `bqs-auditor` (transcrição via `prod.cx.fat_tickets_transcription` / Zendesk) · 5. Artefato consolidado + Slack visual.
+4. Subagente `bqs-auditor` (transcrição via `prod.cx.fat_tickets_transcription` / Zendesk; a nota revisada entra no BQS) · 5. Artefato consolidado + Slack visual.
