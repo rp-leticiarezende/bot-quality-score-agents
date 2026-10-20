@@ -330,7 +330,7 @@ Seu backlog não é uma lista de "melhorias de qualidade": é a lista de **o que
 | D | Humano necessário: melhorar o **handoff do bot** (o que ele coleta e informa antes de transferir). Não analisar nem recomendar nada sobre o atendimento humano | Produto CX | Sprint |
 
 **5. Regras específicas:**
-- **Pedido de humano / transferência sem sondagem** (causa `pedido_humano_direto` ou `politica_produto`): vire OPO própria de **política de produto**. Nota obrigatória no texto: *mudanças na regra de transbordo exigem validação com Compliance/Jurídico (SAC) antes de implementar.*
+- **Pedido de humano / transferência sem sondagem** (causa `pedido_humano_direto` ou `politica_produto`): vire OPO própria de **política de produto**.
 - **Handoff `improvisado` ou `tardio` em D:** OPO para o Produto CX (o bot coletar dados e informar prazo/canal antes de transferir). Escopo é só o bot: nada sobre macros, orientação a atendentes ou qualquer análise de atendimento humano.
 - **Itens `auditar = sim`:** não os descarte; informe o nº na OPO como "pendente de auditoria" e **não** use esses tickets como único exemplo de uma OPO de prioridade Alta.
 - **Contexto degradado:** indicador em revisão; não crie OPO a partir de `welcome_not_found`. Só crie oportunidade de integração/payload quando houver evidência em conversa (`ticket_id`) de dado do cliente ausente ou quebrado.

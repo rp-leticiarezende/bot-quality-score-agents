@@ -300,7 +300,7 @@ Escopo: o que o **bot** deveria dizer ou fazer. Nada sobre atendimento humano. *
 ### Padrões transversais que mais fazem o cliente pedir atendente
 1. **Responder primeiro à pergunta direta** (1ª frase) e só depois personalizar com dados. Hoje o bot costuma despejar fatura/vencimento sem responder o "por quê".
 2. **Não repetir o mesmo bloco.** Após 2 respostas idênticas, mudar a abordagem ou transferir; nunca pedir "reformule em uma única mensagem" para frase clara.
-3. **Depois de um "Não" na confirmação de resolução**, sondar com 2–3 opções específicas do tema (ex.: "o prazo, o valor ou o caminho no app?") antes de transferir. *(Mudança na regra de transbordo: validar com Compliance/Jurídico — SAC.)*
+3. **Depois de um "Não" na confirmação de resolução**, sondar com 2–3 opções específicas do tema (ex.: "o prazo, o valor ou o caminho no app?") antes de transferir.
 4. **Não citar prazo que contradiga o artigo** (ex.: bot disse "30 minutos" para Pix; o artigo diz até 1 dia útil).
 5. **Não deixar resposta da pesquisa de satisfação (0–5) virar nova intenção.**
 6. **Desambiguar temas vizinhos** (Pix × cartão, contestação de Pix × contestação de compra) antes de responder.
@@ -411,7 +411,7 @@ Cada proposta precisa dizer **o que o bot teria dito ou feito para o cliente nã
 | **B** — resolve com ajuste | **Artigo:** título, seção, **primeira frase** (resposta direta, ≤ 40 palavras úteis) e rascunho do conteúdo; **Variável HP:** nome do campo, onde inserir, resposta antes/depois; **Roteamento:** condição proposta. |
 | **C** — capacidade nova | O dado/ação que falta, sistema de origem provável, qual dúvida de cliente deixa de gerar contato, nº de contatos evitáveis (do backlog) e dependências. É especificação para o roadmap — não prometa prazo. |
 | **D** — humano necessário | **Handoff ideal:** o que o bot coleta (dados), informa (prazo, canal, protocolo) e como encerra, de modo que o cliente não precise repetir informações ao ser transferido. Dono: Produto CX. |
-| **Política** (transbordo/pedido de humano) | Descreva a regra atual, a regra proposta, o risco e o que medir. **Marque como "depende de validação com Compliance/Jurídico (SAC) antes de implementar".** |
+| **Política** (transbordo/pedido de humano) | Descreva a regra atual, a regra proposta, o risco e o que medir. |
 
 Para **todo** prompt proposto, inclua as 14 regras de guardrail (itens 0 a 13 da FRENTE 1). Em respostas de cartão: ≤ 50 palavras, sem lista, sem gancho final, datas `DD/MM`, cartão por últimos 4 dígitos, nunca expor termo técnico interno (`CRELI`, `ADMIN_BLOCKED`...), nunca pedir dado que já está no payload, nunca prometer reembolso/estorno.
 
@@ -446,7 +446,7 @@ PROPOSTA:
 Nó/artigo envolvido: [nome confirmado | "nó a confirmar pelo Produto CX" | "artigo a localizar"]
 
 Dono: [Produto CX | Help Design] | Prazo sugerido: [Imediato | Sprint | Backlog]
-Dependências: [ex.: confirmação do time de dados; validação Compliance/Jurídico; produto]
+Dependências: [ex.: confirmação do time de dados; produto]
 Como medir: [indicador que deve cair — ex.: pedidos de humano no tema X; loops no agente Y]
 
 ─────────────────────────────────────────

@@ -29,7 +29,7 @@ Achados que sustentam a revisão:
 - Auditoria por transcrição (4 tickets): em todos a nota original estava inflada; 1 passou de aprovado para reprovado. O avaliador deu 10 de transbordo a conversas em que a régua aceita 4 a 6.
 - TFC (falha de condução) é 42,5% enquanto o BQS é 72,2%: o BQS alto mascara falha real.
 
-Decisões pendentes (Leticia): qual regra adotar; se o transbordo deve exigir resolução mínima; se o BQS oficial passa a incluir penalidade por falha de condução. Mudar a regra de transbordo exige validação do Produto CX e de Compliance/Jurídico (SAC).
+Decisões pendentes (Leticia): qual regra adotar; se o transbordo deve exigir resolução mínima; se o BQS oficial passa a incluir penalidade por falha de condução.
 
 ## 4. Indicador "HP pleno × HP degradado"
 

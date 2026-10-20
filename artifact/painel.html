@@ -341,7 +341,7 @@ function visao(){
   var mensal=S.per==="mensal";
   var ks=FLUXOS.map(function(f){return fluxoKey(f)});
   var teste=ks.some(function(k){return g(S.data[k],"meta.origem")==="teste"});
-  if(teste)h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> Os números vêm do Databricks (20/10/2026). A classificação de contatos evitáveis e as oportunidades existem só na visão semanal do Agente de Cartão de Crédito (amostra de 30 conversas); nas demais há métricas. A visão mensal será consolidada a partir das semanais.</div></div>';
+  if(teste)h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> Os números vêm do Databricks (20/10/2026). A classificação de contatos evitáveis e as oportunidades existem só na visão semanal do Agente de Cartão de Crédito (amostra de conversas classificadas); nas demais há métricas. A visão mensal será consolidada a partir das semanais.</div></div>';
   var cob=ks.filter(function(k){return g(S.data[k],"cobertura.baixa")});
   if(cob.length)h+='<div class="banner warn"><span class="dot warn"></span><div><b>Cobertura baixa em '+cob.length+' rotina(s).</b> '+esc(g(S.data[cob[0]],"cobertura.texto","Há dias sem dados no período."))+' Leia os números como amostra reduzida.</div></div>';
   h+='<section class="block"><h2>Como está cada rotina · '+(mensal?"mensal":"semanal")+'</h2><div class="cards">'+FLUXOS.map(function(f){return cardRotina(f)}).join("")+'</div></section>';

@@ -48,7 +48,7 @@ O BQS legado (`approved`) aparece só em rodapé, para comparação histórica. 
 | `chatbot-hp-variaveis.md` | Reescrito: frontmatter, mapa de variáveis de cartão (API de Contexto v2), saúde do contexto, 5 blocos + snapshot. |
 | `zendesk-guide-expert.md` | MODO CURADORIA usa tabelas pré-calculadas, `sem_artigo` com título, URL redigida, primeira frase do artigo. |
 | `chatbot-oportunidades.md` | MODO CURADORIA prioriza por contatos evitáveis (observado × estimado), por classe/causa/dono. |
-| `chatbot-proposta-ajustes.md` | MODO CURADORIA: "o que teria retido (antes → depois)", referência de nós do cartão, proibição de inventar nós, política de transbordo com validação Compliance/Jurídico. |
+| `chatbot-proposta-ajustes.md` | MODO CURADORIA: "o que teria retido (antes → depois)", referência de nós do cartão, proibição de inventar nós, política de transbordo. |
 | `chatbot-relatorio-cx.md` | MODO CURADORIA: BQS estrito, TFC/CE, cobertura, `MODO SEM DADOS`, donos só **Produto CX** e **Help Design**, título único do artefato, regra de dados pessoais. O visual (Slack/artefato) fica para o passo 5. |
 
 ## Taxonomia da contenção
@@ -67,7 +67,6 @@ Teste real: 30 conversas HP não-sucesso (semana 12–18/10) → A 16 · B 4 · 
 ## Pendências e validações
 
 - Confirmar com Produto CX: cancelamento de cartão **físico** só com atendimento (observado em conversas/artigos, não consta na documentação do agente); variáveis `agcc_desambiguacao` × `cc_desambiguacao` (nomes divergentes na doc); modelo do agente de cartão.
-- Compliance/Jurídico (SAC) antes de qualquer mudança na regra de transbordo por pedido de humano.
 - **Decisão: não alterar o fluxo do n8n** (complexidade). O que dependeria dele é resolvido na rotina, com SQL e conectores: o BQS é recalculado a partir das notas (não do `approved`), a cobertura e os buracos de dados são detectados por consulta, o piso de resolução/transbordo é aplicado em SQL, a nota revisada vem do auditor (transcrição) e o painel é publicado pelo agente de relatório. O que a rotina **não** corrige (ex.: ausência de registros em fim de semana, `botmaker_chatbot_flow` vazio) é sinalizado como limitação no relatório.
 - Canal: **decidido** — todos os relatórios (inclusive críticos) vão para `#bot-quality-score` (C0BP08WPMLP). O Confluence ainda cita `#casos-criticos-bot` e precisa ser corrigido.
 - Os agentes de rotina em nuvem precisam enxergar `bqs-contencao` (está em `.claude/agents`) e ter o MCP de dados disponível para subagentes.
@@ -110,7 +109,7 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 - Rodada de teste ponta a ponta (modo sombra) dos orquestradores em paralelo ao que existe hoje, sem postar no canal; reteste da auditoria seletiva da contenção.
 - Atualizar o Confluence (fórmula do BQS, campos, agentes, escopo só-bot, canal único, regra de conteúdo externo, painel).
 - Enviar ao GitHub e abrir PR para revisão, só com autorização.
-- Pendências com terceiros: validação do Produto CX sobre as respostas-modelo do playbook; Compliance/Jurídico (SAC) sobre qualquer mudança na regra de transbordo; compartilhar o painel com quem for consultar (hoje privado).
+- Pendências com terceiros: validação do Produto CX sobre as respostas-modelo do playbook; compartilhar o painel com quem for consultar (hoje privado).
 
 ## Passo 5b — ajustes pedidos em 20/10/2026 (revisão da Leticia)
 

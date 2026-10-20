@@ -564,7 +564,7 @@ Modelo (preencha com os números do prompt; remova as linhas que não se aplicam
 **Regras:**
 - Emoji do BQS: 🟢 ≥ 80% · 🟡 60–79% · 🔴 < 60%. Sem período anterior, não escreva variação; com período anterior, acrescente ` (▲/▼ [X] pp)` depois do BQS.
 - **O link do painel aparece uma única vez**, na última linha. Não escreva que o painel é privado.
-- "O que mais pesa": no máximo **3** ações, escolhidas pelos contatos evitáveis estimados (A+B+C), cada uma em **uma linha**: onde mexer + o que mudar + contatos + dono (`Produto CX` ou `Help Design`). Item de política de transbordo: acrescente "(validar com Compliance/Jurídico)". Item urgente de compliance ou segurança vai primeiro, com 🚨 no lugar do número. A linha "➕ Help Design" resume o total de artigos; use os números de `artigos`.
+- "O que mais pesa": no máximo **3** ações, escolhidas pelos contatos evitáveis estimados (A+B+C), cada uma em **uma linha**: onde mexer + o que mudar + contatos + dono (`Produto CX` ou `Help Design`). Item urgente de compliance ou segurança vai primeiro, com 🚨 no lugar do número. A linha "➕ Help Design" resume o total de artigos; use os números de `artigos`.
 - "Atenção": no máximo **2** linhas, nesta ordem: (1) transbordos sem pedido (🟠, com 3 `ticket_id`); (2) cobertura baixa, hiato ou ingestão atrasada (🔵). Só entram 🔴 se BQS < 60%. Sem nenhum alerta: `✅ Nenhum ponto de atenção`.
 - Fora da mensagem (ficam só no painel): auditoria, recontato em 24h, desfecho, limiares, divergências do avaliador, tabelas por dimensão.
 - **Rotinas sem análise completa** (sem contenção/oportunidades): omita "O que mais pesa" e deixe só a primeira linha de números (sem "Contatos evitáveis"), "Atenção" e o link.

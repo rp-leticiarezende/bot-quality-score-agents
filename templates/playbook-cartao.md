@@ -6,7 +6,7 @@ Escopo: o que o **bot** deveria dizer ou fazer. Nada sobre atendimento humano. *
 ### Padrões transversais que mais fazem o cliente pedir atendente
 1. **Responder primeiro à pergunta direta** (1ª frase) e só depois personalizar com dados. Hoje o bot costuma despejar fatura/vencimento sem responder o "por quê".
 2. **Não repetir o mesmo bloco.** Após 2 respostas idênticas, mudar a abordagem ou transferir; nunca pedir "reformule em uma única mensagem" para frase clara.
-3. **Depois de um "Não" na confirmação de resolução**, sondar com 2–3 opções específicas do tema (ex.: "o prazo, o valor ou o caminho no app?") antes de transferir. *(Mudança na regra de transbordo: validar com Compliance/Jurídico — SAC.)*
+3. **Depois de um "Não" na confirmação de resolução**, sondar com 2–3 opções específicas do tema (ex.: "o prazo, o valor ou o caminho no app?") antes de transferir.
 4. **Não citar prazo que contradiga o artigo** (ex.: bot disse "30 minutos" para Pix; o artigo diz até 1 dia útil).
 5. **Não deixar resposta da pesquisa de satisfação (0–5) virar nova intenção.**
 6. **Desambiguar temas vizinhos** (Pix × cartão, contestação de Pix × contestação de compra) antes de responder.
