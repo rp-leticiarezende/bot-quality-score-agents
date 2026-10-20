@@ -23,6 +23,7 @@
     "n_avaliaveis": 24,
     "n_ok": 8,
     "bqs": 33.3,
+    "calibracao": { "calibrado": false, "n_amostra": 3, "n_revertidos": 0, "taxa_falso_aprovado": null, "faixa": null },
     "bqs_anterior": null,
     "ultimo_ponto_anterior": null,
     "prompt_version": "v1",

@@ -4,7 +4,7 @@
   "rotina": "Casos críticos (semanal)",
   "meta": {
     "origem": "teste",
-    "nota": "BQS 2.0: só métricas reais do Databricks (20/10/2026). A classificação de contatos evitáveis, a auditoria e as oportunidades ainda não rodaram para esta rotina."
+    "nota": "BQS 2.0 calibrado por auditoria (teste): o avaliador aprovou 66,7% e a auditoria leu 14 dos 14 aprovados da semana e reverteu 6 (43%). Só métricas reais do Databricks e auditoria (20/10/2026). A classificação de contatos evitáveis e as oportunidades ainda não rodaram para esta rotina."
   },
   "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
   "gerado_em": "2026-10-20T11:55:00-03:00",
@@ -17,7 +17,9 @@
     "n_total": 22,
     "n_avaliaveis": 21,
     "n_ok": 14,
-    "bqs": 66.7,
+    "bqs": 38.1,
+    "bqs_avaliador": 66.7,
+    "calibracao": { "calibrado": true, "n_amostra": 14, "n_revertidos": 6, "taxa_falso_aprovado": 42.9, "faixa": [38.1, 38.1] },
     "bqs_anterior": null,
     "pct_recontato_24h": 38.5,
     "sinalizados": { "transbordo_sem_pedido": { "n": 0, "pct": 0.0, "tickets": [] } },

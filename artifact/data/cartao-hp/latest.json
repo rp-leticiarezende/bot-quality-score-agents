@@ -4,7 +4,7 @@
   "rotina": "Agente de Cartão de Crédito (semanal)",
   "meta": {
     "origem": "teste",
-    "nota": "Rodada de teste do BQS 2.0 (validação do formato, do painel e da leitura dos dados pelos agentes). Contenção medida em amostra de 60 das 276 conversas elegíveis; auditoria de 9 tickets lidos na transcrição. Números ainda não oficiais."
+    "nota": "Rodada de teste do BQS 2.0 (validação do formato, do painel e da leitura dos dados pelos agentes). BQS calibrado por auditoria: o avaliador aprovou 64,4% e a auditoria de 25 aprovados sorteados reverteu 8 (32%). Contenção medida em amostra de 60 das 276 conversas elegíveis. Os BQS por agente e por tema abaixo ainda mostram a nota do avaliador. Números ainda não oficiais."
   },
   "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
   "gerado_em": "2026-10-20T15:15:00-03:00",
@@ -16,8 +16,10 @@
   "metricas": {
     "n_total": 398,
     "n_avaliaveis": 388,
-    "n_ok": 246,
-    "bqs": 63.4,
+    "n_ok": 250,
+    "bqs": 43.2,
+    "bqs_avaliador": 64.4,
+    "calibracao": { "calibrado": true, "n_amostra": 25, "n_revertidos": 8, "taxa_falso_aprovado": 32.0, "faixa": [32.1, 51.6] },
     "bqs_anterior": null,
     "ultimo_ponto_anterior": null,
     "prompt_version": "v1",
