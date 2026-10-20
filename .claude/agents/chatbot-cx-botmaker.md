@@ -69,7 +69,7 @@ PADRÕES DE FALHA (ordenados por nº de conversas):
    Sintoma: [o que o bot fez, em 1–2 linhas]
    Exemplos: ticket_id, ticket_id, ticket_id
    O que teria retido: [frase/regra/dado concreto]
-   Dono: [Produto CX | Help Design | Operação CX]
+   Dono: [Produto CX | Help Design]
 2. ...
 
 LOOPS E "NÃO ENTENDI": [n conversas; frases do cliente mais mal interpretadas, sem dados pessoais]

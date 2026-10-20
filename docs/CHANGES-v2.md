@@ -2,6 +2,10 @@
 
 Branch: `bqs-v2-estrito-contencao` · Data: 20/10/2026 · Status: **não publicado** (nenhum push, nenhuma rotina alterada).
 
+## Escopo (decisão de 20/10)
+
+**Somente conversas do bot.** Nenhum agente analisa ou recomenda sobre o atendimento humano (macros, orientação a atendentes, filas, TMO, CSAT do humano). Donos de ação: **Produto CX** e **Help Design**. Quando só uma pessoa resolve (classe D), a análise é sobre o que o bot deveria ter coletado e informado antes de transferir.
+
 ## Por que mudar
 
 A taskforce quer reduzir contatos. O BQS respondia "o bot conduziu bem?", mas não "quantos contatos ele poderia ter evitado e o que teria retido o cliente". Além disso, a auditoria dos dados (20/10/2026, tabela `prod.cx.fat_botmaker_conversations_quality`) mostrou problemas que distorciam o próprio BQS.
@@ -43,7 +47,7 @@ O BQS legado (`approved`) aparece só em rodapé, para comparação histórica. 
 | `zendesk-guide-expert.md` | MODO CURADORIA usa tabelas pré-calculadas, `sem_artigo` com título, URL redigida, primeira frase do artigo. |
 | `chatbot-oportunidades.md` | MODO CURADORIA prioriza por contatos evitáveis (observado × estimado), por classe/causa/dono. |
 | `chatbot-proposta-ajustes.md` | MODO CURADORIA: "o que teria retido (antes → depois)", referência de nós do cartão, proibição de inventar nós, política de transbordo com validação Compliance/Jurídico. |
-| `chatbot-relatorio-cx.md` | MODO CURADORIA: BQS estrito, TFC/CE, cobertura, `MODO SEM DADOS`, dono **Operação CX**, título único do artefato, regra de dados pessoais. O visual (Slack/artefato) fica para o passo 5. |
+| `chatbot-relatorio-cx.md` | MODO CURADORIA: BQS estrito, TFC/CE, cobertura, `MODO SEM DADOS`, donos só **Produto CX** e **Help Design**, título único do artefato, regra de dados pessoais. O visual (Slack/artefato) fica para o passo 5. |
 
 ## Taxonomia da contenção
 
@@ -52,7 +56,7 @@ O BQS legado (`approved`) aparece só em rodapé, para comparação histórica. 
 | A | Bot resolvia hoje (falha de execução: loop, NLU, prompt, regra de transbordo) | Produto CX |
 | B | Resolveria com ajuste (artigo, variável existente, roteamento) | Help Design / Produto CX |
 | C | Exigiria capacidade nova (consulta, ação, integração) | Produto CX |
-| D | Humano necessário — avalia o handoff (correto / improvisado / tardio) | Operação CX (+ Produto CX) |
+| D | Só humano resolve — avalia o handoff **do bot** (correto / improvisado / tardio) | Produto CX |
 | R | Retido provável (abandono após resposta correta) | — |
 | E | Indeterminado → candidato a auditoria (passo 4) | — |
 

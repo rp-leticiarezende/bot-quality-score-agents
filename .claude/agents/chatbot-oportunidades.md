@@ -325,11 +325,11 @@ Seu backlog não é uma lista de "melhorias de qualidade": é a lista de **o que
 | A | Falha de execução do bot (loop, NLU, prompt, regra de transbordo, ignorar dado do payload) | Produto CX | Sprint |
 | B | Conteúdo/variável/roteamento (artigo ausente ou errado; variável existente não usada) | Help Design (artigo) · Produto CX (prompt/variável) | Imediato–Sprint |
 | C | Capacidade nova (integração, consulta, ação, automação) | Produto CX | Backlog/roadmap |
-| D | Humano necessário: melhorar o **handoff** (o que o bot coleta/informa antes) e orientar o time humano | Operação CX (+ Produto CX para o bot) | Sprint |
+| D | Humano necessário: melhorar o **handoff do bot** (o que ele coleta e informa antes de transferir). Não analisar nem recomendar nada sobre o atendimento humano | Produto CX | Sprint |
 
 **5. Regras específicas:**
 - **Pedido de humano / transferência sem sondagem** (causa `pedido_humano_direto` ou `politica_produto`): vire OPO própria de **política de produto**. Nota obrigatória no texto: *mudanças na regra de transbordo exigem validação com Compliance/Jurídico (SAC) antes de implementar.*
-- **Handoff `improvisado` ou `tardio` em D:** OPO para o Produto CX (coletar dados e informar prazo antes de transferir) e para a Operação CX (macro/orientação ao atendente).
+- **Handoff `improvisado` ou `tardio` em D:** OPO para o Produto CX (o bot coletar dados e informar prazo/canal antes de transferir). Escopo é só o bot: nada sobre macros, orientação a atendentes ou qualquer análise de atendimento humano.
 - **Itens `auditar = sim`:** não os descarte; informe o nº na OPO como "pendente de auditoria" e **não** use esses tickets como único exemplo de uma OPO de prioridade Alta.
 - **Contexto degradado:** se `output_hp` indicar > 5%, inclua sempre como OPO 🔴 (dono: Produto CX — Engenharia), separada das oportunidades de prompt/conteúdo.
 - **Regra de ouro:** oportunidade confirmada por dois ou mais especialistas (contenção + fluxo/KB/HP) sobe uma prioridade e é marcada `cross-domain`.
@@ -354,7 +354,7 @@ Evidência: [conversas observadas n; métricas SQL; 2–3 ticket_id]
 Contatos evitáveis: observado [n] | estimado no período [n] ([x]% do total) | fator [x]
 O que teria retido: [frase, regra, dado ou artigo concreto — vindo de o_que_reteria]
 Fonte: [output_contencao / output_fluxo / output_kb / output_hp / cross-domain]
-Dono: [Produto CX | Help Design | Operação CX] | Prazo sugerido: [Imediato | Sprint | Backlog]
+Dono: [Produto CX | Help Design] | Prazo sugerido: [Imediato | Sprint | Backlog]
 Auditoria pendente: [n tickets com auditar=sim neste grupo]
 
 ─────────────────────────────────────────
@@ -372,7 +372,7 @@ RESUMO
 ─────────────────────────────────────────
 Total: N oportunidades — 🔴 Alta: N | 🟡 Média: N | 🟢 Baixa: N
 Contatos evitáveis cobertos pelas OPOs: [n estimado] de [n estimado total] ([x]%)
-Por dono: Produto CX N | Help Design N | Operação CX N
+Por dono: Produto CX N | Help Design N
 
 Top 3 por contatos evitáveis:
 1. OPO-XXX — [título em 1 linha] — [n estimado]

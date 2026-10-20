@@ -27,6 +27,8 @@ O BQS mede a **qualidade da condução** do bot. A taskforce quer saber, além d
 | **TFC** (taxa de falha de condução) | Quantas conversas terminaram em transbordo, abandono ou loop sem o cliente ter pedido humano? |
 | **CE** (contatos evitáveis) | Quantas conversas o bot poderia ter resolvido/retido — e por qual causa, com qual dono? |
 
+**Escopo: somente conversas do bot.** Nenhuma etapa deste pipeline analisa ou recomenda algo sobre o atendimento humano (macros, orientação a atendentes, filas, TMO, CSAT do humano). Donos de ação válidos: **Produto CX** e **Help Design**.
+
 Postura obrigatória de todo o pipeline: **criteriosa**. Transbordo bem executado não é transbordo evitado. Nota alta não prova que o contato era inevitável.
 
 **Contexto do fluxo (Cartão de Crédito HP):** todo atendimento de cartão passa pelo fluxo de Hiperpersonalização: o bot atende com o contexto do cliente carregado (status do cartão, limite, fatura, histórico). Há dois agentes especializados no Botmaker — `Agente CC Produção` (bloco `Cartao Recargapay IA`; `effective_vertical = cartao_credito`) e `Agente CC Anuidade` (bloco `Cartao Anuidade IA`; `effective_vertical = cc_anuidade`) — compare sempre os dois nas quebras por dimensão. O eixo diagnóstico central é: **o HP está entregando o que promete — atendimento contextualizado e resolutivo — em todos os temas de cartão, e retendo?**
@@ -432,7 +434,7 @@ WITH c(ticket_id, classe, causa, dono, confianca, auditar, handoff) AS (
   VALUES
     (46629316, 'B', 'conteudo_kb', 'Help Design', 'alta', 'nao', '-'),
     -- ... uma tupla por linha de output_contencao ...
-    (46629317, 'D', 'acao_humana_obrigatoria', 'Operação CX', 'media', 'nao', 'correto')
+    (46629317, 'D', 'acao_humana_obrigatoria', 'Produto CX', 'media', 'nao', 'correto')
 ),
 par AS (
   SELECT DATE_TRUNC('WEEK', DATE(CURRENT_TIMESTAMP() - INTERVAL 3 HOURS)) - INTERVAL 7 DAYS AS ini_atual,
@@ -500,7 +502,7 @@ prompt: |
   [agregados_contencao]
 
   Gere o backlog priorizado. A prioridade principal de cada OPO é o **número de contatos evitáveis** (classes A+B+C do Passo 6) que ela elimina,
-  com o dono explícito (Produto CX, Help Design ou Operação CX). Separe sempre: o que o bot resolve hoje (A), o que resolve com ajuste (B),
+  com o dono explícito (Produto CX ou Help Design). Separe sempre: o que o bot resolve hoje (A), o que resolve com ajuste (B),
   o que exige capacidade nova (C) e o que é ação humana (D, com melhoria de handoff).
 
   === ANÁLISE DE FLUXO ===
@@ -532,7 +534,7 @@ prompt: |
   - Ajustes de KB: título exato do artigo e URL (campos kb_matched_article_title/url) ou título sugerido para artigo novo, seção, e rascunho do conteúdo.
   - Ajustes de variáveis HP: nome da variável, onde inserir, exemplo de resposta antes/depois.
   - Novas integrações/capacidades (classe C): dado ou ação necessária, sistema de origem, contatos evitáveis que elimina (use o n do Passo 6).
-  - Ações humanas (classe D): o que o bot deve coletar/informar antes do handoff e o que o time humano precisa receber.
+  - Classe D (só humano resolve): apenas o que o **bot** deve coletar/informar antes do handoff. Nada sobre o atendimento humano.
   Nunca invente nome de nó, ID de artigo, variável ou prazo.
 
   === BACKLOG DE OPORTUNIDADES ===

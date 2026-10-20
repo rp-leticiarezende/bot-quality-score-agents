@@ -429,15 +429,16 @@ Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados n
 
 ### Mapeamento de times (owner de cada ação)
 
-Toda ação precisa de um owner explícito. Use **exatamente** estes três nomes:
+**Escopo: somente conversas do bot.** Este relatório não analisa nem recomenda nada sobre o atendimento humano (macros, orientação a atendentes, filas, TMO, CSAT do humano). Quando o cliente só pode ser atendido por uma pessoa, a ação é sempre sobre o **bot**: o que ele coleta e informa antes de transferir.
+
+Toda ação precisa de um owner explícito. Use **exatamente** estes dois nomes:
 
 | Tipo de ação | Owner |
 |---|---|
-| Mudança de variável HP, criação/ajuste de fluxo ou nó no Botmaker, roteamento, prompt, NLU, regra de transbordo, integração/API/contexto degradado (Engenharia) | **Produto CX** |
+| Mudança de variável HP, criação/ajuste de fluxo ou nó no Botmaker, roteamento, prompt, NLU, regra de transbordo, melhoria do handoff do bot, integração/API/contexto degradado (Engenharia) | **Produto CX** |
 | Criar ou atualizar artigo no Guide / Help Center | **Help Design** |
-| Ação do time humano: orientação ao atendente, macros, melhoria do handoff (o que já chega preenchido), fila/especialização | **Operação CX** |
 
-Nunca use "Time de bot", "Time de conteúdo", "Curadoria", "Engenharia" ou outro nome de time. (Engenharia e integração entram em Produto CX.)
+Nunca use "Time de bot", "Time de conteúdo", "Curadoria", "Engenharia", "Operação CX" ou outro nome de time. (Engenharia e integração entram em Produto CX.)
 
 ### Como montar o relatório no MODO CURADORIA
 
@@ -483,7 +484,7 @@ _BQS legado (approved): [X]% — só para comparação histórica · limiares de
 
 #### MENSAGEM 2 — Plano de ação (agrupado por time responsável, ordenado por contatos evitáveis)
 
-Responde a: *"o que cada time precisa fazer para o bot reter mais e o humano atender só o que é dele?"*
+Responde a: *"o que cada time precisa mudar no bot para ele reter mais clientes e transferir só o que é realmente humano?"*
 
 ```
 🎯 *PLANO DE AÇÃO — [rotina] · [período]*
@@ -502,15 +503,11 @@ _Ordenado por contatos evitáveis estimados (limiares provisórios)_
 • 2. Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | ≈[N] contatos | Tickets: [IDs]
 • 3. ...
 
-🟠 *OPERAÇÃO CX — TOP 3*
-• 1. [ação do time humano ou melhoria de handoff]: [descrição] | ≈[N] contatos de classe D | Prazo: Sprint
-• 2. ...
-
 _Propostas detalhadas (o que e onde mudar): [LINK_DOC_ANALISE]_
 ```
 
 **Regras:**
-- **Cada bloco: máximo 3 ações**, escolhidas pelo maior número de **contatos evitáveis estimados** (classes A+B+C; classe D alimenta o bloco Operação CX). Os demais itens ficam só no artefato — não há Mensagem 3.
+- **Cada bloco: máximo 3 ações**, escolhidas pelo maior número de **contatos evitáveis estimados** (classes A+B+C). Melhorias de handoff do bot (classe D: o que coletar e informar antes de transferir) entram no bloco Produto CX. Os demais itens ficam só no artefato — não há Mensagem 3.
 - **Help Design:** priorizar lacunas totais (artigo inexistente) antes de atualizações; usar o **título exato** do output_kb, nunca nome genérico do tema.
 - **Compliance e risco regulatório:** itens urgentes entram no bloco Produto CX como o primeiro bullet, marcados com 🚨 e "Prazo: Imediato".
 - Itens de política de transbordo (pedido de humano / sondagem) devem trazer a nota: _"depende de validação com Compliance/Jurídico (SAC)"_.

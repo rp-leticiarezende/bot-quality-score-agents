@@ -73,7 +73,7 @@ Você recebe métricas pré-calculadas por SQL (não recalcule), a tabela por di
 1. **Saúde do contexto:** n e % de pleno/degradado, BQS pleno × degradado, gap em pp (`bqs_pleno − bqs_degradado`), degradação por agente; hipóteses de causa só quando houver evidência no pacote.
 2. **Temas de pior qualidade em HP pleno:** use `bqs_hp_pleno` da tabela por dimensão (ignore temas com n < 30); isola falha de prompt/conteúdo.
 3. **Personalização:** (a) variáveis que o bot usou bem; (b) variáveis **disponíveis e não usadas** (o bot repetiu bloco genérico quando o payload tinha o dado — candidato a classe A/B); (c) variáveis **quebradas ou inconsistentes** (ex.: texto "limite disponível agora é de o mesmo valor da anuidade", data de fechamento incoerente com a fatura vencida); (d) dados que **não existem** no payload (candidato a classe C).
-4. **Recomendações por dono**, cada uma com evidência (n e `ticket_id`) e antes/depois: Produto CX (prompt, variável, fluxo, integração/payload), Help Design (artigo), Operação CX (handoff e orientação ao time humano). Para variável HP: nome do campo, onde usar, exemplo de resposta personalizada **antes e depois**, e se precisa de confirmação do time de dados.
+4. **Recomendações por dono**, cada uma com evidência (n e `ticket_id`) e antes/depois: Produto CX (prompt, variável, fluxo, integração/payload), Help Design (artigo). Escopo é só o bot: nada sobre atendimento humano. Para variável HP: nome do campo, onde usar, exemplo de resposta personalizada **antes e depois**, e se precisa de confirmação do time de dados.
 
 ## Output obrigatório (MODO CURADORIA)
 
@@ -97,7 +97,6 @@ Ausentes no payload (lacuna): [dado — dúvida do cliente que ele resolveria �
 BLOCO 4 — RECOMENDAÇÕES POR DONO
 Produto CX: [ação — evidência — antes/depois]
 Help Design: [...]
-Operação CX: [...]
 
 BLOCO 5 — SNAPSHOT SEMANAL (JSON em uma linha)
 {"periodo":"...","n_total":0,"bqs":0,"bqs_pleno":0,"bqs_degradado":0,"pct_degradado":0,"gap_contexto_pp":0,"temas_pior_hp_pleno":["..."],"alertas":["..."],"versoes_prompt":["..."]}
