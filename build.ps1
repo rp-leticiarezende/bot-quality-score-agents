@@ -163,14 +163,14 @@ Todas as consultas começam com `[BASE]`. Formate cada resultado como texto estr
 [BASE]
 SELECT ticket_id, effective_vertical, topic, botmaker_chatbot_flow, botmaker_stage, retention_type, nota_ok,
        score_understanding, score_efficiency, intent_detected,
-       SUBSTR(diagnostics, 1, 1200) AS diagnostics, SUBSTR(summary, 1, 600) AS summary, botmaker_link_chatbot
+       SUBSTR(diagnostics, 1, 700) AS diagnostics, SUBSTR(summary, 1, 350) AS summary, botmaker_link_chatbot
 FROM base
 WHERE periodo = 'atual' AND nota_ok IS NOT NULL
   AND (retention_type IN ('loop','transbordo')
        OR diagnostics LIKE '%falha_de_fluxo%' OR diagnostics LIKE '%falha_de_interpretacao%'
        OR diagnostics LIKE '%resposta_generica%' OR diagnostics LIKE '%resposta_incorreta%')
 ORDER BY xxhash64(request_id)
-LIMIT 120
+LIMIT 70
 ```
 
 ### Pacote B — Base de conhecimento (destinatário: `zendesk-guide-expert`)

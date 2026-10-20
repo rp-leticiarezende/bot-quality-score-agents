@@ -373,7 +373,7 @@ SELECT COUNT(*) AS n_avaliaveis,
 FROM fin
 ```
 
-Guarde como `bqs_final` (nome interno; no relatório e no painel ele se chama apenas **BQS**). **O BQS do cabeçalho é o `bqs_final`.** Não exiba `bqs_original`: ele existe só para medir o efeito da auditoria, que aparece como contagens (`n_auditados`, `n_revisados` e as trocas de aprovação). As tabelas por dimensão do Passo 3 usam as notas do avaliador automático, sem a revisão do auditor (a auditoria cobre só uma amostra seletiva de casos duvidosos — diga isso no relatório). Informe também o saldo da auditoria (`n_aprovado_para_reprovado` × `n_reprovado_para_aprovado`) e as "divergências do avaliador" do resumo dos auditores: elas mostram onde o avaliador automático erra.
+Guarde como `bqs_final` (nome interno; no relatório e no painel ele se chama apenas **BQS 2.0**). **O BQS do cabeçalho é o `bqs_final`.** Não exiba `bqs_original`: ele existe só para medir o efeito da auditoria, que aparece como contagens (`n_auditados`, `n_revisados` e as trocas de aprovação). As tabelas por dimensão do Passo 3 usam as notas do avaliador automático, sem a revisão do auditor (a auditoria cobre só uma amostra seletiva de casos duvidosos — diga isso no relatório). Informe também o saldo da auditoria (`n_aprovado_para_reprovado` × `n_reprovado_para_aprovado`) e as "divergências do avaliador" do resumo dos auditores: elas mostram onde o avaliador automático erra.
 
 ---
 

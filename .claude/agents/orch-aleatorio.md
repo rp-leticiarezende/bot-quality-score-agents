@@ -269,14 +269,14 @@ Todas as consultas começam com `[BASE]`. Formate cada resultado como texto estr
 [BASE]
 SELECT ticket_id, effective_vertical, topic, botmaker_chatbot_flow, botmaker_stage, retention_type, nota_ok,
        score_understanding, score_efficiency, intent_detected,
-       SUBSTR(diagnostics, 1, 1200) AS diagnostics, SUBSTR(summary, 1, 600) AS summary, botmaker_link_chatbot
+       SUBSTR(diagnostics, 1, 700) AS diagnostics, SUBSTR(summary, 1, 350) AS summary, botmaker_link_chatbot
 FROM base
 WHERE periodo = 'atual' AND nota_ok IS NOT NULL
   AND (retention_type IN ('loop','transbordo')
        OR diagnostics LIKE '%falha_de_fluxo%' OR diagnostics LIKE '%falha_de_interpretacao%'
        OR diagnostics LIKE '%resposta_generica%' OR diagnostics LIKE '%resposta_incorreta%')
 ORDER BY xxhash64(request_id)
-LIMIT 120
+LIMIT 70
 ```
 
 ### Pacote B — Base de conhecimento (destinatário: `zendesk-guide-expert`)
@@ -559,7 +559,7 @@ SELECT COUNT(*) AS n_avaliaveis,
 FROM fin
 ```
 
-Guarde como `bqs_final` (nome interno; no relatório e no painel ele se chama apenas **BQS**). **O BQS do cabeçalho é o `bqs_final`.** Não exiba `bqs_original`: ele existe só para medir o efeito da auditoria, que aparece como contagens (`n_auditados`, `n_revisados` e as trocas de aprovação). As tabelas por dimensão do Passo 3 usam as notas do avaliador automático, sem a revisão do auditor (a auditoria cobre só uma amostra seletiva de casos duvidosos — diga isso no relatório). Informe também o saldo da auditoria (`n_aprovado_para_reprovado` × `n_reprovado_para_aprovado`) e as "divergências do avaliador" do resumo dos auditores: elas mostram onde o avaliador automático erra.
+Guarde como `bqs_final` (nome interno; no relatório e no painel ele se chama apenas **BQS 2.0**). **O BQS do cabeçalho é o `bqs_final`.** Não exiba `bqs_original`: ele existe só para medir o efeito da auditoria, que aparece como contagens (`n_auditados`, `n_revisados` e as trocas de aprovação). As tabelas por dimensão do Passo 3 usam as notas do avaliador automático, sem a revisão do auditor (a auditoria cobre só uma amostra seletiva de casos duvidosos — diga isso no relatório). Informe também o saldo da auditoria (`n_aprovado_para_reprovado` × `n_reprovado_para_aprovado`) e as "divergências do avaliador" do resumo dos auditores: elas mostram onde o avaliador automático erra.
 
 ---
 

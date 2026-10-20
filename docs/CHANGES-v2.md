@@ -133,3 +133,17 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 - **Regra nova** (ver `docs/REVISAO-REGRAS-BQS.md`, seção 8): conduta boa E desfecho aceitável (resolutiva; transbordo pedido pelo cliente; abandono depois de resposta boa). Loop e transbordo sem pedido reprovam; o transbordo sem pedido é sinalizado.
 - **SQL:** `BASE_CTE` ganhou `desfecho_ok`, `transbordo_sem_pedido` e `recontato_24h` (join com `prod.cx.fat_botmaker_metrics`); Passo 3.1/3.2 e 6.2 calculam o BQS 2.0; novo Passo 3.4 (sinalizados).
 - **Painel e Slack:** nome BQS 2.0; indicador de recontato 24h; seção "Sinalizados para análise"; histórico e linha do tempo recomeçam em 20/10/2026 (marco "Início do BQS 2.0"); explicação em "Como ler".
+
+## Teste de ponta a ponta (20/10/2026) — Agente de Cartão de Crédito, semana 12 a 18/10
+
+Rodada completa com postagem real no #bot-quality-score (marcada como TESTE): SQL → fluxo, KB, HP → 2 lotes de contenção (60 de 276) → 2 auditores (9 tickets) → SQL de consolidação → oportunidades e propostas (25) → painel (versão 6) e 2 mensagens. Resultado: **BQS 2.0 63,4%** (64,4% antes da auditoria; 4 de 9 tickets auditados passaram de aprovado para reprovado), contatos evitáveis ≈ 54% (IC 66–87% das classificadas), 32 transbordos sem pedido sinalizados.
+
+Achados do teste e o que foi feito ou fica pendente:
+- **Resultado grande demais no conector** (Pacote A, 190 mil caracteres) e `diagnostics` cortado no meio do JSON: reduzi o pacote (70 linhas, `diagnostics` 700 e `summary` 350 caracteres) — feito.
+- **Modelo pull:** os especialistas buscaram os próprios dados e gravaram a saída em arquivo; o orquestrador só passou caminhos. Gastou muito menos contexto que colar linhas no prompt. Vale adotar na rotina.
+- **Pacote A não traz** `user_messages`/motivo de abandono: o especialista de fluxo não consegue aplicar a regra de loop. Pendente.
+- **Régua do avaliador:** não distingue "transferência anunciada e nunca conectada" de "executada tarde" (tickets 46605356, 46610432). Pendente: ajustar a rubrica do bqs-auditor.
+- **Distribuição por desfecho soma 394, não 398** (4 conversas sem `retention_type`): o relatório já trata, mas vale uma linha "sem classificação" no contrato.
+- **Contrato:** oportunidades com 0 observados ficam com estimado 0; falta o valor "n/c". Pendente.
+- **Ferramentas:** o agente de relatório cita nomes de conector que não existem neste ambiente (`mcp__Slack__*`); na rotina em nuvem os nomes são os do ambiente dela. Conferir no modo sombra.
+- **Conflito de regras para o Produto CX decidir:** guardrails do bot proíbem orientar caminho no app, mas as propostas citam caminho; variável de desambiguação com dois nomes (`agcc_desambiguacao` × `cc_desambiguacao`).
