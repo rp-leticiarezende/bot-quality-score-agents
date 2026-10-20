@@ -1,0 +1,5 @@
+[
+  {"tipo":"marco","data":"2026-09-09","titulo":"Última semana com a nota geral em média aritmética","detalhe":"A partir de 14/10 a nota geral passa a ser ponderada. O painel recalcula toda a série com a fórmula ponderada, então os pontos são comparáveis."},
+  {"tipo":"hiato","inicio":"2026-09-10","fim":"2026-10-13","titulo":"Hiato do BQS: sem avaliações","detalhe":"O BQS voltou ao normal em 14/10/2026."},
+  {"tipo":"marco","data":"2026-10-18","titulo":"Primeira rodada do BQS estrito (rodada de teste)","detalhe":"Auditoria por transcrição e classificação de contatos evitáveis; BQS único."}
+]

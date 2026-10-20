@@ -151,6 +151,8 @@ details.opo[open] summary::after{transform:rotate(90deg)}
 ul.plain{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
 ul.plain li{display:flex;gap:10px;align-items:flex-start}
 .tip{position:fixed;z-index:20;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:5px 9px;border-radius:6px;max-width:260px;box-shadow:0 4px 14px rgba(0,0,0,.28)}
+.evlist{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink-2)}
+.evlist b{color:var(--ink);font-family:var(--mono);font-weight:500}
 .def{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:6px 16px}
 .def dt{font-weight:600} .def dd{margin:0;color:var(--ink-2)}
 code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
@@ -187,7 +189,7 @@ var CLASSES={
 };
 var FRENTES={artigo:"Artigos",variavel_hp:"Variáveis e prompts",prompt:"Variáveis e prompts",fluxo:"Fluxo e regras",politica:"Fluxo e regras",capacidade:"Capacidades novas",handoff:"Handoff"};
 var GRUPOS=["Todos","Artigos","Variáveis e prompts","Fluxo e regras","Capacidades novas","Handoff"];
-var S={data:{},hist:{},tab:"visao",crit:"criticos-semanal",filtro:{}};
+var S={data:{},hist:{},eventos:[],tab:"visao",crit:"criticos-semanal",filtro:{},metric:"bqs",linhaFluxo:"cartao-hp"};
 var $=function(s){return document.querySelector(s)};
 
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -202,14 +204,40 @@ function load(path){
   return fetch(path,{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).catch(function(){return null});
 }
 function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+/* aceita nomes antigos (bqs_final, hp) e entrega sempre m.bqs e m.qualidade_dado */
+function normRun(d){
+  if(!d||!d.metricas)return d;
+  var m=d.metricas;
+  if(m.bqs==null&&m.bqs_final!=null)m.bqs=m.bqs_final;
+  if(m.n_ok==null&&m.n_ok_final!=null)m.n_ok=m.n_ok_final;
+  if(!m.qualidade_dado&&m.hp)m.qualidade_dado={n_sem_boas_vindas:m.hp.degradado,pct_sem_boas_vindas:m.hp.pct_degradado};
+  return d;
+}
+function normHist(h){return arr(h).map(function(x){if(x.bqs==null&&x.bqs_final!=null)x.bqs=x.bqs_final;return x}).filter(function(x){return x&&x.fim}).sort(function(a,b){return a.fim<b.fim?-1:1})}
+function dia(s){return Date.parse(s+"T12:00:00Z")}
+function ddmm(s){return s?String(s).slice(8,10)+"/"+String(s).slice(5,7):""}
 
 /* ---------- peças ---------- */
 function chip(txt,tipo){return '<span class="chip '+(tipo||"")+'"><i></i>'+esc(txt)+'</span>'}
 function prioChip(p){var m={alta:["Alta","crit"],media:["Média","warn"],baixa:["Baixa",""]};var x=m[p]||["—",""];return chip(x[0],x[1])}
-function delta(atual,ant,inverso){
-  if(!num(atual)||!num(ant))return '<span class="delta">sem base de comparação</span>';
+function delta(atual,ant,inverso,ult){
+  if(!num(atual)||!num(ant)){
+    var u=ult||{};
+    return '<span class="delta">sem base de comparação'+(num(u.bqs)?' · último ponto antes da pausa: '+fmt(u.bqs,1)+'%'+(u.fim?' em '+ddmm(u.fim):''):'')+'</span>';
+  }
   var d=atual-ant,cls=Math.abs(d)<0.05?"":((d>0)!==!!inverso?"up":"down");
   return '<span class="delta '+cls+'">'+(d>0?"▲ ":d<0?"▼ ":"")+fmt(Math.abs(d),1)+' pp vs período anterior</span>';
+}
+/* variação do BQS: usa bqs_anterior; senão o semanal anterior no histórico até 10 dias; senão o último ponto (hiato) */
+function deltaRun(k,d){
+  var m=g(d,"metricas",{}),ant=m.bqs_anterior,ult=m.ultimo_ponto_anterior;
+  if(!num(ant)){
+    var ini=g(d,"periodo.inicio"),h=S.hist[k]||[],prev=null;
+    h.forEach(function(x){if(x.fim<(g(d,"periodo.fim","9999"))&&num(x.bqs))prev=x});
+    if(prev&&ini&&(dia(ini)-dia(prev.fim))<=10*86400000)ant=prev.bqs;
+    else if(prev)ult={bqs:prev.bqs,fim:prev.fim};
+  }
+  return delta(m.bqs,ant,false,ult);
 }
 function statusBqs(v){if(!num(v))return "";return v>=80?chip("Saudável","good"):v>=60?chip("Atenção","warn"):chip("Crítico","crit")}
 function seg(items,total){
@@ -241,21 +269,22 @@ function classeSeg(c){
   var cl=g(c,"classes",{});
   return seg(Object.keys(CLASSES).map(function(k){return {nome:k+" · "+CLASSES[k].nome,n:cl[k]||0,cor:CLASSES[k].cor}}));
 }
-function fluxoDados(f){
-  if(f.id==="criticos"){var k=S.crit;return S.data[k]||S.data[f.keys.filter(function(x){return S.data[x]})[0]]||null}
-  return S.data[f.keys[0]]||null;
+function fluxoKey(f){
+  if(f.id==="criticos")return S.data[S.crit]?S.crit:(f.keys.filter(function(x){return S.data[x]})[0]||f.keys[0]);
+  return f.keys[0];
 }
+function fluxoDados(f){return S.data[fluxoKey(f)]||null}
 
 /* ---------- visão geral ---------- */
 function cardRotina(f){
   var d=fluxoDados(f),m=g(d,"metricas",{});
-  var h='<div class="card"><header><div><div class="name">'+esc(f.nome)+'</div><div class="per">'+(d?esc(g(d,"periodo.label","")):"sem rodada")+'</div></div>'+(d?statusBqs(m.bqs_final):chip("Aguardando"))+'</header>';
+  var h='<div class="card"><header><div><div class="name">'+esc(f.nome)+'</div><div class="per">'+(d?esc(g(d,"periodo.label","")):"sem rodada")+'</div></div>'+(d?statusBqs(m.bqs):chip("Aguardando"))+'</header>';
   if(!d)return h+'<div class="sub">Esta rotina ainda não publicou dados aqui. A primeira execução preenche este cartão.</div></div>';
-  h+='<div><div class="big mono">'+fmt(m.bqs_final,1)+'<small>%</small></div>'+delta(m.bqs_final,m.bqs_anterior)+'</div>';
+  h+='<div><div class="big mono">'+fmt(m.bqs,1)+'<small>%</small></div>'+deltaRun(fluxoKey(f),d)+'</div>';
   h+='<div class="mini"><div><span>TFC</span><b>'+fmt(m.tfc,1)+'%</b></div><div><span>Evitáveis</span><b>'+(num(g(d,"contencao.ce_pct_total"))?fmt(g(d,"contencao.ce_pct_total"),0)+'%':"—")+'</b></div><div><span>Conversas</span><b>'+int(m.n_total)+'</b></div></div>';
   h+=retSeg(m);
   if(g(d,"cobertura.baixa"))h+='<div>'+chip("Cobertura baixa","warn")+'</div>';
-  return h+'<button class="linkbtn" data-go="'+f.id+'">Ver detalhes e o que mudar →</button></div>';
+  return h+'<button class="linkbtn" data-go="'+f.id+'">Ver evolução, detalhes e o que mudar →</button></div>';
 }
 function visao(){
   var any=Object.keys(S.data).some(function(k){return S.data[k]});
@@ -273,8 +302,8 @@ function visao(){
     h+='<div class="panel">'+linhas.map(function(x){var c=x.d.contencao;return '<div><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3>'+esc(x.f.nome)+'</h3><span class="muted" style="font-size:12px">'+int(c.n_classificadas)+' classificadas de '+int(c.n_elegiveis)+' elegíveis · evitáveis '+fmt(c.pct_evitavel,0)+'% (IC 95%: '+esc(arr(c.ic95).join("–"))+'%)</span></div>'+classeSeg(c)+'</div>'}).join("")+'</div>';
   }else h+=empty("Ainda sem classificação","A classificação por contato evitável aparece depois da primeira rodada completa.");
   h+='</section>';
-  // tendência
-  h+='<section class="block"><h2>Tendência do BQS</h2>'+tendencia()+'</section>';
+  // linha do tempo
+  h+='<section class="block"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>Evolução semana a semana</h2><button class="linkbtn" data-go="linha">Abrir a linha do tempo completa →</button></div>'+linhaTempo(["cartao-hp","aleatorio","criticos-semanal"],{eventos:true})+'</section>';
   // maiores oportunidades
   var todas=[];
   FLUXOS.forEach(function(f){var d=fluxoDados(f);arr(g(d,"oportunidades")).forEach(function(o){todas.push({f:f,o:o})})});
@@ -286,7 +315,7 @@ function visao(){
   }else h+=empty("Sem oportunidades ainda","Elas aparecem depois que a análise completa de uma rotina roda.");
   h+='</section>';
   // auditoria
-  h+='<section class="block"><h2>Quanto o avaliador automático erra</h2><p class="sub">O auditor lê a transcrição de casos duvidosos e revisa as notas. A nota revisada entra no BQS final. É uma amostra seletiva, não aleatória.</p>';
+  h+='<section class="block"><h2>Quanto o avaliador automático erra</h2><p class="sub">O auditor lê a transcrição de casos duvidosos e revisa as notas. A nota revisada entra no BQS. É uma amostra seletiva, não aleatória.</p>';
   var au=FLUXOS.map(function(f){var d=fluxoDados(f);return d&&g(d,"auditoria.auditados")!=null?{f:f,a:d.auditoria}:null}).filter(Boolean);
   if(au.length){
     h+='<div class="panel scroll"><table><thead><tr><th>Rotina</th><th class="n">Auditados</th><th class="n">Notas revisadas</th><th class="n">Aprovado → reprovado</th><th class="n">Reprovado → aprovado</th></tr></thead><tbody>'+au.map(function(x){return '<tr><td>'+esc(x.f.nome)+'</td><td class="n">'+int(x.a.auditados)+'</td><td class="n">'+int(x.a.revisados)+'</td><td class="n">'+int(x.a.aprovado_para_reprovado)+'</td><td class="n">'+int(x.a.reprovado_para_aprovado)+'</td></tr>'}).join("")+'</tbody></table></div>';
@@ -295,24 +324,104 @@ function visao(){
   }else h+=empty("Sem auditoria ainda","Os tickets marcados para auditoria são lidos na transcrição a cada rodada.");
   main(h+'</section>');
 }
-function tendencia(){
-  var cores={"cartao-hp":"var(--cD)","aleatorio":"var(--cA)","criticos-semanal":"var(--cR)"};
-  var nomes={"cartao-hp":"Cartão HP","aleatorio":"Aleatório","criticos-semanal":"Casos críticos (semanal)"};
-  var series=Object.keys(cores).map(function(k){return {k:k,p:arr(S.hist[k]).filter(function(x){return num(x.bqs_final)})}}).filter(function(s){return s.p.length>=2});
-  if(!series.length)return empty("A série começa na segunda rodada","Com um único período não há tendência. A partir do segundo, o gráfico mostra o BQS final de cada rotina semana a semana.");
-  var W=760,H=220,L=36,R=14,T=12,B=26,all=[];
-  series.forEach(function(s){s.p.forEach(function(x){all.push(x.fim)})});
-  var uniq=Array.from(new Set(all)).sort(),ix=function(d){return uniq.length>1?L+(W-L-R)*uniq.indexOf(d)/(uniq.length-1):L};
-  var y=function(v){return T+(H-T-B)*(1-v/100)};
-  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="BQS final por período" style="max-width:100%;height:auto">';
-  [0,20,40,60,80,100].forEach(function(t){svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="var(--line)" stroke-width="'+(t===60||t===80?1.2:.6)+'" '+(t===60||t===80?'stroke-dasharray="4 3"':'')+'/><text x="'+(L-6)+'" y="'+(y(t)+4)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">'+t+'</text>'});
-  uniq.forEach(function(d,i){if(uniq.length>8&&i%2)return;svg+='<text x="'+ix(d)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="var(--muted)">'+esc(String(d).slice(5).split("-").reverse().join("/"))+'</text>'});
+/* ---------- linha do tempo ---------- */
+var CORES={"cartao-hp":"var(--cD)","aleatorio":"var(--cA)","criticos-semanal":"var(--cR)","criticos-diario":"var(--cC)"};
+var NOMES={"cartao-hp":"Cartão HP","aleatorio":"Aleatório","criticos-semanal":"Casos críticos (semanal)","criticos-diario":"Casos críticos (diário)"};
+var METRICAS={bqs:{n:"BQS",f:"bqs"},tfc:{n:"TFC",f:"tfc"},ce:{n:"Contatos evitáveis",f:"ce_pct_total"}};
+var MESES=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+var DIA=86400000;
+function metricPills(){
+  return '<div class="pills" role="group" aria-label="Métrica">'+Object.keys(METRICAS).map(function(k){return '<button class="pill" data-metric="'+k+'" aria-pressed="'+(S.metric===k)+'">'+METRICAS[k].n+'</button>'}).join("")+'</div>';
+}
+function eventosTodos(keys){
+  var ev=arr(S.eventos).slice(),seen={};
+  keys.forEach(function(k){
+    var p=null;
+    arr(S.hist[k]).forEach(function(x){
+      if(p&&x.prompt_version&&p.prompt_version&&x.prompt_version!==p.prompt_version){
+        var id=x.fim+"|"+x.prompt_version;
+        if(!seen[id]){seen[id]=1;ev.push({tipo:"marco",data:x.fim,titulo:"Versão do prompt do bot mudou: "+p.prompt_version+" → "+x.prompt_version})}
+      }
+      p=x;
+    });
+  });
+  return ev.filter(function(e){return e&&(e.tipo==="hiato"?(e.inicio&&e.fim):e.data)}).sort(function(a,b){return (a.inicio||a.data)<(b.inicio||b.data)?-1:1});
+}
+function linhaTempo(keys,opt){
+  var mt=METRICAS[S.metric]||METRICAS.bqs;
+  var series=keys.map(function(k){return {k:k,p:arr(S.hist[k]).filter(function(x){return num(x[mt.f])})}}).filter(function(s){return s.p.length});
+  if(!series.length)return empty("A série começa na primeira rodada","Cada rodada acrescenta um ponto à linha do tempo.");
+  var ev=eventosTodos(keys),ts=[];
+  series.forEach(function(s){s.p.forEach(function(x){ts.push(dia(x.fim))})});
+  ev.forEach(function(e){if(e.tipo==="hiato"){ts.push(dia(e.inicio));ts.push(dia(e.fim))}else ts.push(dia(e.data))});
+  var t0=Math.min.apply(null,ts)-6*DIA,t1=Math.max.apply(null,ts)+6*DIA;
+  var maxv=100;
+  if(mt.f!=="bqs"){maxv=20;series.forEach(function(s){s.p.forEach(function(x){maxv=Math.max(maxv,Math.ceil(x[mt.f]/10)*10)})})}
+  var W=760,H=250,L=36,R=14,T=26,B=28;
+  var X=function(t){return L+(W-L-R)*(t-t0)/(t1-t0)},Y=function(v){return T+(H-T-B)*(1-v/maxv)};
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Evolução de '+esc(mt.n)+' ao longo do tempo" style="max-width:100%;height:auto">';
+  var passo=maxv>50?20:10;
+  for(var t=0;t<=maxv;t+=passo){
+    var ref=mt.f==="bqs"&&(t===60||t===80);
+    svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(t)+'" y2="'+Y(t)+'" stroke="var(--line)" stroke-width="'+(ref?1.2:.6)+'" '+(ref?'stroke-dasharray="4 3"':'')+'/><text x="'+(L-6)+'" y="'+(Y(t)+4)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">'+t+'</text>';
+  }
+  // meses
+  var d0=new Date(t0);d0=new Date(Date.UTC(d0.getUTCFullYear(),d0.getUTCMonth()+1,1,12));
+  for(var dm=d0;dm.getTime()<t1;dm=new Date(Date.UTC(dm.getUTCFullYear(),dm.getUTCMonth()+1,1,12))){
+    var xm=X(dm.getTime());
+    svg+='<line x1="'+xm+'" x2="'+xm+'" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--line-soft)" stroke-width=".6"/><text x="'+xm+'" y="'+(H-9)+'" text-anchor="middle" font-size="10" fill="var(--muted)">'+MESES[dm.getUTCMonth()]+(dm.getUTCMonth()===0?"/"+String(dm.getUTCFullYear()).slice(2):"")+'</text>';
+  }
+  // hiatos (faixas) e marcos
+  ev.forEach(function(e,i){
+    var n=i+1;
+    if(e.tipo==="hiato"){
+      var xa=X(dia(e.inicio)),xb=X(dia(e.fim));
+      svg+='<rect x="'+xa+'" y="'+T+'" width="'+Math.max(2,xb-xa)+'" height="'+(H-T-B)+'" fill="var(--warn-bg)" data-tip="'+esc(n+" · "+(e.titulo||"Hiato")+" ("+ddmm(e.inicio)+" a "+ddmm(e.fim)+")")+'"/>';
+      svg+='<g data-tip="'+esc(n+" · "+(e.titulo||"Hiato"))+'"><circle cx="'+((xa+xb)/2)+'" cy="12" r="8" fill="var(--warn)"/><text x="'+((xa+xb)/2)+'" y="15.5" text-anchor="middle" font-size="10" font-weight="700" fill="var(--brand-ink)">'+n+'</text></g>';
+    }else{
+      var xe=X(dia(e.data));
+      svg+='<line x1="'+xe+'" x2="'+xe+'" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3"/><g data-tip="'+esc(n+" · "+ddmm(e.data)+" · "+(e.titulo||""))+'"><circle cx="'+xe+'" cy="12" r="8" fill="var(--ink)"/><text x="'+xe+'" y="15.5" text-anchor="middle" font-size="10" font-weight="700" fill="var(--bg)">'+n+'</text></g>';
+    }
+  });
+  // linhas
   series.forEach(function(s){
-    svg+='<polyline fill="none" stroke="'+cores[s.k]+'" stroke-width="2" stroke-linejoin="round" points="'+s.p.map(function(x){return ix(x.fim)+","+y(x.bqs_final)}).join(" ")+'"/>';
-    s.p.forEach(function(x,i){svg+='<circle cx="'+ix(x.fim)+'" cy="'+y(x.bqs_final)+'" r="'+(i===s.p.length-1?5:3.5)+'" fill="'+cores[s.k]+'" stroke="var(--surface)" stroke-width="2" data-tip="'+esc(nomes[s.k]+" · "+(x.periodo_label||x.fim)+": "+fmt(x.bqs_final,1)+"%"+(x.cobertura_baixa?" (cobertura baixa)":""))+'"/>'});
+    var seg=[],cor=CORES[s.k],prev=null;
+    s.p.forEach(function(x){
+      var tx=dia(x.fim);
+      if(prev&&(tx-prev)>10*DIA){svg+='<line x1="'+X(prev)+'" y1="'+Y(s.last)+'" x2="'+X(tx)+'" y2="'+Y(x[mt.f])+'" stroke="'+cor+'" stroke-width="1.5" stroke-dasharray="2 4" opacity=".7"/>';if(seg.length>1)svg+='<polyline fill="none" stroke="'+cor+'" stroke-width="2" stroke-linejoin="round" points="'+seg.join(" ")+'"/>';seg=[]}
+      seg.push(X(tx)+","+Y(x[mt.f]));prev=tx;s.last=x[mt.f];
+    });
+    if(seg.length>1)svg+='<polyline fill="none" stroke="'+cor+'" stroke-width="2" stroke-linejoin="round" points="'+seg.join(" ")+'"/>';
+    s.p.forEach(function(x,i){
+      svg+='<circle cx="'+X(dia(x.fim))+'" cy="'+Y(x[mt.f])+'" r="'+(i===s.p.length-1?5:3.5)+'" fill="'+(x.cobertura_baixa?"var(--surface)":cor)+'" stroke="'+cor+'" stroke-width="2" data-tip="'+esc(NOMES[s.k]+" · "+(x.periodo_label||ddmm(x.fim))+" · "+mt.n+": "+fmt(x[mt.f],1)+"%"+(x.cobertura_baixa?" (cobertura baixa)":""))+'"/>';
+    });
   });
   svg+='</svg>';
-  return '<div class="panel">'+svg+'<div class="legend">'+series.map(function(s){return '<span><i style="background:'+cores[s.k]+'"></i>'+esc(nomes[s.k])+'</span>'}).join("")+'<span class="muted">Linhas tracejadas: 60% (crítico) e 80% (saudável) · limiares provisórios</span></div></div>';
+  var lg='<div class="legend">'+series.map(function(s){return '<span><i style="background:'+CORES[s.k]+'"></i>'+esc(NOMES[s.k])+'</span>'}).join("")+'<span class="muted">Círculo vazado: cobertura baixa · linha pontilhada: pausa na série'+(mt.f==="bqs"?' · tracejados: 60% e 80% (limiares provisórios)':'')+'</span></div>';
+  var lista=ev.length?'<ol class="evlist">'+ev.map(function(e){return '<li><b>'+(e.tipo==="hiato"?ddmm(e.inicio)+" a "+ddmm(e.fim):ddmm(e.data))+'</b> · '+esc(e.titulo||"")+(e.detalhe?' <span class="muted">— '+esc(e.detalhe)+'</span>':'')+'</li>'}).join("")+'</ol>':'';
+  return '<div class="panel">'+metricPills()+svg+lg+lista+'</div>';
+}
+function dcell(cur,prev,f,gapOk){
+  if(!prev||!num(cur[f])||!num(prev[f]))return '<td class="n muted">—</td>';
+  if(!gapOk)return '<td class="n muted" data-tip="Há uma pausa na série entre os dois pontos">pausa</td>';
+  var d=cur[f]-prev[f],bom=f==="bqs"?d>0:d<0,cls=Math.abs(d)<0.05?"":(bom?"up":"down");
+  return '<td class="n"><span class="delta '+cls+'">'+(d>0?"▲ ":d<0?"▼ ":"")+fmt(Math.abs(d),1)+'</span></td>';
+}
+function tabelaPeriodos(k,limite){
+  var h=arr(S.hist[k]);
+  if(!h.length)return empty("Sem histórico","Esta rotina ainda não tem pontos na linha do tempo.");
+  var linhas=h.map(function(x,i){
+    var p=i?h[i-1]:null,ok=p?(dia(x.fim)-dia(p.fim))<=10*DIA:false;
+    return '<tr><td>'+esc(x.periodo_label||x.fim)+(x.cobertura_baixa?' '+chip("cobertura baixa","warn"):'')+'</td><td class="n">'+int(x.n_total)+'</td><td class="n"><b>'+fmt(x.bqs,1)+'%</b></td>'+dcell(x,p,"bqs",ok)+'<td class="n">'+fmt(x.tfc,1)+'%</td>'+dcell(x,p,"tfc",ok)+'<td class="n">'+(num(x.ce_pct_total)?fmt(x.ce_pct_total,0)+'%':'—')+'</td><td class="n">'+esc(x.prompt_version||"—")+'</td></tr>';
+  }).reverse().slice(0,limite||30);
+  return '<div class="panel scroll"><table><thead><tr><th>Período</th><th class="n">Conversas</th><th class="n">BQS</th><th class="n">Δ pp</th><th class="n">TFC</th><th class="n">Δ pp</th><th class="n">Evitáveis</th><th class="n">Prompt</th></tr></thead><tbody>'+linhas.join("")+'</tbody></table></div>';
+}
+function abaLinha(){
+  var ks=["cartao-hp","aleatorio","criticos-semanal"];
+  var h='<section class="block"><h2>Linha do tempo</h2><p class="sub">Uma linha por rotina, uma bolinha por semana. A faixa amarela marca períodos sem BQS; os círculos numerados são marcos (mudança de regra, de prompt do bot, hiatos). Cada rodada das rotinas acrescenta um ponto.</p>'+linhaTempo(ks)+'</section>';
+  var k=S.linhaFluxo||"cartao-hp";
+  h+='<section class="block"><h2>Períodos, um a um</h2><div class="pills" role="group" aria-label="Rotina">'+["cartao-hp","aleatorio","criticos-semanal","criticos-diario"].map(function(x){return '<button class="pill" data-lf="'+x+'" aria-pressed="'+(k===x)+'">'+esc(NOMES[x])+'</button>'}).join("")+'</div>'+tabelaPeriodos(k)+'<p class="sub">Δ pp = variação em pontos percentuais frente ao ponto anterior. Para TFC, queda é melhora. "pausa" = não há ponto anterior comparável (mais de 10 dias).</p></section>';
+  main(h);
 }
 
 /* ---------- aba de fluxo ---------- */
@@ -327,7 +436,7 @@ function fluxo(f){
   h+='<section class="block"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><p class="sub">'+esc(f.desc)+'</p>';
   if(g(d,"meta.origem")==="teste")h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> '+esc(g(d,"meta.nota","Dados de validação."))+'</div></div>';
   h+='<div class="kpis">'+
-    kpi("BQS final",fmt(m.bqs_final,1)+'%',delta(m.bqs_final,m.bqs_anterior)+'<br><span class="muted">original '+fmt(m.bqs_original,1)+'% · legado '+fmt(m.bqs_legado,1)+'%</span>')+
+    kpi("BQS",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f),d))+
     kpi("TFC",fmt(m.tfc,1)+'%','falha de condução sem pedido do cliente')+
     kpi("Contatos evitáveis",num(c.ce_pct_total)?'≈ '+fmt(c.ce_pct_total,0)+'%':'—',num(c.pct_evitavel)?fmt(c.pct_evitavel,0)+'% das classificadas'+(c.ic95?' (IC '+esc(c.ic95.join("–"))+'%)':''):'sem classificação')+
     kpi("Pediram humano",fmt(m.pct_pediu_humano,1)+'%',int(m.n_total)+' conversas · '+int(m.n_avaliaveis)+' avaliáveis')+
@@ -338,9 +447,12 @@ function fluxo(f){
   if(g(d,"cobertura.baixa"))pa=[{tipo:"warn",texto:"Cobertura baixa: "+g(d,"cobertura.texto","dados incompletos no período")}].concat(pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x}));
   else pa=pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x});
   if(pa.length)h+='<section class="block"><h2>Pontos de atenção</h2><div class="panel"><ul class="plain">'+pa.map(function(x){return '<li><span class="dot '+esc(x.tipo||"warn")+'"></span><span>'+esc(x.texto)+'</span></li>'}).join("")+'</ul></div></section>';
+  // evolução
+  var kf=fluxoKey(f);
+  h+='<section class="block"><h2>Evolução desta rotina</h2>'+linhaTempo([kf])+tabelaPeriodos(kf,8)+'</section>';
   // distribuição
   h+='<section class="block"><h2>Como terminaram as conversas</h2><div class="two"><div class="panel"><h3>Desfecho</h3>'+retSeg(m)+'</div><div class="panel"><h3>Rótulo de qualidade</h3>'+labelsSeg(m)+'</div></div>'+criterios(m)+'</section>';
-  if(m.hp)h+=hp(m.hp);
+  if(m.qualidade_dado)h+=qualDado(m.qualidade_dado);
   // dimensões
   var dims=g(d,"dimensoes",{}),dk=Object.keys(dims).filter(function(k){return arr(dims[k]).length});
   if(dk.length){h+='<section class="block"><h2>Qualidade por agente e por tema</h2><p class="sub">Valores originais do avaliador (sem a revisão do auditor). Grupos com menos de 30 conversas não são ranqueados.</p>'+dk.map(function(k){return tabelaDim(k,dims[k])}).join("")+'</section>'}
@@ -360,19 +472,16 @@ function criterios(m){
   var menor=ks.slice().sort(function(a,b){return c[a]-c[b]})[0];
   return '<div class="panel"><h3>Média dos 6 critérios (0 a 10)</h3>'+bars(ks.map(function(k){return {l:nomes[k]+(k===menor?" · mais baixo":""),v:c[k],t:fmt(c[k],2),cor:k===menor?"var(--cA)":"var(--blue)"}}),10)+'</div>';
 }
-function hp(h){
-  return '<section class="block"><h2>Saúde do contexto (HP)</h2><div class="kpis">'+
-    kpi("HP pleno",int(h.pleno),'BQS '+fmt(h.bqs_pleno,1)+'%')+
-    kpi("HP degradado",fmt(h.pct_degradado,1)+'%',int(h.degradado)+' conversas · limite 5%'+(num(h.pct_degradado)&&h.pct_degradado>5?' · '+chip("Acima do limite","crit"):''))+
-    kpi("BQS degradado",fmt(h.bqs_degradado,1)+'%','sem contexto do cliente')+
-  '</div><p class="sub">HP pleno = contexto do cliente carregado; falha é de prompt, conteúdo ou fluxo. HP degradado = o bot atendeu sem contexto; falha de integração.</p></section>';
+function qualDado(q){
+  return '<section class="block"><h2>Qualidade do dado de contexto <span class="chip warn">indicador em revisão</span></h2><div class="kpis">'+
+    kpi("Sem boas-vindas na transcrição",fmt(q.pct_sem_boas_vindas,1)+'%',int(q.n_sem_boas_vindas)+' conversas')+
+  '</div><p class="sub">Informativo. Antes este número era lido como "bot sem contexto do cliente", mas as medições de 15 a 20/10/2026 não sustentam isso (o campo marca conversas mais curtas, e a maioria delas tinha as variáveis carregadas). Não gera alerta nem oportunidade enquanto a regra é revisada.</p></section>';
 }
 function tabelaDim(k,rows){
   var nome={effective_vertical:"Agente / vertical",topic:"Tema",product:"Produto"}[k]||k;
-  var hasHp=rows.some(function(r){return num(r.bqs_hp_pleno)});
-  return '<div class="panel scroll"><h3>'+esc(nome)+'</h3><table><thead><tr><th>'+esc(nome)+'</th><th class="n">Conversas</th><th>BQS</th><th class="n">TFC</th><th class="n">Pediu humano</th>'+(hasHp?'<th class="n">Degradado</th>':'')+'</tr></thead><tbody>'+rows.map(function(r){
+  return '<div class="panel scroll"><h3>'+esc(nome)+'</h3><table><thead><tr><th>'+esc(nome)+'</th><th class="n">Conversas</th><th>BQS</th><th class="n">TFC</th><th class="n">Pediu humano</th>'+'</tr></thead><tbody>'+rows.map(function(r){
     var peq=(r.n||0)<30;
-    return '<tr><td>'+esc(r.rotulo||r.valor)+(peq?' '+chip("amostra pequena"):'')+'</td><td class="n">'+int(r.n)+' <span class="muted">('+fmt(r.pct_volume,0)+'%)</span></td><td><div class="inbar"><span class="bar"><span style="width:'+(r.bqs||0)+'%;'+(peq?'opacity:.45;':'')+(r.bqs<60?'background:var(--crit)':r.bqs<80?'background:var(--warn)':'background:var(--good)')+'"></span></span><b class="mono">'+fmt(r.bqs,1)+'%</b></div></td><td class="n">'+fmt(r.tfc,1)+'%</td><td class="n">'+fmt(r.pct_pediu_humano,1)+'%</td>'+(hasHp?'<td class="n">'+fmt(r.pct_degradado,1)+'%</td>':'')+'</tr>';
+    return '<tr><td>'+esc(r.rotulo||r.valor)+(peq?' '+chip("amostra pequena"):'')+'</td><td class="n">'+int(r.n)+' <span class="muted">('+fmt(r.pct_volume,0)+'%)</span></td><td><div class="inbar"><span class="bar"><span style="width:'+(r.bqs||0)+'%;'+(peq?'opacity:.45;':'')+(r.bqs<60?'background:var(--crit)':r.bqs<80?'background:var(--warn)':'background:var(--good)')+'"></span></span><b class="mono">'+fmt(r.bqs,1)+'%</b></div></td><td class="n">'+fmt(r.tfc,1)+'%</td><td class="n">'+fmt(r.pct_pediu_humano,1)+'%</td>'+'</tr>';
   }).join("")+'</tbody></table></div>';
 }
 function contencao(c,m){
@@ -418,8 +527,8 @@ function opo(o){
 /* ---------- como ler ---------- */
 function comoLer(){
   main('<section class="block"><h2>Como ler este painel</h2><div class="panel"><dl class="def">'+
-  '<dt>BQS final</dt><dd>Percentual de conversas aprovadas. Uma conversa é aprovada quando a nota geral é 7 ou mais e <i>resolução</i> e <i>transbordo</i> ficam acima de 2. Conversas "regular" são reprovadas (sem crédito parcial). Nos tickets auditados, vale a nota revisada pelo auditor.</dd>'+
-  '<dt>BQS original e legado</dt><dd>O original é o mesmo cálculo sem a revisão do auditor. O legado é o antigo, baseado no campo <code>approved</code>, que deixa as conversas "regular" fora da conta e infla o resultado; aparece só para comparação histórica.</dd>'+
+  '<dt>BQS</dt><dd>Percentual de conversas aprovadas. A nota geral é recalculada a partir das 6 notas (resolução 30%, eficiência 20%, transbordo 20%, entendimento 15%, clareza 10%, tom 5%). A conversa é aprovada quando a nota geral é 7 ou mais e <i>resolução</i> e <i>transbordo</i> ficam acima de 2. Conversas "regular" são reprovadas (sem crédito parcial). Nos tickets auditados, vale a nota revisada pelo auditor. Existe um único BQS, calculado da mesma forma em toda a série.</dd>'+
+  '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
   '<dt>TFC</dt><dd>Taxa de falha de condução: conversas que terminaram em transbordo, abandono ou loop sem o cliente ter pedido atendente.</dd>'+
   '<dt>Contatos evitáveis</dt><dd>Entre as conversas classificadas, as que o bot poderia ter resolvido hoje (A), resolveria com ajuste de conteúdo, variável ou roteamento (B) ou exigiria uma capacidade nova (C). A estimativa para o período vem de uma amostra aleatória e traz intervalo de confiança.</dd>'+
   '<dt>Classes</dt><dd>A bot resolvia hoje · B resolveria com ajuste · C exigiria capacidade nova · D só humano resolve (mede o handoff do bot) · R retido provável · E indeterminado.</dd>'+
@@ -434,19 +543,21 @@ function comoLer(){
 /* ---------- navegação ---------- */
 function main(h){$("#main").innerHTML=h}
 function tabs(){
-  var t=[{id:"visao",n:"Visão geral"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
+  var t=[{id:"visao",n:"Visão geral"},{id:"linha",n:"Linha do tempo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
   $("#tabs").innerHTML=t.map(function(x){return '<button role="tab" data-tab="'+x.id+'" aria-selected="'+(S.tab===x.id)+'">'+esc(x.n)+'</button>'}).join("");
 }
 function render(){
   tabs();
   var f=FLUXOS.filter(function(x){return x.id===S.tab})[0];
-  if(S.tab==="visao")visao();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
+  if(S.tab==="visao")visao();else if(S.tab==="linha")abaLinha();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
   var ult=Object.keys(S.data).map(function(k){return g(S.data[k],"gerado_em")}).filter(Boolean).sort().pop();
   $("#atualizado").textContent=ult?"Atualizado em "+dt(ult):"";
 }
 document.addEventListener("click",function(e){
-  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro]");if(!el)return;
+  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro],[data-metric],[data-lf]");if(!el)return;
   if(el.dataset.tab||el.dataset.go){S.tab=el.dataset.tab||el.dataset.go;store("bqs-tab",S.tab);window.scrollTo(0,0)}
+  if(el.dataset.metric)S.metric=el.dataset.metric;
+  if(el.dataset.lf)S.linhaFluxo=el.dataset.lf;
   if(el.dataset.crit)S.crit=el.dataset.crit;
   if(el.dataset.filtro)S.filtro[S.tab]=el.dataset.filtro;
   render();
@@ -466,7 +577,7 @@ document.addEventListener("pointerleave",function(){tip.hidden=true});
 /* ---------- boot ---------- */
 var chaves=["cartao-hp","aleatorio","criticos-semanal","criticos-diario"];
 var salvo=store("bqs-tab");if(salvo)S.tab=salvo;
-Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=r[0];S.hist[k]=r[1]})})).then(render);
+Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
 render();
 })();
 </script>

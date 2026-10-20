@@ -2,10 +2,11 @@
 
 O painel (`artifact/painel.html`) é uma página fixa que lê arquivos JSON publicados ao lado dela. Cada rotina publica **dois arquivos próprios** e nunca mexe nos das outras:
 - `data/<chave>/latest.json` — a rodada atual completa;
-- `data/<chave>/history.json` — série curta para a tendência (array, até 60 itens).
+- `data/<chave>/history.json` — a série da linha do tempo (array, até 104 itens ≈ 2 anos de semanas).
 Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
+O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global e mantido por humanos**: nenhuma rotina escreve nele.
 
-**Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo.
+**Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo. Existe **um único BQS** (o que inclui a nota revisada pelo auditor): não grave "BQS original" nem "BQS legado".
 
 ```
 {
@@ -17,17 +18,18 @@ Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
   "gerado_em": "AAAA-MM-DDThh:mm:ss-03:00",
   "cobertura": { "baixa": true|false, "comparacao_indisponivel": true|false, "texto": "frase curta (dias com dado, buracos, ingestão atrasada)" },
   "metricas": {
-    "n_total": 0, "n_avaliaveis": 0, "n_ok_final": 0,
-    "bqs_final": 0.0, "bqs_original": 0.0, "bqs_anterior": null, "bqs_legado": 0.0,
+    "n_total": 0, "n_avaliaveis": 0, "n_ok": 0,
+    "bqs": 0.0, "bqs_anterior": null, "ultimo_ponto_anterior": { "bqs": 0.0, "fim": "AAAA-MM-DD" },   // ultimo_ponto_anterior: só quando não há período anterior comparável (ex.: depois de um hiato); senão null
+    "prompt_version": "versão do prompt do bot dominante no período (Pacote V) ou null",
     "tfc": 0.0, "pct_pediu_humano": 0.0, "pct_transbordo": 0.0, "n_transbordo_nota_ok": 0,
     "labels": { "excelente": 0, "bom": 0, "regular": 0, "ruim": 0, "critico": 0 },
     "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 0, "loop": 0 },
     "criterios": { "understanding": 0.0, "resolution": 0.0, "clarity": 0.0, "tone": 0.0, "efficiency": 0.0, "escalation": 0.0 },
-    "hp": { "pleno": 0, "degradado": 0, "pct_degradado": 0.0, "bqs_pleno": 0.0, "bqs_degradado": 0.0 }   // só no cartao-hp
+    "qualidade_dado": { "n_sem_boas_vindas": 0, "pct_sem_boas_vindas": 0.0 }   // só no cartao-hp; indicador em revisão, informativo
   },
   "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": ["frase sem dados pessoais"] },
   "dimensoes": {                                        // top 12 do Passo 3.2, valores ORIGINAIS (sem auditoria)
-    "effective_vertical": [ { "valor": "", "rotulo": "nome legível (opcional)", "n": 0, "pct_volume": 0.0, "bqs": 0.0, "tfc": 0.0, "pct_pediu_humano": 0.0, "pct_degradado": 0.0 } ],
+    "effective_vertical": [ { "valor": "", "rotulo": "nome legível (opcional)", "n": 0, "pct_volume": 0.0, "bqs": 0.0, "tfc": 0.0, "pct_pediu_humano": 0.0 } ],
     "topic": [ ... ], "product": [ ... ]                // só as dimensões da rotina
   },
   "contencao": {                                        // do Passo 6.1; omita o objeto se não houve classificação
@@ -57,8 +59,10 @@ Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
 - `contencao.ce_pct_total` = `pct_evitavel × n_elegiveis / n_total` (vem pronto do SQL do Passo 6.1; copie).
 - Só entram em `oportunidades` itens com dono **Produto CX** ou **Help Design**; nada sobre atendimento humano; nenhum artigo cujo título comece com 🔒 ou 🔍.
 - Em `artigos`, só títulos exatos que vieram do `output_kb`; nunca invente título, ID ou URL (a URL costuma chegar redigida: omita).
-- `dimensoes`: copie as linhas do SQL; se `n < 30` mantenha a linha (o painel marca "amostra pequena").
+- Nomes internos do prompt → contrato: `bqs_final` → `bqs`, `n_ok_final` → `n_ok`, `n_hp_degradado`/`pct_degradado` → `qualidade_dado.n_sem_boas_vindas`/`pct_sem_boas_vindas`. Não grave `bqs_original`, `bqs_pleno`, `bqs_degradado` nem colunas fora do contrato.
+- `dimensoes`: copie as linhas do SQL (só as colunas do contrato); se `n < 30` mantenha a linha (o painel marca "amostra pequena").
 - Sem classificação/auditoria/oportunidades nesta rodada: omita `contencao`, use `auditoria` com `auditados: 0` e `oportunidades: []`. O painel mostra o estado vazio.
 
-**`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 60 mais recentes):
-`{ "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs_final": 0.0, "bqs_original": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false }`
+**`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 104 mais recentes). Mesmo `bqs` do `latest.json` (já com a nota revisada):
+`{ "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false, "prompt_version": "…" | null }`
+O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` entre pontos seguidos. Itens antigos sem `prompt_version` ou com a chave `bqs_final` continuam válidos.

@@ -16,11 +16,9 @@
   "metricas": {
     "n_total": 52,
     "n_avaliaveis": 52,
-    "n_ok_final": 42,
-    "bqs_final": 80.8,
-    "bqs_original": 80.8,
+    "n_ok": 42,
+    "bqs": 80.8,
     "bqs_anterior": null,
-    "bqs_legado": 84.0,
     "tfc": 3.8,
     "pct_pediu_humano": 96.2,
     "pct_transbordo": 100,
@@ -29,7 +27,6 @@
     "criterios": { "understanding": 7.15, "resolution": 6.88, "clarity": 7.04, "tone": 8.08, "efficiency": 6.54, "escalation": 9.77 }
   },
   "pontos_atencao": [
-    { "tipo": "info", "texto": "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot; os contatos evitáveis são o número principal desta rotina." },
-    { "tipo": "warn", "texto": "O BQS legado (84,0%) superestima em 3 pp. O critério mais baixo é a eficiência (6,54), seguido da resolução (6,88)." }
+    { "tipo": "info", "texto": "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot; os contatos evitáveis são o número principal desta rotina." }
   ]
 }

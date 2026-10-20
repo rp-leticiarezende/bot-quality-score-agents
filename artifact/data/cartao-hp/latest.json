@@ -16,11 +16,9 @@
   "metricas": {
     "n_total": 398,
     "n_avaliaveis": 388,
-    "n_ok_final": 280,
-    "bqs_final": 72.2,
-    "bqs_original": 72.4,
+    "n_ok": 280,
+    "bqs": 72.2,
     "bqs_anterior": null,
-    "bqs_legado": 81.4,
     "tfc": 42.5,
     "pct_pediu_humano": 25.4,
     "pct_transbordo": 32.7,
@@ -28,7 +26,8 @@
     "labels": { "excelente": 183, "bom": 98, "regular": 49, "ruim": 41, "critico": 17 },
     "retention": { "resolutiva": 125, "abandono": 130, "transbordo": 130, "loop": 9 },
     "criterios": { "understanding": 7.66, "resolution": 6.77, "clarity": 7.37, "tone": 8.24, "efficiency": 6.81, "escalation": 7.79 },
-    "hp": { "pleno": 377, "degradado": 21, "pct_degradado": 5.3, "bqs_pleno": 72.2, "bqs_degradado": 76.2 }
+    "prompt_version": "v1",
+    "qualidade_dado": { "n_sem_boas_vindas": 21, "pct_sem_boas_vindas": 5.3 }
   },
   "auditoria": {
     "auditados": 4,
@@ -43,18 +42,18 @@
   },
   "dimensoes": {
     "effective_vertical": [
-      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 70.6, "tfc": 42.2, "pct_pediu_humano": 27.4, "pct_degradado": 4.9 },
-      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 81.5, "tfc": 43.5, "pct_pediu_humano": 15.9, "pct_degradado": 7.2 }
+      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 70.6, "tfc": 42.2, "pct_pediu_humano": 27.4 },
+      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 81.5, "tfc": 43.5, "pct_pediu_humano": 15.9 }
     ],
     "topic": [
-      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 82.0, "tfc": 39.8, "pct_pediu_humano": 24.9, "pct_degradado": 5.2 },
-      { "valor": "pix", "n": 17, "pct_volume": 4.3, "bqs": 47.1, "tfc": 41.2, "pct_pediu_humano": 35.3, "pct_degradado": 5.9 },
-      { "valor": "recargapay-cards", "n": 15, "pct_volume": 3.8, "bqs": 66.7, "tfc": 26.7, "pct_pediu_humano": 13.3, "pct_degradado": 0.0 },
-      { "valor": "por-que-recebi-uma-fatura", "n": 8, "pct_volume": 2.0, "bqs": 37.5, "tfc": 50.0, "pct_pediu_humano": 37.5, "pct_degradado": 0.0 },
-      { "valor": "pix-payment", "n": 8, "pct_volume": 2.0, "bqs": 62.5, "tfc": 37.5, "pct_pediu_humano": 37.5, "pct_degradado": 0.0 },
-      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 100.0, "pct_pediu_humano": 0.0, "pct_degradado": 16.7 },
-      { "valor": "investimentos", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 66.7, "pct_pediu_humano": 16.7, "pct_degradado": 0.0 },
-      { "valor": "fatura", "n": 5, "pct_volume": 1.3, "bqs": 60.0, "tfc": 80.0, "pct_pediu_humano": 20.0, "pct_degradado": 0.0 }
+      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 82.0, "tfc": 39.8, "pct_pediu_humano": 24.9 },
+      { "valor": "pix", "n": 17, "pct_volume": 4.3, "bqs": 47.1, "tfc": 41.2, "pct_pediu_humano": 35.3 },
+      { "valor": "recargapay-cards", "n": 15, "pct_volume": 3.8, "bqs": 66.7, "tfc": 26.7, "pct_pediu_humano": 13.3 },
+      { "valor": "por-que-recebi-uma-fatura", "n": 8, "pct_volume": 2.0, "bqs": 37.5, "tfc": 50.0, "pct_pediu_humano": 37.5 },
+      { "valor": "pix-payment", "n": 8, "pct_volume": 2.0, "bqs": 62.5, "tfc": 37.5, "pct_pediu_humano": 37.5 },
+      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 100.0, "pct_pediu_humano": 0.0 },
+      { "valor": "investimentos", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 66.7, "pct_pediu_humano": 16.7 },
+      { "valor": "fatura", "n": 5, "pct_volume": 1.3, "bqs": 60.0, "tfc": 80.0, "pct_pediu_humano": 20.0 }
     ]
   },
   "contencao": {
@@ -80,9 +79,7 @@
     "handoff": { "correto": 2, "tardio": 1 }
   },
   "pontos_atencao": [
-    { "tipo": "crit", "texto": "HP degradado em 5,3% (21 conversas), acima do limite de 5%: o bot atendeu sem o contexto do cliente. Alerta de integração, separado da qualidade do prompt." },
     { "tipo": "warn", "texto": "Transbordo bem executado não é transbordo evitado: 115 dos 130 transbordos receberam nota de aprovado, e 73% das conversas classificadas na amostra eram evitáveis." },
-    { "tipo": "warn", "texto": "O BQS legado (81,4%) superestima em 9 pp: as conversas 'regular' ficam fora da conta. O BQS final é 72,2%." },
     { "tipo": "info", "texto": "Pediram atendente 25,4% dos clientes: 27,4% no Agente CC Produção contra 15,9% no Agente CC Anuidade." }
   ],
   "oportunidades": [
@@ -167,22 +164,7 @@
       "como_medir": "Conversas com 'consulta ausente' no diagnóstico; transbordos nesse tema."
     },
     {
-      "id": "OPO-006", "prioridade": "alta", "classe": "A", "causa": "contexto_degradado", "tipo": "integracao", "frente": "capacidade",
-      "titulo": "HP degradado acima do limite de 5%",
-      "vertical_tema": "Cartão HP (21 conversas)",
-      "problema": "Em 5,3% das conversas o bot atendeu sem o contexto do cliente. Quando a seção de cartão falha, ela é omitida inteira: o bot responde sem fatura, limite ou status.",
-      "evidencia": "21 de 398 conversas; 7,2% no Agente CC Anuidade e 4,9% no Agente CC Produção.",
-      "tickets": [],
-      "antes": "Resposta genérica, sem dados do cliente.",
-      "depois": "Resposta com vencimento, valor e status da fatura do cliente, ou aviso claro de que os dados não carregaram e transferência com canal e prazo.",
-      "proposta": "Investigar por que a seção de cartão chega vazia e definir o comportamento do bot nesse caso (avisar e oferecer o atendente, em vez de responder no escuro).",
-      "no": "campo a confirmar com Engenharia (contexto v2, seção creditCard)",
-      "dono": "Produto CX", "prazo": "Imediato",
-      "dependencias": "Engenharia / dono da API de contexto.",
-      "como_medir": "% de HP degradado por semana (meta: abaixo de 5%)."
-    },
-    {
-      "id": "OPO-007", "prioridade": "alta", "classe": "B", "causa": "conteudo_kb", "tipo": "cross-domain", "frente": "artigo",
+      "id": "OPO-006", "prioridade": "alta", "classe": "B", "causa": "conteudo_kb", "tipo": "cross-domain", "frente": "artigo",
       "titulo": "Artigos de cartão com texto interno publicado, sem passo a passo ou sem resposta na primeira frase",
       "vertical_tema": "Compra recusada, compra não reconhecida, roubo, cancelar cartão físico",
       "problema": "Dois artigos públicos têm marcações internas '[VALIDAR: …]' no texto; o de cancelar cartão físico termina em 'conforme detalhado abaixo' sem conteúdo; 'Roubaram meu cartão' abre com uma frase que não responde. Não existe conteúdo externo com o passo a passo de 'Encerrar relacionamento com cartão'.",
@@ -198,7 +180,7 @@
       "como_medir": "Alinhamento com a KB dos temas; pedidos de atendente nos temas."
     },
     {
-      "id": "OPO-008", "prioridade": "media", "classe": "A", "causa": "prompt_resposta", "tipo": "variavel", "frente": "variavel_hp",
+      "id": "OPO-007", "prioridade": "media", "classe": "A", "causa": "prompt_resposta", "tipo": "variavel", "frente": "variavel_hp",
       "titulo": "Template da anuidade com variável quebrada",
       "vertical_tema": "Agente CC Anuidade",
       "problema": "O texto sai como 'seu limite disponível agora é de o mesmo valor da anuidade' e, com dois cartões virtuais, o passo a passo fala no singular.",
@@ -214,7 +196,7 @@
       "como_medir": "Respostas com variável quebrada nos diagnósticos."
     },
     {
-      "id": "OPO-009", "prioridade": "media", "classe": "D", "causa": "acao_humana_obrigatoria", "tipo": "handoff", "frente": "handoff",
+      "id": "OPO-008", "prioridade": "media", "classe": "D", "causa": "acao_humana_obrigatoria", "tipo": "handoff", "frente": "handoff",
       "titulo": "Handoff do bot quando só uma pessoa resolve",
       "vertical_tema": "Contestação de Pix, cancelamento de cartão físico, anuidade já lançada",
       "problema": "Em um caso o bot anunciou a transferência e voltou a perguntar se tinha respondido; só transferiu no segundo pedido, sem informar canal nem prazo.",

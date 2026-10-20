@@ -9,7 +9,7 @@ description: |
   - Debugar ausência de dados em respostas personalizadas
   - Planejar mensagens HP usando os campos corretos do contexto do usuário
   - Comparar API legada vs API v2 de contexto
-  Em MODO CURADORIA: avalia a saúde do contexto (HP pleno × degradado) e o uso das variáveis de cartão nas conversas do fluxo Cartão HP.
+  Em MODO CURADORIA: avalia a qualidade do dado de contexto (indicador em revisão) e o uso das variáveis de cartão nas conversas do fluxo Cartão HP.
   Trigger: qualquer pergunta sobre variáveis do chatbot, payload, campos do contexto, hiperpersonalização, creditCardAccount, ${firstName}, ${subject}, seções da API, campos do usuário.
 tools:
   - mcp__Atlassian__getConfluencePage
@@ -52,12 +52,12 @@ Campos marcados "não se loguea" na documentação (`statementAmount`, `grantedL
 Outras seções úteis para cartão: `profile` (`walletStatus` com motivo de bloqueio, `documentStatus`, `fullKyc`, `hasJudicialBlock`), `loanOffer`/`activeLoan` (dívida de cartão aparecendo na tela de empréstimos), `pix` (`pixKeyStatus`, `orderDays`), `pixInfraction` (`hasMed`, `medStatus`, `bacenStatus`), `alerts` (`userAlerts[].title/description`), `escalation` (`escalationAvailable`).
 Observação: `suggestedAnswer.chatbotFlow` **chega sempre vazio** no endpoint v2 usado pelo Botmaker (a cascata transporte → ordem → carteira bloqueada só existe no endpoint legado).
 
-## Saúde do contexto (HP pleno × degradado)
+## Qualidade do dado de contexto (indicador em revisão)
 
-- **HP pleno:** `welcome_not_found = false` **e** `pages_fetched > 0` — o bot atendeu com o contexto do cliente. Falha aqui é de prompt, conteúdo ou fluxo (dono: Produto CX / Help Design).
-- **HP degradado:** `welcome_not_found = true` **ou** `pages_fetched = 0` — o bot operou sem contexto; falha de integração/infra (dono: Produto CX — Engenharia). Não penalizar o prompt.
-- Se qualquer erro ocorrer ao montar a seção `creditCard`, ela é **omitida inteira** (não há resposta parcial de cartão): um HP degradado costuma ser "seção de cartão ausente", não "campo vazio".
-- Limite de alerta: HP degradado > 5% do volume é **alerta próprio de engenharia**, independente do BQS.
+- A antiga separação "HP pleno × degradado" (`welcome_not_found`, `pages_fetched`) **está em revisão e não prova que o bot ficou sem contexto**: `pages_fetched` nunca é 0 e cresce com o tamanho da conversa; `welcome_not_found = true` marca conversas mais curtas, e na maioria delas as variáveis do Botmaker estavam carregadas.
+- Use `welcome_not_found` só como **qualidade do dado** (transcrição sem boas-vindas). Não gere alerta crítico nem oportunidade de engenharia a partir dele.
+- Para saber se o bot usou ou deixou de usar dados do cliente, leia `summary` e `diagnostics` e cite `ticket_id`.
+- Se a seção `creditCard` falhar ao ser montada ela é **omitida inteira** (não há resposta parcial de cartão): só afirme "seção ausente" quando houver evidência no texto da conversa.
 - Compare sempre os dois agentes pela dimensão `effective_vertical`: `cartao_credito` (Agente CC Produção) e `cc_anuidade` (Agente CC Anuidade).
 
 ## Fonte de dados de qualidade
@@ -70,8 +70,8 @@ O uso das variáveis só pode ser inferido do texto: `summary` (ex.: "personaliz
 
 Você recebe métricas pré-calculadas por SQL (não recalcule), a tabela por dimensão e o Pacote C (todas as conversas degradadas + conversas de HP pleno com sinal de resposta genérica/consulta ausente).
 
-1. **Saúde do contexto:** n e % de pleno/degradado, BQS pleno × degradado, gap em pp (`bqs_pleno − bqs_degradado`), degradação por agente; hipóteses de causa só quando houver evidência no pacote.
-2. **Temas de pior qualidade em HP pleno:** use `bqs_hp_pleno` da tabela por dimensão (ignore temas com n < 30); isola falha de prompt/conteúdo.
+1. **Qualidade do dado (informativo):** n e % de conversas sem boas-vindas e BQS delas × demais; sem conclusão de causa e sem alerta.
+2. **Temas de pior qualidade:** use o BQS por tema da tabela por dimensão (ignore temas com n < 30).
 3. **Personalização:** (a) variáveis que o bot usou bem; (b) variáveis **disponíveis e não usadas** (o bot repetiu bloco genérico quando o payload tinha o dado — candidato a classe A/B); (c) variáveis **quebradas ou inconsistentes** (ex.: texto "limite disponível agora é de o mesmo valor da anuidade", data de fechamento incoerente com a fatura vencida); (d) dados que **não existem** no payload (candidato a classe C).
 4. **Recomendações por dono**, cada uma com evidência (n e `ticket_id`) e antes/depois: Produto CX (prompt, variável, fluxo, integração/payload), Help Design (artigo). Escopo é só o bot: nada sobre atendimento humano. Para variável HP: nome do campo, onde usar, exemplo de resposta personalizada **antes e depois**, e se precisa de confirmação do time de dados.
 
@@ -81,12 +81,11 @@ Você recebe métricas pré-calculadas por SQL (não recalcule), a tabela por di
 === ANÁLISE HP ===
 Fluxo: Cartão HP | Período: [datas]
 
-BLOCO 1 — SAÚDE DO CONTEXTO
-[pleno n (x%) | degradado n (x%) — limite 5% | BQS pleno x% | BQS degradado x% | gap x pp | por agente: CC Produção x% / CC Anuidade x% degradado]
-[hipótese de causa, se houver evidência]
+BLOCO 1 — QUALIDADE DO DADO (indicador em revisão; sem alerta)
+[sem boas-vindas n (x%) | BQS delas x% | BQS das demais x%]
 
-BLOCO 2 — TEMAS DE PIOR QUALIDADE EM HP PLENO
-[tema | n | bqs_hp_pleno | o que falha | ticket_id de exemplo]
+BLOCO 2 — TEMAS DE PIOR QUALIDADE
+[tema | n | bqs | o que falha | ticket_id de exemplo]
 
 BLOCO 3 — PERSONALIZAÇÃO
 Usadas com sucesso: [...]
@@ -99,7 +98,7 @@ Produto CX: [ação — evidência — antes/depois]
 Help Design: [...]
 
 BLOCO 5 — SNAPSHOT SEMANAL (JSON em uma linha)
-{"periodo":"...","n_total":0,"bqs":0,"bqs_pleno":0,"bqs_degradado":0,"pct_degradado":0,"gap_contexto_pp":0,"temas_pior_hp_pleno":["..."],"alertas":["..."],"versoes_prompt":["..."]}
+{"periodo":"...","n_total":0,"bqs":0,"pct_sem_boas_vindas":0,"temas_pior_bqs":["..."],"alertas":["..."],"versoes_prompt":["..."]}
 ```
 
 ## Regras

@@ -419,11 +419,11 @@ Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados n
 - **Não use Zendesk, Confluence ou Amplitude** — apenas consolide o que foi recebido.
 - **Todo número vem do prompt (SQL).** Não recalcule, não reescreva percentuais, não invente comparação. Sem período anterior = "sem base de comparação".
 - **Nunca reproduza nomes de clientes, e-mails, telefones ou números de cartão** (os resumos às vezes os contêm). Identifique conversas por `ticket_id`.
-- O BQS do relatório é sempre o **BQS estrito** (`nota_ok`; "regular" é reprovado, sem crédito parcial). O BQS legado (`approved`) aparece **somente** como nota de rodapé para comparação histórica.
+- Existe **um único BQS** (`nota_ok` recalculada, com a nota revisada do auditor; "regular" é reprovado, sem crédito parcial). Não mostre "BQS original", "BQS legado" nem "BQS final": só **BQS**.
 
 ### Inputs que você recebe do orquestrador
 
-1. **Métricas base (SQL):** `n_total`, `n_avaliaveis`, **BQS estrito** (`n_ok`/`n_avaliaveis`) e o do período anterior, BQS legado (+ `n_fora_do_legado`), **TFC**, **CE** (% das classificadas e estimativa sobre o total), distribuição por `quality_label` e `retention_type`, % que pediu humano, transbordos com `nota_ok`, médias dos 6 critérios, tabelas por dimensão, cobertura/alertas. Cartão HP: HP pleno/degradado, BQS por segmento.
+1. **Métricas base (SQL):** `n_total`, `n_avaliaveis`, **BQS** (`n_ok`/`n_avaliaveis`) e o do período anterior (ou o último ponto antes de um hiato), **TFC**, **CE** (% das classificadas e estimativa sobre o total), distribuição por `quality_label` e `retention_type`, % que pediu humano, transbordos com `nota_ok`, médias dos 6 critérios, tabelas por dimensão, cobertura/alertas. Cartão HP: % de conversas sem boas-vindas na transcrição (indicador em revisão, só informativo).
 2. **Agregados de contenção (SQL):** matriz classe × causa, evitáveis por dono, qualidade dos handoffs (classe D), itens a auditar, evitáveis por vertical/tema.
 3. **output_fluxo**, **output_kb**, **output_hp** (só Cartão HP), **output_contencao** (linhas por conversa), **output_auditoria** (notas revisadas pelo auditor após ler a transcrição; o BQS final já vem calculado), **output_oportunidades**, **output_propostas**.
    Transcrições nunca chegam a você nem entram no artefato: só `ticket_id`, notas e paráfrases curtas sem dados pessoais.
@@ -454,7 +454,7 @@ Todos os números vêm do prompt (SQL). Não recalcule. Sem período anterior = 
 O painel é **uma página única** (`artifact/painel.html` neste repositório) que lê arquivos JSON publicados ao lado dela. Você **não monta HTML**: gera os dois arquivos JSON da sua rotina e publica. Nunca altere os arquivos de outras rotinas.
 
 1. **Gere `latest.json`** seguindo o contrato abaixo e salve com `Write` em `./painel-data/[chave_artefato]/latest.json`. A chave vem no prompt do orquestrador (`aleatorio`, `cartao-hp`, `criticos-diario` ou `criticos-semanal`).
-2. **Leia o histórico atual:** `Artifact` com `action: "read"`, `url: [URL_PAINEL]`, `path: "data/[chave_artefato]/history.json"`. Se o arquivo não existir, parta de `[]`. Acrescente o item desta rodada (substituindo o de mesmo `fim`), ordene por `fim`, mantenha os 60 mais recentes e salve em `./painel-data/[chave_artefato]/history.json`.
+2. **Leia o histórico atual:** `Artifact` com `action: "read"`, `url: [URL_PAINEL]`, `path: "data/[chave_artefato]/history.json"`. Se o arquivo não existir, parta de `[]`. Acrescente o item desta rodada (substituindo o de mesmo `fim`; inclua `prompt_version` do Pacote V), ordene por `fim`, mantenha os 104 mais recentes e salve em `./painel-data/[chave_artefato]/history.json`.
 3. **Leia o painel uma vez** (`action: "read"`, `url: [URL_PAINEL]`, sem `path`) — a plataforma exige ler antes de publicar em artefato existente.
 4. **Publique** com `Artifact`: `file_path: "artifact/painel.html"`, `url: [URL_PAINEL]`, `files: {"data/[chave_artefato]/latest.json": "painel-data/[chave_artefato]/latest.json", "data/[chave_artefato]/history.json": "painel-data/[chave_artefato]/history.json"}`. Não passe `icon` nem `capabilities` (mantêm-se os atuais).
 5. **Conflito:** se a publicação falhar por conflito (outra rotina publicou no meio), releia o painel (passo 3) e publique de novo **uma vez**. Se falhar de novo, siga para o Slack com `[LINK_PAINEL]` = `_(painel indisponível neste ciclo)_` e avise na Mensagem 1.
@@ -465,10 +465,11 @@ O painel é **uma página única** (`artifact/painel.html` neste repositório) q
 
 O painel (`artifact/painel.html`) é uma página fixa que lê arquivos JSON publicados ao lado dela. Cada rotina publica **dois arquivos próprios** e nunca mexe nos das outras:
 - `data/<chave>/latest.json` — a rodada atual completa;
-- `data/<chave>/history.json` — série curta para a tendência (array, até 60 itens).
+- `data/<chave>/history.json` — a série da linha do tempo (array, até 104 itens ≈ 2 anos de semanas).
 Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
+O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global e mantido por humanos**: nenhuma rotina escreve nele.
 
-**Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo.
+**Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo. Existe **um único BQS** (o que inclui a nota revisada pelo auditor): não grave "BQS original" nem "BQS legado".
 
 ```
 {
@@ -480,17 +481,18 @@ Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
   "gerado_em": "AAAA-MM-DDThh:mm:ss-03:00",
   "cobertura": { "baixa": true|false, "comparacao_indisponivel": true|false, "texto": "frase curta (dias com dado, buracos, ingestão atrasada)" },
   "metricas": {
-    "n_total": 0, "n_avaliaveis": 0, "n_ok_final": 0,
-    "bqs_final": 0.0, "bqs_original": 0.0, "bqs_anterior": null, "bqs_legado": 0.0,
+    "n_total": 0, "n_avaliaveis": 0, "n_ok": 0,
+    "bqs": 0.0, "bqs_anterior": null, "ultimo_ponto_anterior": { "bqs": 0.0, "fim": "AAAA-MM-DD" },   // ultimo_ponto_anterior: só quando não há período anterior comparável (ex.: depois de um hiato); senão null
+    "prompt_version": "versão do prompt do bot dominante no período (Pacote V) ou null",
     "tfc": 0.0, "pct_pediu_humano": 0.0, "pct_transbordo": 0.0, "n_transbordo_nota_ok": 0,
     "labels": { "excelente": 0, "bom": 0, "regular": 0, "ruim": 0, "critico": 0 },
     "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 0, "loop": 0 },
     "criterios": { "understanding": 0.0, "resolution": 0.0, "clarity": 0.0, "tone": 0.0, "efficiency": 0.0, "escalation": 0.0 },
-    "hp": { "pleno": 0, "degradado": 0, "pct_degradado": 0.0, "bqs_pleno": 0.0, "bqs_degradado": 0.0 }   // só no cartao-hp
+    "qualidade_dado": { "n_sem_boas_vindas": 0, "pct_sem_boas_vindas": 0.0 }   // só no cartao-hp; indicador em revisão, informativo
   },
   "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": ["frase sem dados pessoais"] },
   "dimensoes": {                                        // top 12 do Passo 3.2, valores ORIGINAIS (sem auditoria)
-    "effective_vertical": [ { "valor": "", "rotulo": "nome legível (opcional)", "n": 0, "pct_volume": 0.0, "bqs": 0.0, "tfc": 0.0, "pct_pediu_humano": 0.0, "pct_degradado": 0.0 } ],
+    "effective_vertical": [ { "valor": "", "rotulo": "nome legível (opcional)", "n": 0, "pct_volume": 0.0, "bqs": 0.0, "tfc": 0.0, "pct_pediu_humano": 0.0 } ],
     "topic": [ ... ], "product": [ ... ]                // só as dimensões da rotina
   },
   "contencao": {                                        // do Passo 6.1; omita o objeto se não houve classificação
@@ -520,11 +522,13 @@ Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
 - `contencao.ce_pct_total` = `pct_evitavel × n_elegiveis / n_total` (vem pronto do SQL do Passo 6.1; copie).
 - Só entram em `oportunidades` itens com dono **Produto CX** ou **Help Design**; nada sobre atendimento humano; nenhum artigo cujo título comece com 🔒 ou 🔍.
 - Em `artigos`, só títulos exatos que vieram do `output_kb`; nunca invente título, ID ou URL (a URL costuma chegar redigida: omita).
-- `dimensoes`: copie as linhas do SQL; se `n < 30` mantenha a linha (o painel marca "amostra pequena").
+- Nomes internos do prompt → contrato: `bqs_final` → `bqs`, `n_ok_final` → `n_ok`, `n_hp_degradado`/`pct_degradado` → `qualidade_dado.n_sem_boas_vindas`/`pct_sem_boas_vindas`. Não grave `bqs_original`, `bqs_pleno`, `bqs_degradado` nem colunas fora do contrato.
+- `dimensoes`: copie as linhas do SQL (só as colunas do contrato); se `n < 30` mantenha a linha (o painel marca "amostra pequena").
 - Sem classificação/auditoria/oportunidades nesta rodada: omita `contencao`, use `auditoria` com `auditados: 0` e `oportunidades: []`. O painel mostra o estado vazio.
 
-**`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 60 mais recentes):
-`{ "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs_final": 0.0, "bqs_original": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false }`
+**`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 104 mais recentes). Mesmo `bqs` do `latest.json` (já com a nota revisada):
+`{ "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false, "prompt_version": "…" | null }`
+O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` entre pontos seguidos. Itens antigos sem `prompt_version` ou com a chave `bqs_final` continuam válidos.
 <!-- SCHEMA_PAINEL:END -->
 
 ---
@@ -537,19 +541,19 @@ Modelo (preencha com os números do prompt; remova as linhas que não se aplicam
 
 ```
 ## [emoji da rotina] [TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS] · [período]
+📊 **[Abrir o painel (evolução, detalhes e plano por fluxo)]([LINK_PAINEL])**
 [N_total] conversas · [n_avaliaveis] avaliáveis
 
 > ⚠️ *Cobertura baixa:* [texto curto]. Leia como amostra reduzida.        ← só se houver
 > 🧪 *Rodada de teste:* [nota]                                              ← só se meta.origem = teste
 
-| BQS final | TFC | Contatos evitáveis | Pediram atendente |
+| BQS | TFC | Contatos evitáveis | Pediram atendente |
 |:-:|:-:|:-:|:-:|
 | **[X]%** [🟢/🟡/🔴] | **[X]%** | **≈[Y]%** | **[Z]%** |
-| [▲/▼][X] pp vs anterior · original [X]% | falha de condução | IC [a]–[b]% das classificadas | [N] conversas |
+| [▲/▼][X] pp vs anterior | falha de condução | IC [a]–[b]% das classificadas | [N] conversas |
 
 **Desfecho**  [10 quadrados: 🟩 resolutiva · 🟨 abandono · 🟦 transbordo · 🟥 loop]
 🟩 Resolutiva [N] · 🟨 Abandono [N] · 🟦 Transbordo [N] · 🟥 Loop [N]
-**Contexto (HP)** pleno [X]% · degradado **[X]%** (limite 5%) [🔴 se > 5%]           ← só Cartão HP
 **Auditoria** [n] tickets lidos na transcrição · [m] notas revisadas · [a] aprovado→reprovado
 
 ### Pontos de atenção
@@ -557,14 +561,15 @@ Modelo (preencha com os números do prompt; remova as linhas que não se aplicam
 🟠 [bullet de atenção]
 🔵 [bullet informativo]
 
-[Abrir o painel →]([LINK_PAINEL]) · _BQS legado (approved): [X]% (só comparação histórica) · limiares de alerta provisórios · Bot: RecargaBot_
+📊 [Abrir o painel →]([LINK_PAINEL]) · _limiares de alerta provisórios · Bot: RecargaBot_
 ```
 
 **Regras:**
+- O link do painel aparece no topo da Mensagem 1 e da Mensagem 2 (e no rodapé da 1). O painel é privado: se `[LINK_PAINEL]` foi recém-criado (novo), avise na Mensagem 1 que a pessoa dona precisa compartilhá-lo (menu Compartilhar) para o canal abrir.
 - Emoji do BQS: 🟢 ≥ 80% · 🟡 60–79% · 🔴 < 60%. Sem período anterior: escreva `sem base de comparação` no lugar do `▲/▼`.
 - Os 10 quadrados do desfecho dividem-se proporcionalmente (maior resto); qualquer desfecho com ≥ 3% ganha ao menos 1 quadrado.
 - Sem auditoria no período: `**Auditoria** nenhum ticket auditado neste período`. Sem classificação de contenção: troque a coluna "Contatos evitáveis" por `—` e diga `classificação ainda não rodou` na legenda.
-- **Pontos de atenção:** máximo 4, nesta ordem de prioridade: (1) cobertura/buraco de dados/ingestão atrasada; (2) se `pct_transbordo ≥ 90`: _"amostra composta por transbordos: o BQS mede a conduta até o transbordo, não a qualidade geral do bot"_; (3) se BQS > 80% e TFC > 40%: _"BQS alto mascara falha de condução real"_; (4) o maior bloco de contatos evitáveis (causa, ≈N, dono) e, se aplicável, a parcela de transbordos bem conduzidos que ainda eram evitáveis; depois, o saldo da auditoria e as divergências do avaliador. 🔴 só para o que for crítico (BQS < 60%, HP degradado > 5%, `critico` > 5%); 🟠 atenção; 🔵 informativo. Sem nenhum alerta: `✅ Nenhum ponto de atenção disparado`.
+- **Pontos de atenção:** máximo 4, nesta ordem de prioridade: (1) cobertura/buraco de dados/ingestão atrasada; (2) se `pct_transbordo ≥ 90`: _"amostra composta por transbordos: o BQS mede a conduta até o transbordo, não a qualidade geral do bot"_; (3) se BQS > 80% e TFC > 40%: _"BQS alto mascara falha de condução real"_; (4) o maior bloco de contatos evitáveis (causa, ≈N, dono) e, se aplicável, a parcela de transbordos bem conduzidos que ainda eram evitáveis; depois, o saldo da auditoria e as divergências do avaliador. 🔴 só para o que for crítico (BQS < 60%, `critico` > 5%); 🟠 atenção; 🔵 informativo. Sem nenhum alerta: `✅ Nenhum ponto de atenção disparado`.
 - Casos críticos: não abra com "BQS baixo é crítico" (é esperado); destaque o padrão de falha mais recorrente.
 - Nunca misture ações aqui: só métricas e alertas.
 
@@ -576,6 +581,7 @@ Poste com `slack_send_message` em `#bot-quality-score`, com `thread_ts` igual ao
 
 ```
 ## 🎯 Plano de ação · [rotina] · [período]
+📊 **[Painel com o detalhe de cada ação]([LINK_PAINEL])**
 _Ordenado por contatos evitáveis estimados. Limiares provisórios._
 
 ### 🔵 Produto CX · top 3

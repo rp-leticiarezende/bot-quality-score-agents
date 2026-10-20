@@ -111,3 +111,12 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 - Atualizar o Confluence (fórmula do BQS, campos, agentes, escopo só-bot, canal único, regra de conteúdo externo, painel).
 - Enviar ao GitHub e abrir PR para revisão, só com autorização.
 - Pendências com terceiros: validação do Produto CX sobre as respostas-modelo do playbook; Compliance/Jurídico (SAC) sobre qualquer mudança na regra de transbordo; compartilhar o painel com quem for consultar (hoje privado).
+
+## Passo 5b — ajustes pedidos em 20/10/2026 (revisão da Leticia)
+
+- **BQS único:** removidos "BQS original" e "legado" do painel, do Slack, do contrato e dos agentes. Nota geral sempre recalculada (ponderada) a partir das 6 notas; a série inteira fica comparável.
+- **Linha do tempo no painel:** aba nova com gráfico por data (BQS, TFC e contatos evitáveis), faixa de hiato, marcos (`data/eventos.json`, manual) e mudança de `prompt_version` detectada sozinha, tabela de períodos com variação; cada aba de fluxo ganhou "Evolução desta rotina". Histórico semanal reconstruído do Databricks (jul a out/2026). Após pausa, a variação mostra "sem base de comparação" e o último ponto conhecido.
+- **Link do painel** no topo das duas mensagens do Slack (e no rodapé da primeira); aviso de que o artefato é privado e precisa ser compartilhado.
+- **HP pleno × degradado** rebaixado a "indicador em revisão" (informativo, sem alerta nem oportunidade). Evidência em `docs/REVISAO-REGRAS-BQS.md`.
+- **Regras a revisar** (BQS de cartão não é oficial; simulações; hiato 11/09–14/10, retorno em 14/10): `docs/REVISAO-REGRAS-BQS.md`.
+- BQS por agente e por tema: mantido.

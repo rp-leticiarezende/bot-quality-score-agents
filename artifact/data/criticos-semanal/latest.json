@@ -16,11 +16,9 @@
   "metricas": {
     "n_total": 22,
     "n_avaliaveis": 21,
-    "n_ok_final": 14,
-    "bqs_final": 66.7,
-    "bqs_original": 66.7,
+    "n_ok": 14,
+    "bqs": 66.7,
     "bqs_anterior": null,
-    "bqs_legado": 77.8,
     "tfc": 4.5,
     "pct_pediu_humano": 18.2,
     "pct_transbordo": 4.5,
@@ -29,7 +27,6 @@
     "criterios": { "understanding": 6.95, "resolution": 6.64, "clarity": 7.23, "tone": 7.32, "efficiency": 6.59, "escalation": 6.86 }
   },
   "pontos_atencao": [
-    { "tipo": "warn", "texto": "20 das 22 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. O padrão mais recorrente a investigar é a resposta que encerra sem resolver." },
-    { "tipo": "warn", "texto": "O BQS legado (77,8%) superestima em 11 pp. O critério mais baixo é a resolução (6,64)." }
+    { "tipo": "warn", "texto": "20 das 22 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. O padrão mais recorrente a investigar é a resposta que encerra sem resolver." }
   ]
 }

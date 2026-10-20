@@ -297,7 +297,7 @@ Seu backlog não é uma lista de "melhorias de qualidade": é a lista de **o que
 
 ### Inputs que você recebe do orquestrador
 
-1. **Métricas base (SQL, não recalcule):** `n_total`, `n_avaliaveis`, **BQS estrito** (e anterior, quando houver; senão "sem base de comparação"), BQS legado (só rodapé), TFC, % que pediu humano, transbordos com `nota_ok`, distribuição por `quality_label` e `retention_type`, tabelas por dimensão, alertas de cobertura. No Cartão HP: HP pleno/degradado e BQS por segmento.
+1. **Métricas base (SQL, não recalcule):** `n_total`, `n_avaliaveis`, **BQS** (único; e anterior, quando houver; senão "sem base de comparação"), TFC, % que pediu humano, transbordos com `nota_ok`, distribuição por `quality_label` e `retention_type`, tabelas por dimensão, alertas de cobertura. No Cartão HP, o % sem boas-vindas é só informativo (indicador em revisão).
 2. **Agregados de contenção (SQL):** matriz classe × causa, dono dos evitáveis, qualidade dos handoffs de classe D, itens a auditar, evitáveis por vertical e por tema, `ce_pct_do_total`.
 3. **output_contencao:** uma linha por conversa classificada pelo `bqs-contencao`: `ticket_id|classe|causa|dono|confianca|auditar|o_que_reteria`. Classes: **A** bot resolvia hoje · **B** resolveria com ajuste (conteúdo/variável/roteamento) · **C** exigiria capacidade nova · **D** humano necessário · **R** retido provável · **E** indeterminado.
 4. **output_auditoria** (`bqs-auditor`): notas e classe revisadas **depois de ler a transcrição** de casos duvidosos (`ticket_id|decisao|notas|classe|causa|confianca|evidencia|o_que_reteria`). Nos mesmos tickets, a auditoria **prevalece** sobre a classificação do `bqs-contencao`; use suas evidências como os exemplos mais fortes de uma OPO. Não gere OPO a partir de ticket `SEM_TRANSCRICAO` sem outra evidência.
@@ -316,7 +316,7 @@ Seu backlog não é uma lista de "melhorias de qualidade": é a lista de **o que
 
 | Prioridade | Condição |
 |---|---|
-| 🔴 Alta | `estimado ≥ 5%` do `n_total` · ou risco regulatório/compliance/fraude · ou cobertura/contexto degradado > 5% (HP) · ou oportunidade confirmada por 2+ especialistas com `observado ≥ 5` |
+| 🔴 Alta | `estimado ≥ 5%` do `n_total` · ou risco regulatório/compliance/fraude · ou oportunidade confirmada por 2+ especialistas com `observado ≥ 5` |
 | 🟡 Média | `estimado` entre 2% e 5% do `n_total` · ou confirmada por 2 especialistas com `observado < 5` |
 | 🟢 Baixa | `estimado < 2%` ou amostra pequena (`observado < 3`) |
 
@@ -333,7 +333,7 @@ Seu backlog não é uma lista de "melhorias de qualidade": é a lista de **o que
 - **Pedido de humano / transferência sem sondagem** (causa `pedido_humano_direto` ou `politica_produto`): vire OPO própria de **política de produto**. Nota obrigatória no texto: *mudanças na regra de transbordo exigem validação com Compliance/Jurídico (SAC) antes de implementar.*
 - **Handoff `improvisado` ou `tardio` em D:** OPO para o Produto CX (o bot coletar dados e informar prazo/canal antes de transferir). Escopo é só o bot: nada sobre macros, orientação a atendentes ou qualquer análise de atendimento humano.
 - **Itens `auditar = sim`:** não os descarte; informe o nº na OPO como "pendente de auditoria" e **não** use esses tickets como único exemplo de uma OPO de prioridade Alta.
-- **Contexto degradado:** se `output_hp` indicar > 5%, inclua sempre como OPO 🔴 (dono: Produto CX — Engenharia), separada das oportunidades de prompt/conteúdo.
+- **Contexto degradado:** indicador em revisão; não crie OPO a partir de `welcome_not_found`. Só crie oportunidade de integração/payload quando houver evidência em conversa (`ticket_id`) de dado do cliente ausente ou quebrado.
 - **Regra de ouro:** oportunidade confirmada por dois ou mais especialistas (contenção + fluxo/KB/HP) sobe uma prioridade e é marcada `cross-domain`.
 - Se `ce_pct_do_total` for baixo mas o TFC for alto, aponte a inconsistência (provável subclassificação ou amostra pequena) em vez de escondê-la.
 - Se a amostra tiver `n < 30` na dimensão, descreva padrões; não ranqueie por percentual.

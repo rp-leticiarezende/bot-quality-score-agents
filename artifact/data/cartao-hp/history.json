@@ -1,0 +1,11 @@
+[
+  {"inicio":"2026-07-20","fim":"2026-07-26","periodo_label":"20/07 a 26/07/2026","bqs":41.3,"tfc":79.5,"ce_pct_total":null,"n_total":400,"cobertura_baixa":true,"prompt_version":"v1"},
+  {"inicio":"2026-07-27","fim":"2026-08-02","periodo_label":"27/07 a 02/08/2026","bqs":43.9,"tfc":78.6,"ce_pct_total":null,"n_total":636,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-08-03","fim":"2026-08-09","periodo_label":"03/08 a 09/08/2026","bqs":58.2,"tfc":60.1,"ce_pct_total":null,"n_total":710,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-08-10","fim":"2026-08-16","periodo_label":"10/08 a 16/08/2026","bqs":61.5,"tfc":50.4,"ce_pct_total":null,"n_total":804,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-08-17","fim":"2026-08-23","periodo_label":"17/08 a 23/08/2026","bqs":62.8,"tfc":49.7,"ce_pct_total":null,"n_total":1732,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-08-24","fim":"2026-08-30","periodo_label":"24/08 a 30/08/2026","bqs":74.9,"tfc":45.6,"ce_pct_total":null,"n_total":2460,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-08-31","fim":"2026-09-06","periodo_label":"31/08 a 06/09/2026","bqs":69.5,"tfc":41.8,"ce_pct_total":null,"n_total":2704,"cobertura_baixa":false,"prompt_version":"v1"},
+  {"inicio":"2026-09-07","fim":"2026-09-13","periodo_label":"07/09 a 13/09/2026","bqs":69.7,"tfc":41.6,"ce_pct_total":null,"n_total":875,"cobertura_baixa":true,"prompt_version":"v1"},
+  {"inicio":"2026-10-12","fim":"2026-10-18","periodo_label":"12/10 a 18/10/2026","bqs":72.2,"tfc":42.5,"ce_pct_total":50.8,"n_total":398,"cobertura_baixa":true,"prompt_version":"v1"}
+]

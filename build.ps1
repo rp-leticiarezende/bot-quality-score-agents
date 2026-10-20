@@ -31,8 +31,9 @@ base AS (
   SELECT q.*,
     CASE WHEN (q.received_timestamp - INTERVAL 3 HOURS) >= p.ini_atual AND (q.received_timestamp - INTERVAL 3 HOURS) < p.fim_atual THEN 'atual'
          WHEN (q.received_timestamp - INTERVAL 3 HOURS) >= p.ini_ant   AND (q.received_timestamp - INTERVAL 3 HOURS) < p.fim_ant   THEN 'anterior' END AS periodo,
-    CASE WHEN q.quality_label = 'sem_dados' OR q.score_overall IS NULL THEN NULL
-         WHEN q.score_overall >= 7 AND q.score_resolution > 2 AND q.score_escalation > 2 THEN true
+    ROUND(0.30*q.score_resolution + 0.20*q.score_efficiency + 0.20*q.score_escalation + 0.15*q.score_understanding + 0.10*q.score_clarity + 0.05*q.score_tone) AS score_pond,
+    CASE WHEN q.quality_label = 'sem_dados' OR q.score_resolution IS NULL OR q.score_efficiency IS NULL OR q.score_escalation IS NULL OR q.score_understanding IS NULL OR q.score_clarity IS NULL OR q.score_tone IS NULL THEN NULL
+         WHEN ROUND(0.30*q.score_resolution + 0.20*q.score_efficiency + 0.20*q.score_escalation + 0.15*q.score_understanding + 0.10*q.score_clarity + 0.05*q.score_tone) >= 7 AND q.score_resolution > 2 AND q.score_escalation > 2 THEN true
          ELSE false END AS nota_ok
   FROM prod.cx.fat_botmaker_conversations_quality q CROSS JOIN par p
   WHERE q.flow = '{{FLOW}}'
@@ -245,8 +246,8 @@ prompt: |
 
   MÉTRICAS BASE (SQL — não recalcule):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis]
-  - HP pleno: [n_hp_pleno] | HP degradado: [n_hp_degradado] ([pct_degradado]% — limite 5%)
-  - BQS geral: [bqs]% | BQS pleno: [bqs_pleno]% | BQS degradado: [bqs_degradado]%
+  - Indicador em revisão (não é falha confirmada de contexto): welcome_not_found em [pct_degradado]% das conversas ([n_hp_degradado]); BQS dessas conversas: [bqs_degradado]% × demais: [bqs_pleno]%
+  - BQS geral: [bqs]%
   - Critério mais baixo: [nome] (média [m_*])
   - Versões de prompt: [Pacote V]
 
@@ -272,8 +273,7 @@ $HP_OPO_BLOCO = @'
 '@
 
 $HP_RELATORIO_BLOCO = @'
-  - HP pleno: [n_hp_pleno] | HP degradado: [n_hp_degradado] ([pct_degradado]% — limite 5%, alerta de engenharia sempre em destaque)
-  - BQS pleno: [bqs_pleno]% | BQS degradado: [bqs_degradado]% | gap de contexto (pp): [use o valor informado por output_hp]
+  - Qualidade do dado (indicador em revisão, não é falha de contexto): [pct_degradado]% das conversas sem a mensagem de boas-vindas na transcrição ([n_hp_degradado]). Não gere alerta crítico nem oportunidade a partir dele.
   - Versões de prompt do bot no período: [Pacote V]
 '@
 
@@ -293,12 +293,7 @@ $CTX_HP = @'
 
 **Contexto do fluxo (Cartão de Crédito HP):** todo atendimento de cartão passa pelo fluxo de Hiperpersonalização: o bot atende com o contexto do cliente carregado (status do cartão, limite, fatura, histórico). Há dois agentes especializados no Botmaker — `Agente CC Produção` (bloco `Cartao Recargapay IA`; `effective_vertical = cartao_credito`) e `Agente CC Anuidade` (bloco `Cartao Anuidade IA`; `effective_vertical = cc_anuidade`) — compare sempre os dois nas quebras por dimensão. O eixo diagnóstico central é: **o HP está entregando o que promete — atendimento contextualizado e resolutivo — em todos os temas de cartão, e retendo?**
 
-| Segmento | Como identificar | O que significa |
-|---|---|---|
-| **HP pleno** | `welcome_not_found = false` E `pages_fetched > 0` | Bot atendeu com contexto carregado. Falha aqui = falha de prompt, conteúdo ou fluxo (dono: Produto CX / Help Design). |
-| **HP degradado** | `welcome_not_found = true` OU `pages_fetched = 0` | Bot operou sem contexto. Falha de infraestrutura/integração (dono: Produto CX — Engenharia). Não penalizar o prompt. |
-
-HP degradado > 5% do volume é **alerta próprio**, independente do BQS.
+**Indicador em revisão — não é falha confirmada de contexto.** A separação "HP pleno × HP degradado" (`welcome_not_found` e `pages_fetched`) está sendo revisada: medições de 15–20/10/2026 mostram que `pages_fetched` nunca é 0 e cresce com o tamanho da conversa, e que `welcome_not_found = true` marca conversas mais curtas em que, ainda assim, 94% tinham as variáveis do Botmaker carregadas e 41% foram personalizadas. Por isso o relatório trata `welcome_not_found` como **qualidade do dado** (transcrição sem mensagem de boas-vindas), não como "bot sem contexto", e **não gera alerta crítico nem oportunidade** a partir dele. Para saber se o bot usou dados do cliente, use a leitura do resumo e do diagnóstico, citando `ticket_id`.
 '@
 
 $CTX_CRITICOS = @'
@@ -320,8 +315,8 @@ $flows = @(
         FLOW = 'Conversations fluxo_hp_botmaker'; PERIODICIDADE = 'semanal'; WEEKLY = $true
         DESCRICAO = 'Orquestrador da análise semanal de qualidade do fluxo Cartão de Crédito HP. Ativado toda segunda-feira às 10:00 BRT pela rotina cloud.'
         CTX = $CTX_HP; DIMS = @('effective_vertical','topic'); ELEGIVEL = $ELEGIVEL_STD; ELEGIVEL_B = $ELEGIVEL_STD_B
-        HP = $true; ALERTAS_EXTRA = ' · `pct_degradado > 5` (HP degradado — alerta de engenharia, sempre em destaque) · mais de 40% das conversas classificadas no Passo 6 com causa `contexto_degradado`'
-        REGRAS_EXTRA = '- `welcome_not_found` e `pages_fetched` são os únicos sinais de HP degradado — não inferir por outros campos.' + "`n" + '- HP degradado > 5% do volume é alerta de engenharia — incluir sempre em destaque no relatório.'
+        HP = $true; ALERTAS_EXTRA = ''
+        REGRAS_EXTRA = '- O indicador HP pleno × degradado está **em revisão**: `pct_degradado` é só informação de qualidade do dado (registre como 🔵 se for > 5%, com a frase "indicador em revisão"); nunca como alerta crítico nem como oportunidade.'
     },
     @{
         NAME = 'orch-criticos'; ROTINA = 'Casos Críticos (diário)'; CHAVE = 'criticos-diario'
