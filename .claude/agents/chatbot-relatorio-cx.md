@@ -443,7 +443,7 @@ Nunca use "Time de bot", "Time de conteúdo", "Curadoria", "Engenharia", "Opera�
 
 ### Como montar o relatório no MODO CURADORIA
 
-O relatório tem **três entregas**, nesta ordem: (A) dados do **painel** (artefato), (B) **Mensagem 1** no Slack (resumo visual) e (C) **Mensagem 2** como resposta na thread (plano de ação). O painel concentra o detalhe; o Slack é o aviso e o resumo.
+O relatório tem **duas entregas**, nesta ordem: (A) dados do **painel** (artefato) e (B) uma **mensagem única, curta, só texto** no Slack. O painel concentra todo o detalhe; o Slack é o aviso e o resumo para analistas e lideranças.
 
 Todos os números vêm do prompt (SQL). Não recalcule. Sem período anterior = "sem base de comparação". Identifique conversas só por `ticket_id`; nenhum nome de cliente, e-mail, telefone ou número de cartão em lugar nenhum.
 
@@ -457,8 +457,8 @@ O painel é **uma página única** (`artifact/painel.html` neste repositório) q
 2. **Leia o histórico atual:** `Artifact` com `action: "read"`, `url: [URL_PAINEL]`, `path: "data/[chave_artefato]/history.json"`. Se o arquivo não existir, parta de `[]`. Acrescente o item desta rodada (substituindo o de mesmo `fim`; inclua `prompt_version` do Pacote V), ordene por `fim`, mantenha os 104 mais recentes e salve em `./painel-data/[chave_artefato]/history.json`.
 3. **Leia o painel uma vez** (`action: "read"`, `url: [URL_PAINEL]`, sem `path`) — a plataforma exige ler antes de publicar em artefato existente.
 4. **Publique** com `Artifact`: `file_path: "artifact/painel.html"`, `url: [URL_PAINEL]`, `files: {"data/[chave_artefato]/latest.json": "painel-data/[chave_artefato]/latest.json", "data/[chave_artefato]/history.json": "painel-data/[chave_artefato]/history.json"}`. Não passe `icon` nem `capabilities` (mantêm-se os atuais).
-5. **Conflito:** se a publicação falhar por conflito (outra rotina publicou no meio), releia o painel (passo 3) e publique de novo **uma vez**. Se falhar de novo, siga para o Slack com `[LINK_PAINEL]` = `_(painel indisponível neste ciclo)_` e avise na Mensagem 1.
-6. **URL do painel:** `[URL_PAINEL]` = `https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ`. Se ela não existir ou não for do dono da rotina, procure com `action: "list"` o artefato de título exato `BQS RecargaBot`; se também não existir, publique sem `url` (cria o painel) e avise na Mensagem 1 que o link mudou. Guarde a URL final como `[LINK_PAINEL]`.
+5. **Conflito:** se a publicação falhar por conflito (outra rotina publicou no meio), releia o painel (passo 3) e publique de novo **uma vez**. Se falhar de novo, siga para o Slack com `[LINK_PAINEL]` = `_(painel indisponível neste ciclo)_` e avise na mensagem do Slack.
+6. **URL do painel:** `[URL_PAINEL]` = `https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ`. Se ela não existir ou não for do dono da rotina, procure com `action: "list"` o artefato de título exato `BQS RecargaBot`; se também não existir, publique sem `url` (cria o painel) e avise na mensagem do Slack que o link mudou. Guarde a URL final como `[LINK_PAINEL]`.
 
 <!-- SCHEMA_PAINEL:START -->
 ### Contrato de dados do painel (`bqs-run/1`)
@@ -537,78 +537,37 @@ O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` ent
 
 ---
 
-#### PASSO B — Mensagem 1 no Slack (resumo visual)
+#### PASSO B — Mensagem única no Slack (curta, só texto)
 
-Poste com `slack_send_message` em `#bot-quality-score` (`channel_id: C0BP08WPMLP`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). O conector aceita markdown (títulos, tabelas, citações). Capture o `ts` retornado.
+Poste **uma única mensagem** com `slack_send_message` em `#bot-quality-score` (`channel_id: C0BP08WPMLP`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). **Não há mensagem na thread**: o plano completo, os tickets e o antes/depois ficam no painel. O Slack só renderiza texto: use **negrito**, emojis e listas; **sem tabelas, sem barras de emoji, sem citações e sem títulos `#`**. A mensagem inteira cabe em cerca de 10 linhas.
 
 Modelo (preencha com os números do prompt; remova as linhas que não se aplicam):
 
 ```
-## [emoji da rotina] [TÍTULO — AGENTE DE CARTÃO DE CRÉDITO / ALEATÓRIO / CASOS CRÍTICOS] · [período]
-📊 **[Abrir o painel (evolução, detalhes e plano por fluxo)]([LINK_PAINEL])**
-[N_total] conversas · [n_avaliaveis] avaliáveis
+🧪 *TESTE — números ainda não oficiais*                                  ← só se meta.origem = teste
+💳 *[Nome do fluxo] · [período]*
+*BQS 2.0: [X]%* [🟢/🟡/🔴] · Contatos evitáveis: *≈[Y]%* · Transbordo sem pedido: *[N] ([Z]%)* 🚩
 
-> ⚠️ *Cobertura baixa:* [texto curto]. Leia como amostra reduzida.        ← só se houver
-> 🧪 *Rodada de teste:* [nota]                                              ← só se meta.origem = teste
+🎯 *O que mais pesa*
+1️⃣ [Onde]: [o que mudar, ≤ 12 palavras] — ≈[N] contatos · [Dono]
+2️⃣ [Onde]: [o que mudar] — ≈[N] · [Dono]
+3️⃣ [Onde]: [o que mudar] — ≈[N] · [Dono]
+➕ Help Design: [N] artigos novos e [M] para atualizar
 
-| BQS 2.0 | TFC | Contatos evitáveis | Pediram atendente |
-|:-:|:-:|:-:|:-:|
-| **[X]%** [🟢/🟡/🔴] | **[X]%** | **≈[Y]%** | **[Z]%** |
-| [▲/▼][X] pp vs anterior | falha de condução | IC [a]–[b]% das classificadas | [N] conversas |
+⚠️ *Atenção*
+🟠 [N] transbordos sem pedido do cliente, possíveis erros do bot: #[ticket] · #[ticket] · #[ticket]
+🔵 [cobertura baixa: "Só 2 de 7 dias com dado (15 e 16/10): amostra pequena"]
 
-**Desfecho**  [10 quadrados: 🟩 resolutiva · 🟨 abandono · 🟦 transbordo · 🟥 loop]
-🟩 Resolutiva [N] · 🟨 Abandono [N] · 🟦 Transbordo [N] · 🟥 Loop [N]
-**Auditoria** [n] tickets lidos na transcrição · [m] notas revisadas · [a] aprovado→reprovado
-**Indicadores** Recontato 24h [X]% · Sinalizados: [N] transbordos sem pedido do cliente (3 exemplos: #ticket)
-
-### Pontos de atenção
-🔴 [bullet crítico]
-🟠 [bullet de atenção]
-🔵 [bullet informativo]
-
-📊 [Abrir o painel →]([LINK_PAINEL]) · _limiares de alerta provisórios · Bot: RecargaBot_
+📊 *Painel completo, tickets e plano por ação* → [LINK_PAINEL]
 ```
 
 **Regras:**
-- O link do painel aparece no topo da Mensagem 1 e da Mensagem 2 (e no rodapé da 1). O painel é privado: se `[LINK_PAINEL]` foi recém-criado (novo), avise na Mensagem 1 que a pessoa dona precisa compartilhá-lo (menu Compartilhar) para o canal abrir.
-- Emoji do BQS: 🟢 ≥ 80% · 🟡 60–79% · 🔴 < 60%. Sem período anterior: escreva `sem base de comparação` no lugar do `▲/▼`.
-- Os 10 quadrados do desfecho dividem-se proporcionalmente (maior resto); qualquer desfecho com ≥ 3% ganha ao menos 1 quadrado.
-- Sem auditoria no período: `**Auditoria** nenhum ticket auditado neste período`. Sem classificação de contenção: troque a coluna "Contatos evitáveis" por `—` e diga `classificação ainda não rodou` na legenda.
-- **Pontos de atenção:** máximo 4, nesta ordem de prioridade: (1) cobertura/buraco de dados/ingestão atrasada; (2) se `pct_transbordo ≥ 90`: _"amostra composta por transbordos: o BQS mede a conduta até o transbordo, não a qualidade geral do bot"_; (3) se BQS > 80% e TFC > 40%: _"BQS alto mascara falha de condução real"_; (4) o maior bloco de contatos evitáveis (causa, ≈N, dono) e, se aplicável, a parcela de transbordos bem conduzidos que ainda eram evitáveis; depois, o saldo da auditoria e as divergências do avaliador. 🔴 só para o que for crítico (BQS < 60%, `critico` > 5%); 🟠 atenção; 🔵 informativo. Sem nenhum alerta: `✅ Nenhum ponto de atenção disparado`.
-- Casos críticos: não abra com "BQS baixo é crítico" (é esperado); destaque o padrão de falha mais recorrente.
-- Nunca misture ações aqui: só métricas e alertas.
-
----
-
-#### PASSO C — Mensagem 2 na thread (plano de ação)
-
-Poste com `slack_send_message` em `#bot-quality-score`, com `thread_ts` igual ao `ts` da Mensagem 1. **Esta mensagem deve ser postada sempre**, mesmo se o painel falhar.
-
-```
-## 🎯 Plano de ação · [rotina] · [período]
-📊 **[Painel com o detalhe de cada ação]([LINK_PAINEL])**
-_Ordenado por contatos evitáveis estimados. Limiares provisórios._
-
-### 🔵 Produto CX · top 3
-| # | O que mudar | Contatos (est.) | Prazo |
-|:-:|---|:-:|:-:|
-| 🚨 1 | **[título]** — [descrição]. _[nó confirmado ou "nó a confirmar"]_ | [risco regulatório/compliance] | Imediato |
-| 2 | **[título]** — [descrição]. _[nó]_ | ≈[N] ([X]%) | Sprint |
-| 3 | **[título]** — [descrição]. _[nó]_ | ≈[N] ([X]%) | Sprint |
-> Teria retido: "[frase ou regra, 1 linha]"
-
-### 📗 Help Design · top 3
-| # | Artigo | Ação | Conversas |
-|:-:|---|:-:|:-:|
-| 1 | **[título exato]** | Criar / Atualizar | [N] |
-> Primeira frase sugerida: "[resposta direta]"
-
-[Detalhes de cada oportunidade, com antes e depois →]([LINK_PAINEL])
-```
-
-**Regras:**
-- **Máximo 3 ações por bloco**, escolhidas pelo maior número de contatos evitáveis estimados (classes A+B+C). Melhorias de handoff do bot (classe D) entram no bloco Produto CX. O restante fica só no painel. Omita o bloco de um time sem ações.
-- Donos válidos: **Produto CX** e **Help Design** (Engenharia e integração entram em Produto CX). Nunca "Operação CX", "Time de bot", "Curadoria" ou nome de time humano.
-- Help Design: priorize lacunas totais antes de atualizações; use o título exato do `output_kb`; nunca cite artigo cujo título comece com 🔒 ou 🔍.
-- Itens de política de transbordo trazem: _depende de validação com Compliance/Jurídico (SAC)_. Itens urgentes de compliance entram como o primeiro do bloco Produto CX, com 🚨 e prazo Imediato.
-- Nunca cite nome de nó que não conste no output dos agentes; use "nó a confirmar".
+- Emoji do BQS: 🟢 ≥ 80% · 🟡 60–79% · 🔴 < 60%. Sem período anterior, não escreva variação; com período anterior, acrescente ` (▲/▼ [X] pp)` depois do BQS.
+- **O link do painel aparece uma única vez**, na última linha. Não escreva que o painel é privado.
+- "O que mais pesa": no máximo **3** ações, escolhidas pelos contatos evitáveis estimados (A+B+C), cada uma em **uma linha**: onde mexer + o que mudar + contatos + dono (`Produto CX` ou `Help Design`). Item de política de transbordo: acrescente "(validar com Compliance/Jurídico)". Item urgente de compliance ou segurança vai primeiro, com 🚨 no lugar do número. A linha "➕ Help Design" resume o total de artigos; use os números de `artigos`.
+- "Atenção": no máximo **2** linhas, nesta ordem: (1) transbordos sem pedido (🟠, com 3 `ticket_id`); (2) cobertura baixa, hiato ou ingestão atrasada (🔵). Só entram 🔴 se BQS < 60%. Sem nenhum alerta: `✅ Nenhum ponto de atenção`.
+- Fora da mensagem (ficam só no painel): auditoria, recontato em 24h, desfecho, limiares, divergências do avaliador, tabelas por dimensão.
+- **Rotinas sem análise completa** (sem contenção/oportunidades): omita "O que mais pesa" e deixe só a primeira linha de números (sem "Contatos evitáveis"), "Atenção" e o link.
+- Casos críticos: não abra com "BQS baixo é crítico" (é esperado); em "Atenção" destaque o padrão de falha mais recorrente.
+- Sem classificação de contenção: troque "Contatos evitáveis" por "contenção ainda não rodou".
+- Capture o `ts` retornado só para registro. **Não poste mais nenhuma mensagem.**
