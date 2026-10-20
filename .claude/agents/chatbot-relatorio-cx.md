@@ -20,6 +20,10 @@ tools:
   - mcp__Slack__slack_send_message
   - mcp__Slack__slack_search_channels
   - Artifact
+  - Read
+  - Glob
+  - Grep
+  - Bash
   - Write
 ---
 
@@ -539,26 +543,26 @@ O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` ent
 
 #### PASSO B — Mensagem única no Slack (curta, só texto)
 
-Poste **uma única mensagem** com `slack_send_message` em `#bot-quality-score` (`channel_id: C0BP08WPMLP`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). **Não há mensagem na thread**: o plano completo, os tickets e o antes/depois ficam no painel. O Slack só renderiza texto: use **negrito**, emojis e listas; **sem tabelas, sem barras de emoji, sem citações e sem títulos `#`**. A mensagem inteira cabe em cerca de 10 linhas.
+**Antes de postar, o painel (Passo A) já deve estar publicado**: só use "painel indisponível neste ciclo" se a publicação falhar de verdade depois de uma nova tentativa (para publicar o painel você precisa da ferramenta `Read` para ler `artifact/painel.html` inteiro; ela está na sua lista). Poste **uma única mensagem** com `slack_send_message` em `#bot-quality-score` (`channel_id: C0BP08WPMLP`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). **Não há mensagem na thread**: o plano completo, os tickets e o antes/depois ficam no painel. O Slack só renderiza texto: use **negrito com DOIS asteriscos** (`**assim**`; um asterisco só vira itálico conectado ao Slack), emojis e listas; **sem tabelas, sem barras de emoji, sem citações e sem títulos `#`**. A mensagem inteira cabe em cerca de 10 linhas.
 
 Modelo (preencha com os números do prompt; remova as linhas que não se aplicam):
 
 ```
-🧪 *TESTE — números ainda não oficiais*                                  ← só se meta.origem = teste
-💳 *[Nome do fluxo] · [período]*
-*BQS 2.0: [X]%* [🟢/🟡/🔴] · Contatos evitáveis: *≈[Y]%* · Transbordo sem pedido: *[N] ([Z]%)* 🚩
+🧪 **TESTE — números ainda não oficiais**                                  ← só se meta.origem = teste
+💳 **[Nome do fluxo] · [período]**
+**BQS 2.0: [X]%** [🟢/🟡/🔴] · Contatos evitáveis: **≈[Y]%** · Transbordo sem pedido: **[N] ([Z]%)** 🚩
 
-🎯 *O que mais pesa*
+🎯 **O que mais pesa**
 1️⃣ [Onde]: [o que mudar, ≤ 12 palavras] — ≈[N] contatos · [Dono]
 2️⃣ [Onde]: [o que mudar] — ≈[N] · [Dono]
 3️⃣ [Onde]: [o que mudar] — ≈[N] · [Dono]
 ➕ Help Design: [N] artigos novos e [M] para atualizar
 
-⚠️ *Atenção*
+⚠️ **Atenção**
 🟠 [N] transbordos sem pedido do cliente, possíveis erros do bot: #[ticket] · #[ticket] · #[ticket]
 🔵 [cobertura baixa: "Só 2 de 7 dias com dado (15 e 16/10): amostra pequena"]
 
-📊 *Painel completo, tickets e plano por ação* → [LINK_PAINEL]
+📊 **Painel completo, tickets e plano por ação** → [LINK_PAINEL]
 ```
 
 **Regras:**

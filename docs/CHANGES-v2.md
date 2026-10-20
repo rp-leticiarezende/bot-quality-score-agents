@@ -146,3 +146,13 @@ Achados do teste e o que foi feito ou fica pendente:
 - **Contrato:** oportunidades com 0 observados ficam com estimado 0; falta o valor "n/c". Pendente.
 - **Ferramentas:** o agente de relatório cita nomes de conector que não existem neste ambiente (`mcp__Slack__*`); na rotina em nuvem os nomes são os do ambiente dela. Conferir no modo sombra.
 - **Conflito de regras para o Produto CX decidir:** guardrails do bot proíbem orientar caminho no app, mas as propostas citam caminho; variável de desambiguação com dois nomes (`agcc_desambiguacao` × `cc_desambiguacao`).
+
+## Primeira execução real na nuvem — Casos Críticos (diário), 20/10/2026
+
+Rodada manual da rotina `Bot Quality — Casos Críticos` (dia 19/10). Cadeia completa: SQL, fluxo, contenção (24 conversas), auditoria (4 tickets), consolidação, oportunidades (12), propostas e relatório. **BQS 2.0: 33,3%** (45,8% antes da auditoria; 3 aprovações revertidas), contatos evitáveis ≈ 60%.
+
+O que quebrou e como ficou:
+- **`zendesk-guide-expert` não subia** (o conector Zendesk não existe na nuvem e era a única ferramenta listada): agora herda as ferramentas disponíveis. A análise de KB não rodou nesta execução.
+- **`chatbot-relatorio-cx` não conseguiu publicar o painel** (faltava a ferramenta `Read`, e o Artifact exige ler a página inteira): adicionadas `Read`, `Glob`, `Grep` e `Bash`. Nesta rodada o orquestrador publicou o painel (versão 10) depois da mensagem, que saiu com "painel indisponível neste ciclo".
+- **Negrito no Slack:** o conector trata `*texto*` como itálico; o formato agora usa `**texto**`.
+- Instrução nova: o painel é publicado **antes** da mensagem do Slack.
