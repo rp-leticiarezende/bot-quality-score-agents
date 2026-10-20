@@ -1,0 +1,472 @@
+<title>BQS RecargaBot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: faixa de marca, abas fixas no topo, uma coluna de leitura (máx. 1080px) com cartões só onde o dado pede.
+   Dark-first (azul-marinho RecargaPay); tema claro redefinido nos mesmos tokens. */
+:root{
+  color-scheme:dark;
+  --bg:#0A2540; --surface:#0F2D4A; --surface-2:#0D2038; --line:#1E3A54; --line-soft:#173049;
+  --ink:#EAF2FA; --ink-2:#A9C1D8; --muted:#7BA8CC;
+  --brand:#F5A623; --brand-ink:#0A2540; --blue:#5BA7F5;
+  --good:#1DB954; --good-bg:rgba(29,185,84,.14);
+  --warn:#F5C842; --warn-bg:rgba(245,200,66,.13);
+  --crit:#F0605D; --crit-bg:rgba(240,96,93,.15);
+  --info:#5BA7F5; --info-bg:rgba(91,167,245,.14);
+  --cA:#E8683A; --cB:#D9A100; --cC:#9085E9; --cD:#3987E5; --cR:#19A774; --cE:#7A93AB;
+  --track:#173049; --gap:#0F2D4A;
+  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    color-scheme:light;
+    --bg:#F1F5F9; --surface:#FFFFFF; --surface-2:#EAF0F6; --line:#D3DDE8; --line-soft:#E3EAF2;
+    --ink:#0B1F33; --ink-2:#3C546B; --muted:#617A91;
+    --brand:#F5A623; --brand-ink:#0A2540; --blue:#1A66CC;
+    --good:#0A7A33; --good-bg:rgba(10,122,51,.10);
+    --warn:#8A5B00; --warn-bg:rgba(245,166,35,.16);
+    --crit:#C0302D; --crit-bg:rgba(192,48,45,.10);
+    --info:#1A66CC; --info-bg:rgba(26,102,204,.10);
+    --cA:#E0541F; --cB:#C98F00; --cC:#6250D6; --cD:#2A78D6; --cR:#12946A; --cE:#7B8794;
+    --track:#E3EAF2; --gap:#FFFFFF;
+  }
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F1F5F9; --surface:#FFFFFF; --surface-2:#EAF0F6; --line:#D3DDE8; --line-soft:#E3EAF2;
+  --ink:#0B1F33; --ink-2:#3C546B; --muted:#617A91;
+  --brand:#F5A623; --brand-ink:#0A2540; --blue:#1A66CC;
+  --good:#0A7A33; --good-bg:rgba(10,122,51,.10);
+  --warn:#8A5B00; --warn-bg:rgba(245,166,35,.16);
+  --crit:#C0302D; --crit-bg:rgba(192,48,45,.10);
+  --info:#1A66CC; --info-bg:rgba(26,102,204,.10);
+  --cA:#E0541F; --cB:#C98F00; --cC:#6250D6; --cD:#2A78D6; --cR:#12946A; --cE:#7B8794;
+  --track:#E3EAF2; --gap:#FFFFFF;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p{margin:0}
+h2{font-size:17px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+h3{font-size:14px;font-weight:600}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.brandbar{background:var(--brand);color:var(--brand-ink);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding-block:6px}
+.brandbar .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header.top{padding-block:22px 6px}
+header.top h1{font-size:clamp(22px,3.6vw,30px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
+header.top p{color:var(--ink-2);margin-top:6px;max-width:68ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-top:14px}
+nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto}
+nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);font:inherit;font-weight:600;padding:11px 14px;cursor:pointer;white-space:nowrap}
+nav.tabs button:hover{color:var(--ink)}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+main{padding-block:20px 56px;display:flex;flex-direction:column;gap:22px}
+section.block{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sub{color:var(--ink-2);font-size:13px;max-width:78ch}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.banner{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:13px}
+.banner.warn{background:var(--warn-bg);border-color:transparent}
+.banner.info{background:var(--info-bg);border-color:transparent}
+.banner b{font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;margin-top:5px;background:var(--muted)}
+.dot.warn{background:var(--warn)} .dot.info{background:var(--info)} .dot.crit{background:var(--crit)} .dot.good{background:var(--good)}
+/* cartões de rotina */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.card .name{font-weight:600;font-size:15px}
+.card .per{font-size:12px;color:var(--muted)}
+.big{font-size:40px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.big small{font-size:18px;font-weight:500;color:var(--ink-2);margin-left:2px}
+.delta{font-size:12px;color:var(--ink-2)}
+.delta.up{color:var(--good)} .delta.down{color:var(--crit)}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mini div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mini span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.mini b{font-family:var(--mono);font-size:15px;font-weight:500}
+.linkbtn{align-self:flex-start;background:none;border:0;color:var(--blue);font:inherit;font-weight:600;cursor:pointer;padding:0}
+.linkbtn:hover{text-decoration:underline}
+/* fichas KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--ink-2)}
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+.chip.good{background:var(--good-bg);color:var(--good)} .chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.crit{background:var(--crit-bg);color:var(--crit)} .chip.info{background:var(--info-bg);color:var(--info)}
+/* barras */
+.seg{display:flex;height:16px;border-radius:4px;overflow:hidden;gap:2px;background:var(--gap)}
+.seg>span{display:block;min-width:2px;height:100%;border-radius:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.rows{display:flex;flex-direction:column;gap:9px}
+.row{display:grid;grid-template-columns:minmax(120px,290px) 1fr auto;gap:12px;align-items:center;font-size:13px}
+.row .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.row .bar{height:10px;background:var(--track);border-radius:3px;overflow:hidden}
+.row .bar>span{display:block;height:100%;border-radius:0 3px 3px 0}
+.row .num{font-family:var(--mono);font-size:12px;min-width:3.4ch;text-align:right}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.inbar{display:flex;align-items:center;gap:8px;min-width:120px}
+.inbar .bar{flex:1;height:8px;background:var(--track);border-radius:3px;overflow:hidden}
+.inbar .bar>span{display:block;height:100%;border-radius:0 3px 3px 0;background:var(--blue)}
+/* oportunidades */
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{background:var(--surface);border:1px solid var(--line);border-radius:999px;color:var(--ink-2);font:inherit;font-size:12px;font-weight:600;padding:5px 12px;cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.opos{display:flex;flex-direction:column;gap:8px}
+details.opo{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+details.opo summary{list-style:none;cursor:pointer;padding:13px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+details.opo summary::-webkit-details-marker{display:none}
+details.opo summary::after{content:"›";color:var(--brand);font-size:20px;line-height:1;transition:transform .15s}
+details.opo[open] summary::after{transform:rotate(90deg)}
+.opo .ttl{font-weight:600;min-width:0}
+.opo .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.opo .body{padding:2px 16px 16px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line-soft)}
+.opo dl{display:grid;grid-template-columns:150px 1fr;gap:8px 14px;margin:12px 0 0}
+.opo dt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.opo dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ba div{border-radius:8px;padding:10px 12px;font-size:13px}
+.ba .antes{background:var(--crit-bg)} .ba .depois{background:var(--good-bg)}
+.ba b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.tick{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:22px 18px;color:var(--ink-2);text-align:left}
+.empty b{display:block;color:var(--ink);margin-bottom:2px}
+.seclist{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink-2)}
+.seclist li{margin-left:18px}
+ul.plain{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.plain li{display:flex;gap:10px;align-items:flex-start}
+.tip{position:fixed;z-index:20;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:5px 9px;border-radius:6px;max-width:260px;box-shadow:0 4px 14px rgba(0,0,0,.28)}
+.def{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:6px 16px}
+.def dt{font-weight:600} .def dd{margin:0;color:var(--ink-2)}
+code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+@media(max-width:640px){
+  .row{grid-template-columns:1fr auto}.row .bar{grid-column:1/-1;order:3}
+  .opo dl{grid-template-columns:1fr}.ba{grid-template-columns:1fr}
+  details.opo summary{grid-template-columns:1fr auto}
+  .def{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="brandbar"><div class="wrap"><span>RecargaPay · Bot Quality Score</span><span id="atualizado"></span></div></div>
+<header class="top"><div class="wrap">
+  <h1>Qualidade do RecargaBot</h1>
+  <p>Quanto o bot conduziu bem cada conversa e quantos contatos humanos ele poderia ter evitado. Só conversas do bot; só conteúdo externo da Central de Ajuda.</p>
+</div></header>
+<nav class="tabs" aria-label="Seções"><div class="wrap" role="tablist" id="tabs"></div></nav>
+<div class="wrap"><main id="main" aria-live="polite"><div class="empty"><b>Carregando</b>Buscando os dados mais recentes das rotinas.</div></main></div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var FLUXOS=[
+  {id:"cartao-hp",nome:"Cartão HP",desc:"Cartão de crédito com hiperpersonalização",keys:["cartao-hp"]},
+  {id:"aleatorio",nome:"Aleatório",desc:"Amostra aleatória de conversas (filtro do Zendesk)",keys:["aleatorio"]},
+  {id:"criticos",nome:"Casos críticos",desc:"Conversas com CSAT 1 e 2",keys:["criticos-semanal","criticos-diario"]}
+];
+var CLASSES={
+  A:{nome:"Bot resolvia hoje",cor:"var(--cA)"},B:{nome:"Resolveria com ajuste",cor:"var(--cB)"},
+  C:{nome:"Exigiria capacidade nova",cor:"var(--cC)"},D:{nome:"Só humano resolve",cor:"var(--cD)"},
+  R:{nome:"Retido provável",cor:"var(--cR)"},E:{nome:"Indeterminado",cor:"var(--cE)"}
+};
+var FRENTES={artigo:"Artigos",variavel_hp:"Variáveis e prompts",prompt:"Variáveis e prompts",fluxo:"Fluxo e regras",politica:"Fluxo e regras",capacidade:"Capacidades novas",handoff:"Handoff"};
+var GRUPOS=["Todos","Artigos","Variáveis e prompts","Fluxo e regras","Capacidades novas","Handoff"];
+var S={data:{},hist:{},tab:"visao",crit:"criticos-semanal",filtro:{}};
+var $=function(s){return document.querySelector(s)};
+
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function num(v){return typeof v==="number"&&isFinite(v)}
+function fmt(v,d){if(!num(v))return "—";return v.toLocaleString("pt-BR",{minimumFractionDigits:d==null?1:d,maximumFractionDigits:d==null?1:d})}
+function int(v){return num(v)?v.toLocaleString("pt-BR"):"—"}
+function g(o,p,d){var x=o;for(var k=p.split("."),i=0;i<k.length;i++){if(x==null)return d;x=x[k[i]]}return x==null?d:x}
+function arr(v){return Array.isArray(v)?v:[]}
+function load(path){
+  var pre=window.BQS_PRELOAD&&window.BQS_PRELOAD[path];
+  if(pre)return Promise.resolve(pre);
+  return fetch(path,{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).catch(function(){return null});
+}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+/* ---------- peças ---------- */
+function chip(txt,tipo){return '<span class="chip '+(tipo||"")+'"><i></i>'+esc(txt)+'</span>'}
+function prioChip(p){var m={alta:["Alta","crit"],media:["Média","warn"],baixa:["Baixa",""]};var x=m[p]||["—",""];return chip(x[0],x[1])}
+function delta(atual,ant,inverso){
+  if(!num(atual)||!num(ant))return '<span class="delta">sem base de comparação</span>';
+  var d=atual-ant,cls=Math.abs(d)<0.05?"":((d>0)!==!!inverso?"up":"down");
+  return '<span class="delta '+cls+'">'+(d>0?"▲ ":d<0?"▼ ":"")+fmt(Math.abs(d),1)+' pp vs período anterior</span>';
+}
+function statusBqs(v){if(!num(v))return "";return v>=80?chip("Saudável","good"):v>=60?chip("Atenção","warn"):chip("Crítico","crit")}
+function seg(items,total){
+  total=total||items.reduce(function(a,x){return a+(x.n||0)},0);
+  if(!total)return '<div class="muted">sem dados</div>';
+  var h='<div class="seg" role="img" aria-label="Distribuição">';
+  items.forEach(function(x){if(!x.n)return;var p=100*x.n/total;h+='<span style="width:'+p+'%;background:'+x.cor+'" data-tip="'+esc(x.nome+": "+int(x.n)+" ("+fmt(p,1)+"%)")+'"></span>'});
+  h+='</div><div class="legend">';
+  items.forEach(function(x){h+='<span><i style="background:'+x.cor+'"></i>'+esc(x.nome)+' <b class="mono">'+int(x.n)+'</b></span>'});
+  return h+'</div>';
+}
+function bars(rows,max,cor){
+  max=max||Math.max.apply(null,rows.map(function(r){return r.v||0}).concat([1]));
+  return '<div class="rows">'+rows.map(function(r){
+    return '<div class="row"><span class="lbl" title="'+esc(r.l)+'">'+esc(r.l)+'</span><span class="bar"><span style="width:'+Math.max(1,100*(r.v||0)/max)+'%;background:'+(r.cor||cor||"var(--blue)")+'" data-tip="'+esc(r.tip||r.l+": "+r.t)+'"></span></span><span class="num">'+esc(r.t)+'</span></div>';
+  }).join("")+'</div>';
+}
+function kpi(l,v,s){return '<div class="kpi"><label>'+esc(l)+'</label><span class="v">'+v+'</span><span class="s">'+s+'</span></div>'}
+function empty(t,d){return '<div class="empty"><b>'+esc(t)+'</b>'+esc(d||"")+'</div>'}
+function labelsSeg(m){
+  var l=g(m,"labels",{});
+  return seg([{nome:"Excelente",n:l.excelente,cor:"var(--cR)"},{nome:"Bom",n:l.bom,cor:"var(--cD)"},{nome:"Regular",n:l.regular,cor:"var(--cB)"},{nome:"Ruim",n:l.ruim,cor:"var(--cA)"},{nome:"Crítico",n:l.critico,cor:"var(--crit)"}]);
+}
+function retSeg(m){
+  var r=g(m,"retention",{});
+  return seg([{nome:"Resolutiva",n:r.resolutiva,cor:"var(--cR)"},{nome:"Abandono",n:r.abandono,cor:"var(--cB)"},{nome:"Transbordo",n:r.transbordo,cor:"var(--cD)"},{nome:"Loop",n:r.loop,cor:"var(--cA)"}]);
+}
+function classeSeg(c){
+  var cl=g(c,"classes",{});
+  return seg(Object.keys(CLASSES).map(function(k){return {nome:k+" · "+CLASSES[k].nome,n:cl[k]||0,cor:CLASSES[k].cor}}));
+}
+function fluxoDados(f){
+  if(f.id==="criticos"){var k=S.crit;return S.data[k]||S.data[f.keys.filter(function(x){return S.data[x]})[0]]||null}
+  return S.data[f.keys[0]]||null;
+}
+
+/* ---------- visão geral ---------- */
+function cardRotina(f){
+  var d=fluxoDados(f),m=g(d,"metricas",{});
+  var h='<div class="card"><header><div><div class="name">'+esc(f.nome)+'</div><div class="per">'+(d?esc(g(d,"periodo.label","")):"sem rodada")+'</div></div>'+(d?statusBqs(m.bqs_final):chip("Aguardando"))+'</header>';
+  if(!d)return h+'<div class="sub">Esta rotina ainda não publicou dados aqui. A primeira execução preenche este cartão.</div></div>';
+  h+='<div><div class="big mono">'+fmt(m.bqs_final,1)+'<small>%</small></div>'+delta(m.bqs_final,m.bqs_anterior)+'</div>';
+  h+='<div class="mini"><div><span>TFC</span><b>'+fmt(m.tfc,1)+'%</b></div><div><span>Evitáveis</span><b>'+(num(g(d,"contencao.ce_pct_total"))?fmt(g(d,"contencao.ce_pct_total"),0)+'%':"—")+'</b></div><div><span>Conversas</span><b>'+int(m.n_total)+'</b></div></div>';
+  h+=retSeg(m);
+  if(g(d,"cobertura.baixa"))h+='<div>'+chip("Cobertura baixa","warn")+'</div>';
+  return h+'<button class="linkbtn" data-go="'+f.id+'">Ver detalhes e o que mudar →</button></div>';
+}
+function visao(){
+  var any=Object.keys(S.data).some(function(k){return S.data[k]});
+  var h='';
+  var teste=Object.keys(S.data).some(function(k){return g(S.data[k],"meta.origem")==="teste"});
+  if(teste)h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> Os números vêm do Databricks (20/10/2026). A classificação de contatos evitáveis e as oportunidades cobrem uma amostra de 30 conversas do Cartão HP; Aleatório e Casos críticos mostram só métricas. Não é a rodada oficial das rotinas.</div></div>';
+  var cob=Object.keys(S.data).filter(function(k){return g(S.data[k],"cobertura.baixa")});
+  if(cob.length)h+='<div class="banner warn"><span class="dot warn"></span><div><b>Cobertura baixa em '+cob.length+' rotina(s).</b> '+esc(g(S.data[cob[0]],"cobertura.texto","Há dias sem dados no período."))+' Leia os números como amostra reduzida.</div></div>';
+  h+='<section class="block"><h2>Como está cada rotina</h2><div class="cards">'+FLUXOS.map(cardRotina).join("")+'</div></section>';
+  if(!any){main(h+empty("Sem dados ainda","Quando uma rotina publicar, os cartões e gráficos aparecem aqui."));return}
+  // contatos evitáveis
+  var linhas=FLUXOS.map(function(f){var d=fluxoDados(f);return d&&g(d,"contencao.n_classificadas")?{f:f,d:d}:null}).filter(Boolean);
+  h+='<section class="block"><h2>Onde estão os contatos evitáveis</h2><p class="sub">Cada conversa que terminou em transbordo, abandono, loop ou nota baixa é classificada pelo que teria evitado o contato. Verde e azul não são falha do bot; laranja e amarelo são o que dá para corrigir.</p>';
+  if(linhas.length){
+    h+='<div class="panel">'+linhas.map(function(x){var c=x.d.contencao;return '<div><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px"><h3>'+esc(x.f.nome)+'</h3><span class="muted" style="font-size:12px">'+int(c.n_classificadas)+' classificadas de '+int(c.n_elegiveis)+' elegíveis · evitáveis '+fmt(c.pct_evitavel,0)+'% (IC 95%: '+esc(arr(c.ic95).join("–"))+'%)</span></div>'+classeSeg(c)+'</div>'}).join("")+'</div>';
+  }else h+=empty("Ainda sem classificação","A classificação por contato evitável aparece depois da primeira rodada completa.");
+  h+='</section>';
+  // tendência
+  h+='<section class="block"><h2>Tendência do BQS</h2>'+tendencia()+'</section>';
+  // maiores oportunidades
+  var todas=[];
+  FLUXOS.forEach(function(f){var d=fluxoDados(f);arr(g(d,"oportunidades")).forEach(function(o){todas.push({f:f,o:o})})});
+  var rank={alta:0,media:1,baixa:2};
+  todas.sort(function(a,b){return ((rank[a.o.prioridade]==null?3:rank[a.o.prioridade])-(rank[b.o.prioridade]==null?3:rank[b.o.prioridade]))||(g(b.o,"contatos.estimado",0)-g(a.o,"contatos.estimado",0))});
+  h+='<section class="block"><h2>O que mais pesa agora</h2>';
+  if(todas.length){
+    h+='<div class="panel scroll"><table><thead><tr><th>Oportunidade</th><th>Rotina</th><th>Dono</th><th class="n">Contatos evitáveis (est.)</th><th></th></tr></thead><tbody>'+todas.slice(0,6).map(function(x){var o=x.o;return '<tr><td>'+esc(o.titulo)+'</td><td>'+esc(x.f.nome)+'</td><td>'+esc(o.dono||"—")+'</td><td class="n">'+int(g(o,"contatos.estimado"))+' <span class="muted">('+fmt(g(o,"contatos.pct_total"),1)+'%)</span></td><td>'+prioChip(o.prioridade)+'</td></tr>'}).join("")+'</tbody></table></div>';
+  }else h+=empty("Sem oportunidades ainda","Elas aparecem depois que a análise completa de uma rotina roda.");
+  h+='</section>';
+  // auditoria
+  h+='<section class="block"><h2>Quanto o avaliador automático erra</h2><p class="sub">O auditor lê a transcrição de casos duvidosos e revisa as notas. A nota revisada entra no BQS final. É uma amostra seletiva, não aleatória.</p>';
+  var au=FLUXOS.map(function(f){var d=fluxoDados(f);return d&&g(d,"auditoria.auditados")!=null?{f:f,a:d.auditoria}:null}).filter(Boolean);
+  if(au.length){
+    h+='<div class="panel scroll"><table><thead><tr><th>Rotina</th><th class="n">Auditados</th><th class="n">Notas revisadas</th><th class="n">Aprovado → reprovado</th><th class="n">Reprovado → aprovado</th></tr></thead><tbody>'+au.map(function(x){return '<tr><td>'+esc(x.f.nome)+'</td><td class="n">'+int(x.a.auditados)+'</td><td class="n">'+int(x.a.revisados)+'</td><td class="n">'+int(x.a.aprovado_para_reprovado)+'</td><td class="n">'+int(x.a.reprovado_para_aprovado)+'</td></tr>'}).join("")+'</tbody></table></div>';
+    var dv=[];au.forEach(function(x){arr(x.a.divergencias).forEach(function(t){dv.push(t)})});
+    if(dv.length)h+='<div class="panel"><h3>Divergências observadas</h3><ul class="plain">'+dv.slice(0,5).map(function(t){return '<li><span class="dot warn"></span><span>'+esc(t)+'</span></li>'}).join("")+'</ul></div>';
+  }else h+=empty("Sem auditoria ainda","Os tickets marcados para auditoria são lidos na transcrição a cada rodada.");
+  main(h+'</section>');
+}
+function tendencia(){
+  var cores={"cartao-hp":"var(--cD)","aleatorio":"var(--cA)","criticos-semanal":"var(--cR)"};
+  var nomes={"cartao-hp":"Cartão HP","aleatorio":"Aleatório","criticos-semanal":"Casos críticos (semanal)"};
+  var series=Object.keys(cores).map(function(k){return {k:k,p:arr(S.hist[k]).filter(function(x){return num(x.bqs_final)})}}).filter(function(s){return s.p.length>=2});
+  if(!series.length)return empty("A série começa na segunda rodada","Com um único período não há tendência. A partir do segundo, o gráfico mostra o BQS final de cada rotina semana a semana.");
+  var W=760,H=220,L=36,R=14,T=12,B=26,all=[];
+  series.forEach(function(s){s.p.forEach(function(x){all.push(x.fim)})});
+  var uniq=Array.from(new Set(all)).sort(),ix=function(d){return uniq.length>1?L+(W-L-R)*uniq.indexOf(d)/(uniq.length-1):L};
+  var y=function(v){return T+(H-T-B)*(1-v/100)};
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="BQS final por período" style="max-width:100%;height:auto">';
+  [0,20,40,60,80,100].forEach(function(t){svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(t)+'" y2="'+y(t)+'" stroke="var(--line)" stroke-width="'+(t===60||t===80?1.2:.6)+'" '+(t===60||t===80?'stroke-dasharray="4 3"':'')+'/><text x="'+(L-6)+'" y="'+(y(t)+4)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">'+t+'</text>'});
+  uniq.forEach(function(d,i){if(uniq.length>8&&i%2)return;svg+='<text x="'+ix(d)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="var(--muted)">'+esc(String(d).slice(5).split("-").reverse().join("/"))+'</text>'});
+  series.forEach(function(s){
+    svg+='<polyline fill="none" stroke="'+cores[s.k]+'" stroke-width="2" stroke-linejoin="round" points="'+s.p.map(function(x){return ix(x.fim)+","+y(x.bqs_final)}).join(" ")+'"/>';
+    s.p.forEach(function(x,i){svg+='<circle cx="'+ix(x.fim)+'" cy="'+y(x.bqs_final)+'" r="'+(i===s.p.length-1?5:3.5)+'" fill="'+cores[s.k]+'" stroke="var(--surface)" stroke-width="2" data-tip="'+esc(nomes[s.k]+" · "+(x.periodo_label||x.fim)+": "+fmt(x.bqs_final,1)+"%"+(x.cobertura_baixa?" (cobertura baixa)":""))+'"/>'});
+  });
+  svg+='</svg>';
+  return '<div class="panel">'+svg+'<div class="legend">'+series.map(function(s){return '<span><i style="background:'+cores[s.k]+'"></i>'+esc(nomes[s.k])+'</span>'}).join("")+'<span class="muted">Linhas tracejadas: 60% (crítico) e 80% (saudável) · limiares provisórios</span></div></div>';
+}
+
+/* ---------- aba de fluxo ---------- */
+function fluxo(f){
+  var d=fluxoDados(f),h='';
+  if(f.id==="criticos"){
+    h+='<div class="pills" role="group" aria-label="Período">'+["criticos-semanal","criticos-diario"].map(function(k){return '<button class="pill" data-crit="'+k+'" aria-pressed="'+(S.crit===k)+'">'+(k==="criticos-semanal"?"Semanal":"Diário")+'</button>'}).join("")+'</div>';
+    d=S.data[S.crit];
+  }
+  if(!d){main(h+'<section class="block"><h2>'+esc(f.nome)+'</h2><p class="sub">'+esc(f.desc)+'</p>'+empty("Esta rotina ainda não publicou dados","Quando rodar, esta aba mostra as métricas, os contatos evitáveis e o que mudar.")+'</section>');return}
+  var m=g(d,"metricas",{}),c=g(d,"contencao",{}),a=g(d,"auditoria",{});
+  h+='<section class="block"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><p class="sub">'+esc(f.desc)+'</p>';
+  if(g(d,"meta.origem")==="teste")h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> '+esc(g(d,"meta.nota","Dados de validação."))+'</div></div>';
+  h+='<div class="kpis">'+
+    kpi("BQS final",fmt(m.bqs_final,1)+'%',delta(m.bqs_final,m.bqs_anterior)+'<br><span class="muted">original '+fmt(m.bqs_original,1)+'% · legado '+fmt(m.bqs_legado,1)+'%</span>')+
+    kpi("TFC",fmt(m.tfc,1)+'%','falha de condução sem pedido do cliente')+
+    kpi("Contatos evitáveis",num(c.ce_pct_total)?'≈ '+fmt(c.ce_pct_total,0)+'%':'—',num(c.pct_evitavel)?fmt(c.pct_evitavel,0)+'% das classificadas'+(c.ic95?' (IC '+esc(c.ic95.join("–"))+'%)':''):'sem classificação')+
+    kpi("Pediram humano",fmt(m.pct_pediu_humano,1)+'%',int(m.n_total)+' conversas · '+int(m.n_avaliaveis)+' avaliáveis')+
+    kpi("Auditados",int(a.auditados),int(a.revisados)+' notas revisadas')+
+  '</div></section>';
+  // alertas
+  var pa=arr(d.pontos_atencao);
+  if(g(d,"cobertura.baixa"))pa=[{tipo:"warn",texto:"Cobertura baixa: "+g(d,"cobertura.texto","dados incompletos no período")}].concat(pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x}));
+  else pa=pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x});
+  if(pa.length)h+='<section class="block"><h2>Pontos de atenção</h2><div class="panel"><ul class="plain">'+pa.map(function(x){return '<li><span class="dot '+esc(x.tipo||"warn")+'"></span><span>'+esc(x.texto)+'</span></li>'}).join("")+'</ul></div></section>';
+  // distribuição
+  h+='<section class="block"><h2>Como terminaram as conversas</h2><div class="two"><div class="panel"><h3>Desfecho</h3>'+retSeg(m)+'</div><div class="panel"><h3>Rótulo de qualidade</h3>'+labelsSeg(m)+'</div></div>'+criterios(m)+'</section>';
+  if(m.hp)h+=hp(m.hp);
+  // dimensões
+  var dims=g(d,"dimensoes",{}),dk=Object.keys(dims).filter(function(k){return arr(dims[k]).length});
+  if(dk.length){h+='<section class="block"><h2>Qualidade por agente e por tema</h2><p class="sub">Valores originais do avaliador (sem a revisão do auditor). Grupos com menos de 30 conversas não são ranqueados.</p>'+dk.map(function(k){return tabelaDim(k,dims[k])}).join("")+'</section>'}
+  // contenção
+  h+='<section class="block"><h2>Contatos evitáveis</h2>'+contencao(c,m)+'</section>';
+  // o que mudar
+  h+=mudar(f,d);
+  // auditoria
+  if(a.auditados!=null){h+='<section class="block"><h2>Auditoria pela transcrição</h2><div class="panel"><p>'+int(a.auditados)+' tickets lidos; '+int(a.revisados)+' com nota revisada ('+int(a.aprovado_para_reprovado)+' passaram de aprovado para reprovado; '+int(a.reprovado_para_aprovado)+' de reprovado para aprovado).</p>'+(arr(a.divergencias).length?'<ul class="plain">'+arr(a.divergencias).map(function(t){return '<li><span class="dot warn"></span><span>'+esc(t)+'</span></li>'}).join("")+'</ul>':'')+'</div></section>'}
+  main(h);
+}
+function dt(s){if(!s)return "—";var x=new Date(s);return isNaN(x)?String(s):x.toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",timeZone:"America/Sao_Paulo"})}
+function criterios(m){
+  var c=g(m,"criterios",null);if(!c)return "";
+  var nomes={resolution:"Resolução",efficiency:"Eficiência",escalation:"Transbordo",understanding:"Entendimento",clarity:"Clareza",tone:"Tom"};
+  var ks=Object.keys(nomes).filter(function(k){return num(c[k])});
+  var menor=ks.slice().sort(function(a,b){return c[a]-c[b]})[0];
+  return '<div class="panel"><h3>Média dos 6 critérios (0 a 10)</h3>'+bars(ks.map(function(k){return {l:nomes[k]+(k===menor?" · mais baixo":""),v:c[k],t:fmt(c[k],2),cor:k===menor?"var(--cA)":"var(--blue)"}}),10)+'</div>';
+}
+function hp(h){
+  return '<section class="block"><h2>Saúde do contexto (HP)</h2><div class="kpis">'+
+    kpi("HP pleno",int(h.pleno),'BQS '+fmt(h.bqs_pleno,1)+'%')+
+    kpi("HP degradado",fmt(h.pct_degradado,1)+'%',int(h.degradado)+' conversas · limite 5%'+(num(h.pct_degradado)&&h.pct_degradado>5?' · '+chip("Acima do limite","crit"):''))+
+    kpi("BQS degradado",fmt(h.bqs_degradado,1)+'%','sem contexto do cliente')+
+  '</div><p class="sub">HP pleno = contexto do cliente carregado; falha é de prompt, conteúdo ou fluxo. HP degradado = o bot atendeu sem contexto; falha de integração.</p></section>';
+}
+function tabelaDim(k,rows){
+  var nome={effective_vertical:"Agente / vertical",topic:"Tema",product:"Produto"}[k]||k;
+  var hasHp=rows.some(function(r){return num(r.bqs_hp_pleno)});
+  return '<div class="panel scroll"><h3>'+esc(nome)+'</h3><table><thead><tr><th>'+esc(nome)+'</th><th class="n">Conversas</th><th>BQS</th><th class="n">TFC</th><th class="n">Pediu humano</th>'+(hasHp?'<th class="n">Degradado</th>':'')+'</tr></thead><tbody>'+rows.map(function(r){
+    var peq=(r.n||0)<30;
+    return '<tr><td>'+esc(r.rotulo||r.valor)+(peq?' '+chip("amostra pequena"):'')+'</td><td class="n">'+int(r.n)+' <span class="muted">('+fmt(r.pct_volume,0)+'%)</span></td><td><div class="inbar"><span class="bar"><span style="width:'+(r.bqs||0)+'%;'+(peq?'opacity:.45;':'')+(r.bqs<60?'background:var(--crit)':r.bqs<80?'background:var(--warn)':'background:var(--good)')+'"></span></span><b class="mono">'+fmt(r.bqs,1)+'%</b></div></td><td class="n">'+fmt(r.tfc,1)+'%</td><td class="n">'+fmt(r.pct_pediu_humano,1)+'%</td>'+(hasHp?'<td class="n">'+fmt(r.pct_degradado,1)+'%</td>':'')+'</tr>';
+  }).join("")+'</tbody></table></div>';
+}
+function contencao(c,m){
+  if(!g(c,"n_classificadas"))return empty("Sem classificação nesta rodada","A classificação por contato evitável roda junto com a análise completa da rotina.");
+  var h='<p class="sub">Amostra aleatória de '+int(c.n_classificadas)+' das '+int(c.n_elegiveis)+' conversas elegíveis (transbordo, abandono, loop ou nota baixa). A estimativa para o período inteiro tem margem: IC 95% de '+esc(arr(c.ic95).join(" a "))+'% das classificadas.</p>';
+  h+='<div class="panel">'+classeSeg(c)+'</div>';
+  var cs=arr(c.causas).slice().sort(function(a,b){return b.n-a.n});
+  h+='<div class="two"><div class="panel"><h3>Por causa</h3>'+bars(cs.map(function(x){var cl=CLASSES[x.classe]||{};return {l:x.classe+" · "+(x.causa_rotulo||x.causa),v:x.n,t:int(x.n),cor:cl.cor,tip:(cl.nome||"")+" — "+(x.causa_rotulo||x.causa)+": "+x.n}}))+'</div>';
+  var dono=g(c,"por_dono",{}),hd=g(c,"handoff",{});
+  h+='<div class="panel"><h3>Quem corrige</h3>'+bars(Object.keys(dono).map(function(k){return {l:k,v:dono[k],t:int(dono[k])}}))+
+     (Object.keys(hd).length?'<h3 style="margin-top:6px">Handoff quando só humano resolve</h3>'+bars(Object.keys(hd).map(function(k){return {l:k,v:hd[k],t:int(hd[k]),cor:k==="correto"?"var(--cR)":"var(--cB)"}})):'')+'</div></div>';
+  if(num(m.n_transbordo_nota_ok)&&num(g(m,"retention.transbordo")))h+='<p class="sub">'+int(m.n_transbordo_nota_ok)+' dos '+int(m.retention.transbordo)+' transbordos receberam nota de aprovado do avaliador automático. Transbordo bem executado não é transbordo evitado: veja quantos desses ainda eram evitáveis acima.</p>';
+  return h;
+}
+
+/* ---------- o que mudar ---------- */
+function mudar(f,d){
+  var ops=arr(d.oportunidades),arts=arr(d.artigos),h='<section class="block"><h2>O que mudar</h2>';
+  if(!ops.length&&!arts.length)return h+empty("Sem recomendações nesta rodada","As oportunidades, artigos e ajustes de fluxo saem da análise completa da rotina.")+'</section>';
+  var fl=S.filtro[f.id]||"Todos";
+  h+='<div class="pills" role="group" aria-label="Filtrar por frente">'+GRUPOS.map(function(x){return '<button class="pill" data-filtro="'+esc(x)+'" aria-pressed="'+(fl===x)+'">'+esc(x)+'</button>'}).join("")+'</div>';
+  var lista=ops.filter(function(o){return fl==="Todos"||(FRENTES[o.frente]||"Fluxo e regras")===fl});
+  if(fl==="Artigos"||fl==="Todos"){if(arts.length)h+='<div class="panel scroll"><h3>Artigos da Central de Ajuda (Help Design)</h3><table><thead><tr><th>Ação</th><th>Artigo</th><th>Primeira frase sugerida</th><th class="n">Conversas</th><th>Prioridade</th></tr></thead><tbody>'+arts.map(function(a){return '<tr><td>'+chip(a.acao==="criar"?"Criar":"Atualizar",a.acao==="criar"?"info":"warn")+'</td><td><b>'+esc(a.titulo)+'</b><div class="muted" style="font-size:12px">'+esc(a.secao?"Seção: "+a.secao:"")+(a.problema?" · "+a.problema:"")+'</div></td><td>'+esc(a.primeira_frase||"—")+'</td><td class="n">'+int(a.conversas)+'</td><td>'+prioChip(a.prioridade)+'</td></tr>'}).join("")+'</tbody></table></div>'}
+  h+='<div class="opos">'+(lista.length?lista.map(opo).join(""):'<div class="empty"><b>Nada nesta frente</b>Troque o filtro para ver as demais.</div>')+'</div></section>';
+  return h;
+}
+function opo(o){
+  var cl=CLASSES[o.classe]||{nome:"",cor:"var(--cE)"},ct=g(o,"contatos",{});
+  var h='<details class="opo"><summary>'+prioChip(o.prioridade)+'<div><div class="ttl">'+esc(o.id?o.id+" · ":"")+esc(o.titulo)+'</div><div class="meta"><span class="chip" style="background:transparent;border:1px solid '+cl.cor+';color:var(--ink-2)"><i style="color:'+cl.cor+'"></i>'+esc((o.classe||"")+" · "+cl.nome)+'</span><span class="chip">'+esc(o.dono||"—")+'</span>'+(o.prazo?'<span class="chip">'+esc(o.prazo)+'</span>':'')+(o.tipo==="cross-domain"?'<span class="chip info">2+ especialistas</span>':'')+'</div></div><span class="mono" style="text-align:right;white-space:nowrap">'+(num(ct.estimado)?'≈ '+int(ct.estimado)+'<br><span class="muted" style="font-size:11px">contatos</span>':'')+'</span></summary><div class="body">';
+  if(o.antes||o.depois||g(o,"o_que_reteria.depois"))h+='<div class="ba"><div class="antes"><b>Hoje</b>'+esc(o.antes||g(o,"o_que_reteria.antes","—"))+'</div><div class="depois"><b>O que teria retido</b>'+esc(o.depois||g(o,"o_que_reteria.depois","—"))+'</div></div>';
+  h+='<dl>';
+  if(o.problema)h+='<dt>Problema</dt><dd>'+esc(o.problema)+'</dd>';
+  if(o.evidencia)h+='<dt>Evidência</dt><dd>'+esc(o.evidencia)+'</dd>';
+  if(num(ct.observado))h+='<dt>Impacto</dt><dd>'+int(ct.observado)+' observados na amostra · estimado '+int(ct.estimado)+' no período ('+fmt(ct.pct_total,1)+'% das conversas)'+(o.nota_impacto?' · '+esc(o.nota_impacto):'')+'</dd>';
+  if(o.proposta)h+='<dt>Proposta</dt><dd>'+esc(o.proposta)+'</dd>';
+  if(o.no)h+='<dt>Nó / artigo</dt><dd>'+esc(o.no)+'</dd>';
+  if(o.dependencias)h+='<dt>Dependências</dt><dd>'+esc(o.dependencias)+'</dd>';
+  if(o.como_medir)h+='<dt>Como medir</dt><dd>'+esc(o.como_medir)+'</dd>';
+  if(arr(o.tickets).length)h+='<dt>Tickets</dt><dd class="tick">'+arr(o.tickets).map(esc).join(" · ")+'</dd>';
+  return h+'</dl></div></details>';
+}
+
+/* ---------- como ler ---------- */
+function comoLer(){
+  main('<section class="block"><h2>Como ler este painel</h2><div class="panel"><dl class="def">'+
+  '<dt>BQS final</dt><dd>Percentual de conversas aprovadas. Uma conversa é aprovada quando a nota geral é 7 ou mais e <i>resolução</i> e <i>transbordo</i> ficam acima de 2. Conversas "regular" são reprovadas (sem crédito parcial). Nos tickets auditados, vale a nota revisada pelo auditor.</dd>'+
+  '<dt>BQS original e legado</dt><dd>O original é o mesmo cálculo sem a revisão do auditor. O legado é o antigo, baseado no campo <code>approved</code>, que deixa as conversas "regular" fora da conta e infla o resultado; aparece só para comparação histórica.</dd>'+
+  '<dt>TFC</dt><dd>Taxa de falha de condução: conversas que terminaram em transbordo, abandono ou loop sem o cliente ter pedido atendente.</dd>'+
+  '<dt>Contatos evitáveis</dt><dd>Entre as conversas classificadas, as que o bot poderia ter resolvido hoje (A), resolveria com ajuste de conteúdo, variável ou roteamento (B) ou exigiria uma capacidade nova (C). A estimativa para o período vem de uma amostra aleatória e traz intervalo de confiança.</dd>'+
+  '<dt>Classes</dt><dd>A bot resolvia hoje · B resolveria com ajuste · C exigiria capacidade nova · D só humano resolve (mede o handoff do bot) · R retido provável · E indeterminado.</dd>'+
+  '<dt>Auditoria</dt><dd>Um segundo agente lê a transcrição dos casos duvidosos, refaz as 6 notas e a classe. Tende a mostrar onde o avaliador automático erra, por exemplo aprovar transbordo depois de uma resposta falha.</dd>'+
+  '<dt>Cobertura</dt><dd>Quando há poucos dias com dados, a semana é uma amostra reduzida. O painel avisa e não calcula variação sem período anterior.</dd>'+
+  '<dt>Escopo</dt><dd>Só conversas do bot, até a primeira fala de um atendente. Só artigos públicos da Central de Ajuda: o que começa com cadeado ou lupa é interno e o bot não consulta.</dd>'+
+  '<dt>Limiares</dt><dd>BQS abaixo de 60% é crítico e 80% ou mais é saudável. Os limiares de TFC e de pedido de atendente são provisórios até haver 4 períodos de série.</dd>'+
+  '<dt>Atualização</dt><dd>As rotinas semanais rodam às segundas (Cartão HP 10h, Aleatório 14h, Casos críticos 15h) e a rotina diária de críticos às 9h40. Cada rodada atualiza a sua parte do painel.</dd>'+
+  '</dl></div></section>');
+}
+
+/* ---------- navegação ---------- */
+function main(h){$("#main").innerHTML=h}
+function tabs(){
+  var t=[{id:"visao",n:"Visão geral"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
+  $("#tabs").innerHTML=t.map(function(x){return '<button role="tab" data-tab="'+x.id+'" aria-selected="'+(S.tab===x.id)+'">'+esc(x.n)+'</button>'}).join("");
+}
+function render(){
+  tabs();
+  var f=FLUXOS.filter(function(x){return x.id===S.tab})[0];
+  if(S.tab==="visao")visao();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
+  var ult=Object.keys(S.data).map(function(k){return g(S.data[k],"gerado_em")}).filter(Boolean).sort().pop();
+  $("#atualizado").textContent=ult?"Atualizado em "+dt(ult):"";
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro]");if(!el)return;
+  if(el.dataset.tab||el.dataset.go){S.tab=el.dataset.tab||el.dataset.go;store("bqs-tab",S.tab);window.scrollTo(0,0)}
+  if(el.dataset.crit)S.crit=el.dataset.crit;
+  if(el.dataset.filtro)S.filtro[S.tab]=el.dataset.filtro;
+  render();
+});
+/* tooltip */
+var tip=$("#tip");
+document.addEventListener("pointermove",function(e){
+  var el=e.target.closest&&e.target.closest("[data-tip]");
+  if(!el){tip.hidden=true;return}
+  tip.textContent=el.getAttribute("data-tip");tip.hidden=false;
+  var x=Math.min(e.clientX+12,window.innerWidth-tip.offsetWidth-8),y=e.clientY+14;
+  if(y+tip.offsetHeight>window.innerHeight-8)y=e.clientY-tip.offsetHeight-10;
+  tip.style.left=Math.max(8,x)+"px";tip.style.top=y+"px";
+});
+document.addEventListener("pointerleave",function(){tip.hidden=true});
+
+/* ---------- boot ---------- */
+var chaves=["cartao-hp","aleatorio","criticos-semanal","criticos-diario"];
+var salvo=store("bqs-tab");if(salvo)S.tab=salvo;
+Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=r[0];S.hist[k]=r[1]})})).then(render);
+render();
+})();
+</script>

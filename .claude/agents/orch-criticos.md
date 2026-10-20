@@ -75,7 +75,10 @@ WITH par AS (
 )
 SELECT DATE_FORMAT(ini_atual, 'dd/MM/yyyy') AS data_inicio,
        DATE_FORMAT(ini_atual, 'dd/MM/yyyy') AS data_fim,
-       DATE_FORMAT(ini_ant, 'dd/MM/yyyy') AS ant_inicio
+       DATE_FORMAT(ini_ant, 'dd/MM/yyyy') AS ant_inicio,
+       DATE_FORMAT(ini_atual, 'yyyy-MM-dd') AS inicio_iso,
+       DATE_FORMAT(ini_atual, 'yyyy-MM-dd') AS fim_iso,
+       CONCAT(DATE_FORMAT(CURRENT_TIMESTAMP() - INTERVAL 3 HOURS, 'yyyy-MM-dd'), 'T', DATE_FORMAT(CURRENT_TIMESTAMP() - INTERVAL 3 HOURS, 'HH:mm:ss')) AS gerado_em_brt
 FROM par
 ```
 
@@ -581,8 +584,10 @@ subagent_type: chatbot-relatorio-cx
 prompt: |
   MODO CURADORIA ativo.
   Fluxo: Casos Críticos (diário) | Rotina (chave do artefato): criticos-diario | Período: [data_inicio] a [data_fim]
+  Datas para o JSON do painel: inicio_iso = [inicio_iso] | fim_iso = [fim_iso] | gerado_em = [gerado_em_brt]-03:00 | tipo do período: diario
+  Período anterior (rótulo): [ant_inicio] a [ant_fim]
 
-  Consolide os outputs abaixo em um relatório executivo e publique (artefato + Slack #bot-quality-score).
+  Consolide os outputs abaixo, publique os dados no painel (artefato BQS RecargaBot) e poste o resumo e o plano de ação no Slack #bot-quality-score.
 
   MÉTRICAS BASE (todas vindas de SQL — não recalcule):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis]

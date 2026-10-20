@@ -1,0 +1,243 @@
+{
+  "schema": "bqs-run/1",
+  "chave": "cartao-hp",
+  "rotina": "Cartão de Crédito HP",
+  "meta": {
+    "origem": "teste",
+    "nota": "Métricas reais do Databricks (20/10/2026). Contenção e oportunidades vêm de uma amostra aleatória de 30 das 276 conversas elegíveis; a margem de erro é grande (IC 95% de 55 a 86%). A auditoria cobre 4 tickets. Não é a rodada oficial."
+  },
+  "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
+  "gerado_em": "2026-10-20T11:55:00-03:00",
+  "cobertura": {
+    "baixa": true,
+    "comparacao_indisponivel": true,
+    "texto": "dados em 2 dos 7 dias da semana (15 e 16/10); sem registros de 11/09 a 14/10; a comparação com a semana anterior não existe."
+  },
+  "metricas": {
+    "n_total": 398,
+    "n_avaliaveis": 388,
+    "n_ok_final": 280,
+    "bqs_final": 72.2,
+    "bqs_original": 72.4,
+    "bqs_anterior": null,
+    "bqs_legado": 81.4,
+    "tfc": 42.5,
+    "pct_pediu_humano": 25.4,
+    "pct_transbordo": 32.7,
+    "n_transbordo_nota_ok": 115,
+    "labels": { "excelente": 183, "bom": 98, "regular": 49, "ruim": 41, "critico": 17 },
+    "retention": { "resolutiva": 125, "abandono": 130, "transbordo": 130, "loop": 9 },
+    "criterios": { "understanding": 7.66, "resolution": 6.77, "clarity": 7.37, "tone": 8.24, "efficiency": 6.81, "escalation": 7.79 },
+    "hp": { "pleno": 377, "degradado": 21, "pct_degradado": 5.3, "bqs_pleno": 72.2, "bqs_degradado": 76.2 }
+  },
+  "auditoria": {
+    "auditados": 4,
+    "revisados": 4,
+    "aprovado_para_reprovado": 1,
+    "reprovado_para_aprovado": 0,
+    "divergencias": [
+      "O avaliador deu nota alta ao transbordo e ignorou a falha anterior (resposta vaga, 'Não' sem sondagem, transferência anunciada e não executada). Transbordo recebeu 10 onde a régua aceita no máximo 4 a 6.",
+      "Aprovou ou manteve alto um loop com 'Não entendi' para frase clara e transferência sem informar canal nem prazo.",
+      "Tratou como resolvida uma resposta que não servia ao caso (cartão bloqueado com sugestão de compra; contestação de Pix com resposta genérica)."
+    ]
+  },
+  "dimensoes": {
+    "effective_vertical": [
+      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 70.6, "tfc": 42.2, "pct_pediu_humano": 27.4, "pct_degradado": 4.9 },
+      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 81.5, "tfc": 43.5, "pct_pediu_humano": 15.9, "pct_degradado": 7.2 }
+    ],
+    "topic": [
+      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 82.0, "tfc": 39.8, "pct_pediu_humano": 24.9, "pct_degradado": 5.2 },
+      { "valor": "pix", "n": 17, "pct_volume": 4.3, "bqs": 47.1, "tfc": 41.2, "pct_pediu_humano": 35.3, "pct_degradado": 5.9 },
+      { "valor": "recargapay-cards", "n": 15, "pct_volume": 3.8, "bqs": 66.7, "tfc": 26.7, "pct_pediu_humano": 13.3, "pct_degradado": 0.0 },
+      { "valor": "por-que-recebi-uma-fatura", "n": 8, "pct_volume": 2.0, "bqs": 37.5, "tfc": 50.0, "pct_pediu_humano": 37.5, "pct_degradado": 0.0 },
+      { "valor": "pix-payment", "n": 8, "pct_volume": 2.0, "bqs": 62.5, "tfc": 37.5, "pct_pediu_humano": 37.5, "pct_degradado": 0.0 },
+      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 100.0, "pct_pediu_humano": 0.0, "pct_degradado": 16.7 },
+      { "valor": "investimentos", "n": 6, "pct_volume": 1.5, "bqs": 50.0, "tfc": 66.7, "pct_pediu_humano": 16.7, "pct_degradado": 0.0 },
+      { "valor": "fatura", "n": 5, "pct_volume": 1.3, "bqs": 60.0, "tfc": 80.0, "pct_pediu_humano": 20.0, "pct_degradado": 0.0 }
+    ]
+  },
+  "contencao": {
+    "n_classificadas": 30,
+    "n_elegiveis": 276,
+    "pct_evitavel": 73.3,
+    "ic95": [55, 86],
+    "ce_pct_total": 50.8,
+    "classes": { "A": 18, "B": 1, "C": 3, "D": 3, "R": 3, "E": 2 },
+    "causas": [
+      { "classe": "A", "causa": "prompt_resposta", "causa_rotulo": "Resposta do bot contradiz ou omite o artigo", "n": 6 },
+      { "classe": "A", "causa": "nlu_roteamento", "causa_rotulo": "Entendimento e roteamento", "n": 5 },
+      { "classe": "A", "causa": "politica_produto", "causa_rotulo": "Regra de transbordo (transfere sem sondar)", "n": 3 },
+      { "classe": "A", "causa": "loop_fluxo", "causa_rotulo": "Loop no fluxo", "n": 3 },
+      { "classe": "A", "causa": "pedido_humano_direto", "causa_rotulo": "Pedido direto de atendente", "n": 1 },
+      { "classe": "C", "causa": "integracao_acao", "causa_rotulo": "Consulta ou ação que o bot não faz", "n": 3 },
+      { "classe": "B", "causa": "conteudo_kb", "causa_rotulo": "Artigo ausente ou incompleto", "n": 1 },
+      { "classe": "D", "causa": "acao_humana_obrigatoria", "causa_rotulo": "Só humano resolve", "n": 3 },
+      { "classe": "R", "causa": "nenhuma", "causa_rotulo": "Retido provável (sem falha)", "n": 3 },
+      { "classe": "E", "causa": "indeterminada", "causa_rotulo": "Indeterminado", "n": 2 }
+    ],
+    "por_dono": { "Produto CX": 21, "Help Design": 1 },
+    "handoff": { "correto": 2, "tardio": 1 }
+  },
+  "pontos_atencao": [
+    { "tipo": "crit", "texto": "HP degradado em 5,3% (21 conversas), acima do limite de 5%: o bot atendeu sem o contexto do cliente. Alerta de integração, separado da qualidade do prompt." },
+    { "tipo": "warn", "texto": "Transbordo bem executado não é transbordo evitado: 115 dos 130 transbordos receberam nota de aprovado, e 73% das conversas classificadas na amostra eram evitáveis." },
+    { "tipo": "warn", "texto": "O BQS legado (81,4%) superestima em 9 pp: as conversas 'regular' ficam fora da conta. O BQS final é 72,2%." },
+    { "tipo": "info", "texto": "Pediram atendente 25,4% dos clientes: 27,4% no Agente CC Produção contra 15,9% no Agente CC Anuidade." }
+  ],
+  "oportunidades": [
+    {
+      "id": "OPO-001", "prioridade": "alta", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
+      "titulo": "O bot contradiz ou omite o que o artigo diz",
+      "vertical_tema": "Cartão: limite, faturas, estorno",
+      "problema": "Prazo de limite após pagamento por Pix dito como 30 minutos (artigo: até 1 dia útil); faturas antigas indicadas no app (artigo: só nos e-mails de cobrança); prazo de estorno trocado (10 dias úteis × 2 faturas); conceito do limite garantido não respondido antes dos dados.",
+      "evidencia": "6 de 30 conversas classificadas; 59% das conversas do período têm algum problema de alinhamento com a Central.",
+      "tickets": ["46609842", "46607531", "46611393", "46607987", "46610281", "46605260"],
+      "contatos": { "observado": 6, "estimado": 55, "pct_total": 13.9 }, "nota_impacto": "amostra de 30; margem ampla",
+      "antes": "Informa 30 minutos para o limite voltar e lista todas as formas de pagamento.",
+      "depois": "Seu limite volta em até 1 dia útil quando a fatura é paga por Pix ou saldo da carteira. Pelo status, a sua fatura consta como paga.",
+      "proposta": "Inserir no prompt do agente de cartão os prazos do artigo por tema (limite: 1 dia útil; compra autorizada: 24 h, 2 a 60 dias, 10 dias úteis; estorno de compra lançada: até 2 faturas) e abrir a resposta pela frase conceitual do tema antes dos dados do payload.",
+      "no": "nó a confirmar pelo Produto CX (Agente CC Produção)",
+      "dono": "Produto CX", "prazo": "Sprint",
+      "dependencias": "Validação do produto sobre os prazos; os textos de exemplo são rascunhos.",
+      "como_medir": "Conversas do tema 'limite não voltou' com pedido de atendente; divergência entre bot e artigo nos diagnósticos."
+    },
+    {
+      "id": "OPO-002", "prioridade": "alta", "classe": "A", "causa": "nlu_roteamento", "tipo": "fluxo", "frente": "fluxo",
+      "titulo": "Frase clara vira 'Não entendi' ou troca de tema",
+      "vertical_tema": "Limite, fatura, acesso à conta, Pix × cartão",
+      "problema": "'Fatura do cartão', 'liberar R$ 100 de limite' e 'não consigo entrar na conta' recebem 'Não entendi sua dúvida'; contestação de Pix é respondida como contestação de cartão; resposta da pesquisa de satisfação (0 a 5) é lida como nova intenção.",
+      "evidencia": "5 de 30 conversas classificadas, em quatro temas diferentes.",
+      "tickets": ["46607029", "46610868", "46609113", "46607033", "46607496"],
+      "contatos": { "observado": 5, "estimado": 46, "pct_total": 11.6 }, "nota_impacto": "amostra de 30; margem ampla",
+      "antes": "'Não entendi sua dúvida' para 'Fatura do cartão'.",
+      "depois": "O limite garantido é um cartão de crédito, não pré-pago: por isso você recebe uma fatura. A sua vence em [vencimento] e está em [valor].",
+      "proposta": "Mapear essas formulações para a intenção correta, desambiguar Pix × cartão antes de responder e isolar as respostas 0–5 da pesquisa de satisfação para que não virem intenção.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX", "prazo": "Sprint",
+      "dependencias": "Revisão das frases de treino do NLU.",
+      "como_medir": "Taxa de 'Não entendi' por tema; loops por 100 conversas."
+    },
+    {
+      "id": "OPO-003", "prioridade": "alta", "classe": "A", "causa": "politica_produto", "tipo": "politica", "frente": "politica",
+      "titulo": "O bot transfere logo depois do 'Não', sem sondar o que faltou",
+      "vertical_tema": "Fatura, limite garantido, limite pré-aprovado",
+      "problema": "Depois de uma explicação correta, o cliente responde 'Não' à confirmação de resolução e pede atendente; o bot transfere ou reabre 'Tem mais dúvidas?' sem perguntar o que ficou em aberto.",
+      "evidencia": "3 de 30 conversas classificadas; padrão repetido nos temas 'por que recebi uma fatura' (42% pedem atendente) e 'paguei e o limite não voltou' (44%).",
+      "tickets": ["46609999", "46607369", "46607660"],
+      "contatos": { "observado": 3, "estimado": 28, "pct_total": 6.9 }, "nota_impacto": "amostra de 30; margem ampla",
+      "antes": "Cliente: 'Não'. Bot: 'Tem mais dúvidas?' ou oferece o atendente.",
+      "depois": "Entendi que ainda ficou algo em aberto. O que falta: o prazo, o valor ou o caminho no app?",
+      "proposta": "Depois de um 'Não', fazer uma única pergunta de sondagem com 2 ou 3 opções do tema antes de oferecer o atendente. Manter o atendente sempre disponível.",
+      "no": "nó a confirmar pelo Produto CX (condição de transbordo)",
+      "dono": "Produto CX", "prazo": "Sprint",
+      "dependencias": "Depende de validação com Compliance/Jurídico (SAC) antes de implementar.",
+      "como_medir": "Pedidos de atendente depois de um 'Não'; clientes que resolvem após a sondagem."
+    },
+    {
+      "id": "OPO-004", "prioridade": "alta", "classe": "A", "causa": "loop_fluxo", "tipo": "fluxo", "frente": "fluxo",
+      "titulo": "O bot repete o mesmo bloco ou pede 'reformule' sem avançar",
+      "vertical_tema": "Cancelar cartão, aumentar limite",
+      "problema": "O bloco de 'Encerrar relacionamento com cartão' é repetido 4 vezes ou mais, inclusive depois de o cliente pedir para não repetir; pedidos claros de limite recebem 'reformule em uma única mensagem'.",
+      "evidencia": "3 de 30 conversas classificadas.",
+      "tickets": ["46606417", "46611276", "46608069"],
+      "contatos": { "observado": 3, "estimado": 28, "pct_total": 6.9 }, "nota_impacto": "amostra de 30; margem ampla",
+      "antes": "Repete o mesmo passo a passo de cancelamento para quem disse 'não consigo cancelar'.",
+      "depois": "Seu cartão virtual tem uma fatura de R$ [valor] com vencimento em [DD/MM]. Pague em Cartão RecargaPay > Minha Fatura; depois o cancelamento fica disponível.",
+      "proposta": "Detectar resposta idêntica repetida e, na segunda, mudar a abordagem (usar o estado da conta e a fatura do payload) ou transferir informando canal e prazo.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX", "prazo": "Sprint",
+      "dependencias": "—",
+      "como_medir": "Conversas com 3 ou mais respostas idênticas do bot."
+    },
+    {
+      "id": "OPO-005", "prioridade": "alta", "classe": "C", "causa": "integracao_acao", "tipo": "capacidade", "frente": "capacidade",
+      "titulo": "O bot não consulta lançamento de fatura, histórico de pagamento nem valor do limite",
+      "vertical_tema": "Cobrança de empréstimo na fatura, limite concedido",
+      "problema": "Dúvidas do tipo 'por que esta cobrança de R$ 139 está na fatura?' ou 'qual meu limite?' dependem de dado que o payload do cartão não traz (histórico de pagamento do empréstimo, lançamento específico, valor concedido). O bot presume ('Pix com cartão') e recicla a explicação.",
+      "evidencia": "3 de 30 conversas classificadas com 'consulta ausente' ou 'limitação estrutural' nos diagnósticos.",
+      "tickets": ["46611653", "46611158", "46608785"],
+      "contatos": { "observado": 3, "estimado": 28, "pct_total": 6.9 }, "nota_impacto": "amostra de 30; margem ampla",
+      "antes": "Presume a origem da cobrança e repete a explicação sobre fatura e empréstimo.",
+      "depois": "Qual cobrança você quer entender: o valor de R$ [valor] ou outra? Fatura do cartão e parcelas de empréstimo são cobranças diferentes: pagar uma não quita a outra.",
+      "proposta": "Especificação para o roadmap: expor ao bot o lançamento da fatura por transação e o pagamento do empréstimo. Até lá, perguntar qual item o cliente contesta antes de explicar e transferir com o item e o valor já informados.",
+      "no": "campo a confirmar com Engenharia (payload de contexto v2)",
+      "dono": "Produto CX", "prazo": "Backlog",
+      "dependencias": "Engenharia: seção de cartão e de empréstimo do contexto.",
+      "como_medir": "Conversas com 'consulta ausente' no diagnóstico; transbordos nesse tema."
+    },
+    {
+      "id": "OPO-006", "prioridade": "alta", "classe": "A", "causa": "contexto_degradado", "tipo": "integracao", "frente": "capacidade",
+      "titulo": "HP degradado acima do limite de 5%",
+      "vertical_tema": "Cartão HP (21 conversas)",
+      "problema": "Em 5,3% das conversas o bot atendeu sem o contexto do cliente. Quando a seção de cartão falha, ela é omitida inteira: o bot responde sem fatura, limite ou status.",
+      "evidencia": "21 de 398 conversas; 7,2% no Agente CC Anuidade e 4,9% no Agente CC Produção.",
+      "tickets": [],
+      "antes": "Resposta genérica, sem dados do cliente.",
+      "depois": "Resposta com vencimento, valor e status da fatura do cliente, ou aviso claro de que os dados não carregaram e transferência com canal e prazo.",
+      "proposta": "Investigar por que a seção de cartão chega vazia e definir o comportamento do bot nesse caso (avisar e oferecer o atendente, em vez de responder no escuro).",
+      "no": "campo a confirmar com Engenharia (contexto v2, seção creditCard)",
+      "dono": "Produto CX", "prazo": "Imediato",
+      "dependencias": "Engenharia / dono da API de contexto.",
+      "como_medir": "% de HP degradado por semana (meta: abaixo de 5%)."
+    },
+    {
+      "id": "OPO-007", "prioridade": "alta", "classe": "B", "causa": "conteudo_kb", "tipo": "cross-domain", "frente": "artigo",
+      "titulo": "Artigos de cartão com texto interno publicado, sem passo a passo ou sem resposta na primeira frase",
+      "vertical_tema": "Compra recusada, compra não reconhecida, roubo, cancelar cartão físico",
+      "problema": "Dois artigos públicos têm marcações internas '[VALIDAR: …]' no texto; o de cancelar cartão físico termina em 'conforme detalhado abaixo' sem conteúdo; 'Roubaram meu cartão' abre com uma frase que não responde. Não existe conteúdo externo com o passo a passo de 'Encerrar relacionamento com cartão'.",
+      "evidencia": "Compra recusada: 67% pedem atendente. Roubo: TFC de 73% e 93% das conversas com problema de alinhamento.",
+      "tickets": ["46609625"],
+      "contatos": { "observado": 1, "estimado": 9, "pct_total": 2.3 }, "nota_impacto": "prioridade elevada por vir de dois especialistas (KB e contenção)",
+      "antes": "O bot só tem o texto incompleto para responder.",
+      "depois": "Bloqueie agora todos os seus cartões pelo botão 'Bloquear meu cartão'. O bloqueio vale para cartões físicos e virtuais.",
+      "proposta": "Ver a tabela de artigos nesta aba: remover as marcações, completar o passo a passo e reescrever a primeira frase de cada artigo como a resposta direta.",
+      "no": "artigos listados abaixo",
+      "dono": "Help Design", "prazo": "Imediato",
+      "dependencias": "Validação do produto sobre prazos e caminhos.",
+      "como_medir": "Alinhamento com a KB dos temas; pedidos de atendente nos temas."
+    },
+    {
+      "id": "OPO-008", "prioridade": "media", "classe": "A", "causa": "prompt_resposta", "tipo": "variavel", "frente": "variavel_hp",
+      "titulo": "Template da anuidade com variável quebrada",
+      "vertical_tema": "Agente CC Anuidade",
+      "problema": "O texto sai como 'seu limite disponível agora é de o mesmo valor da anuidade' e, com dois cartões virtuais, o passo a passo fala no singular.",
+      "evidencia": "1 de 30 conversas classificadas.",
+      "tickets": ["46611052"],
+      "contatos": { "observado": 1, "estimado": 9, "pct_total": 2.3 }, "nota_impacto": "amostra de 30; margem ampla",
+      "antes": "'Seu limite disponível agora é de o mesmo valor da anuidade.'",
+      "depois": "A fatura seria gerada pelo seu limite disponível, de R$ [valor]. Para parar a cobrança, encerre o relacionamento com o cartão depois de cancelar os dois cartões virtuais.",
+      "proposta": "Corrigir a variável de limite disponível no template (regra: só afirmar quando o payload confirmar) e tratar o caso de mais de um cartão virtual.",
+      "no": "nó a confirmar pelo Produto CX (Agente CC Anuidade)",
+      "dono": "Produto CX", "prazo": "Sprint",
+      "dependencias": "Confirmar com o time de dados o campo do limite disponível.",
+      "como_medir": "Respostas com variável quebrada nos diagnósticos."
+    },
+    {
+      "id": "OPO-009", "prioridade": "media", "classe": "D", "causa": "acao_humana_obrigatoria", "tipo": "handoff", "frente": "handoff",
+      "titulo": "Handoff do bot quando só uma pessoa resolve",
+      "vertical_tema": "Contestação de Pix, cancelamento de cartão físico, anuidade já lançada",
+      "problema": "Em um caso o bot anunciou a transferência e voltou a perguntar se tinha respondido; só transferiu no segundo pedido, sem informar canal nem prazo.",
+      "evidencia": "3 de 30 conversas; 2 handoffs corretos e 1 tardio.",
+      "tickets": ["46608057", "46606984", "46611831"],
+      "contatos": { "observado": 3, "estimado": 28, "pct_total": 6.9 }, "nota_impacto": "não são contatos evitáveis; é qualidade do handoff",
+      "antes": "'Vou te transferir agora mesmo' e, na mensagem seguinte, 'Consegui responder?'.",
+      "depois": "Vou te transferir. Já registrei o caso e os comprovantes enviados. O retorno é por [canal] em até [prazo].",
+      "proposta": "Ao primeiro 'Não' em temas que só o atendimento resolve, transferir de imediato dizendo o que acontece a seguir; o bot não pede de novo o que o payload já tem.",
+      "no": "nó a confirmar pelo Produto CX",
+      "dono": "Produto CX", "prazo": "Sprint",
+      "dependencias": "Prazos de retorno informados pelo produto.",
+      "como_medir": "Handoffs 'tardio' ou 'improvisado' na classe D."
+    }
+  ],
+  "artigos": [
+    { "acao": "atualizar", "titulo": "Minha transação está em processamento ou com o status \"Autorizada\". O que faço?", "problema": "13 de 16 conversas com problema de alinhamento; não define 'em processamento' nem diz o que fazer se o limite não voltar", "primeira_frase": "Autorizada significa que o estabelecimento reservou o valor no seu limite; a confirmação costuma sair em até 24 horas e, se a compra for cancelada, o valor volta em até 10 dias úteis.", "conversas": 13, "prioridade": "alta" },
+    { "acao": "atualizar", "titulo": "Não reconheço uma compra na fatura do meu cartão de crédito. O que faço?", "problema": "marcação interna '[VALIDAR]' no texto público (valor contestado: pagar ou suspender?)", "primeira_frase": "Você pode contestar uma compra não reconhecida no app em até 180 dias depois da aprovação.", "conversas": 12, "prioridade": "alta" },
+    { "acao": "atualizar", "titulo": "Ainda não recebi meu cartão de crédito físico. E agora?", "problema": "sem prazo de entrega, sem o que fazer se a previsão passar e sem como pedir reenvio", "primeira_frase": "Veja o status e a previsão em Início > Cartão RP > Acompanhar entrega do cartão; até ele chegar, você pode pagar por aproximação adicionando o cartão à carteira digital.", "conversas": 12, "prioridade": "alta" },
+    { "acao": "atualizar", "titulo": "Roubaram meu cartão RecargaPay, e agora?", "problema": "a primeira frase não responde; 8 de 9 conversas com problema e kb_score médio 5,4", "primeira_frase": "Bloqueie agora todos os seus cartões pelo botão 'Bloquear meu cartão': o bloqueio vale para cartões físicos e virtuais.", "conversas": 8, "prioridade": "alta" },
+    { "acao": "atualizar", "titulo": "Como cancelo meu cartão físico?", "secao": "Cartão de crédito", "problema": "termina em 'conforme detalhado abaixo' sem conteúdo; falta o passo a passo e o caminho de 'Encerrar relacionamento com cartão'", "primeira_frase": "Hoje o cancelamento do cartão físico é feito pelo atendimento; você pode bloquear o cartão agora em Gerenciar cartões.", "conversas": 8, "prioridade": "alta" },
+    { "acao": "atualizar", "titulo": "Compra recusada no Cartão RecargaPay. O que fazer?", "problema": "três marcações internas '[VALIDAR]' no texto público (caminho no app, ação no bloqueio de segurança, prazo de nova tentativa)", "primeira_frase": "Uma compra recusada não é cobrada na fatura e o valor volta ao seu saldo ou limite.", "conversas": 3, "prioridade": "alta" },
+    { "acao": "atualizar", "titulo": "Paguei a fatura e o limite ainda não voltou. E agora?", "problema": "não diz o que fazer se passar de 1 dia útil nem como o limite volta em pagamento parcial", "primeira_frase": "Pagando com Pix ou saldo da carteira, o limite volta em até 1 dia útil.", "conversas": 8, "prioridade": "media" },
+    { "acao": "atualizar", "titulo": "Como funciona o cashback do cartão de crédito?", "problema": "existe em 7 cópias (uma por seção); não diz se pagamento parcial ou parcelamento perde o cashback", "primeira_frase": "O cashback volta como limite do cartão em até 1 dia útil depois do vencimento, se a fatura for paga por inteiro e até a data.", "conversas": 5, "prioridade": "media" }
+  ]
+}

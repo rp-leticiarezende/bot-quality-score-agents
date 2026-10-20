@@ -1,0 +1,35 @@
+{
+  "schema": "bqs-run/1",
+  "chave": "aleatorio",
+  "rotina": "Aleatório (cross-vertical)",
+  "meta": {
+    "origem": "teste",
+    "nota": "Só métricas reais do Databricks (20/10/2026). A classificação de contatos evitáveis, a auditoria e as oportunidades ainda não rodaram para esta rotina."
+  },
+  "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
+  "gerado_em": "2026-10-20T11:55:00-03:00",
+  "cobertura": {
+    "baixa": true,
+    "comparacao_indisponivel": true,
+    "texto": "dados em 2 dos 7 dias da semana; sem registros de 11/09 a 14/10; a comparação com a semana anterior não existe."
+  },
+  "metricas": {
+    "n_total": 52,
+    "n_avaliaveis": 52,
+    "n_ok_final": 42,
+    "bqs_final": 80.8,
+    "bqs_original": 80.8,
+    "bqs_anterior": null,
+    "bqs_legado": 84.0,
+    "tfc": 3.8,
+    "pct_pediu_humano": 96.2,
+    "pct_transbordo": 100,
+    "labels": { "excelente": 19, "bom": 23, "regular": 2, "ruim": 8, "critico": 0 },
+    "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 52, "loop": 0 },
+    "criterios": { "understanding": 7.15, "resolution": 6.88, "clarity": 7.04, "tone": 8.08, "efficiency": 6.54, "escalation": 9.77 }
+  },
+  "pontos_atencao": [
+    { "tipo": "info", "texto": "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot; os contatos evitáveis são o número principal desta rotina." },
+    { "tipo": "warn", "texto": "O BQS legado (84,0%) superestima em 3 pp. O critério mais baixo é a eficiência (6,54), seguido da resolução (6,88)." }
+  ]
+}

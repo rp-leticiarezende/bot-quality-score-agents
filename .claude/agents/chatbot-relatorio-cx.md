@@ -443,426 +443,161 @@ Nunca use "Time de bot", "Time de conteúdo", "Curadoria", "Engenharia", "Opera�
 
 ### Como montar o relatório no MODO CURADORIA
 
-O relatório é composto por **2 mensagens separadas**, postadas em sequência (a 2ª como resposta na thread da 1ª). Quem precisa da visão executiva lê a 1ª; quem precisa agir vai à 2ª.
+O relatório tem **três entregas**, nesta ordem: (A) dados do **painel** (artefato), (B) **Mensagem 1** no Slack (resumo visual) e (C) **Mensagem 2** como resposta na thread (plano de ação). O painel concentra o detalhe; o Slack é o aviso e o resumo.
+
+Todos os números vêm do prompt (SQL). Não recalcule. Sem período anterior = "sem base de comparação". Identifique conversas só por `ticket_id`; nenhum nome de cliente, e-mail, telefone ou número de cartão em lugar nenhum.
 
 ---
 
-#### MENSAGEM 1 — Resumo executivo (big numbers + pontos de atenção)
+#### PASSO A — Dados do painel (executar PRIMEIRO)
 
-Responde a: *"como está o bot neste período e quantos contatos ele poderia ter evitado?"*
+O painel é **uma página única** (`artifact/painel.html` neste repositório) que lê arquivos JSON publicados ao lado dela. Você **não monta HTML**: gera os dois arquivos JSON da sua rotina e publica. Nunca altere os arquivos de outras rotinas.
+
+1. **Gere `latest.json`** seguindo o contrato abaixo e salve com `Write` em `./painel-data/[chave_artefato]/latest.json`. A chave vem no prompt do orquestrador (`aleatorio`, `cartao-hp`, `criticos-diario` ou `criticos-semanal`).
+2. **Leia o histórico atual:** `Artifact` com `action: "read"`, `url: [URL_PAINEL]`, `path: "data/[chave_artefato]/history.json"`. Se o arquivo não existir, parta de `[]`. Acrescente o item desta rodada (substituindo o de mesmo `fim`), ordene por `fim`, mantenha os 60 mais recentes e salve em `./painel-data/[chave_artefato]/history.json`.
+3. **Leia o painel uma vez** (`action: "read"`, `url: [URL_PAINEL]`, sem `path`) — a plataforma exige ler antes de publicar em artefato existente.
+4. **Publique** com `Artifact`: `file_path: "artifact/painel.html"`, `url: [URL_PAINEL]`, `files: {"data/[chave_artefato]/latest.json": "painel-data/[chave_artefato]/latest.json", "data/[chave_artefato]/history.json": "painel-data/[chave_artefato]/history.json"}`. Não passe `icon` nem `capabilities` (mantêm-se os atuais).
+5. **Conflito:** se a publicação falhar por conflito (outra rotina publicou no meio), releia o painel (passo 3) e publique de novo **uma vez**. Se falhar de novo, siga para o Slack com `[LINK_PAINEL]` = `_(painel indisponível neste ciclo)_` e avise na Mensagem 1.
+6. **URL do painel:** `[URL_PAINEL]` = `https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ`. Se ela não existir ou não for do dono da rotina, procure com `action: "list"` o artefato de título exato `BQS RecargaBot`; se também não existir, publique sem `url` (cria o painel) e avise na Mensagem 1 que o link mudou. Guarde a URL final como `[LINK_PAINEL]`.
+
+<!-- SCHEMA_PAINEL:START -->
+### Contrato de dados do painel (`bqs-run/1`)
+
+O painel (`artifact/painel.html`) é uma página fixa que lê arquivos JSON publicados ao lado dela. Cada rotina publica **dois arquivos próprios** e nunca mexe nos das outras:
+- `data/<chave>/latest.json` — a rodada atual completa;
+- `data/<chave>/history.json` — série curta para a tendência (array, até 60 itens).
+Chaves: `cartao-hp`, `aleatorio`, `criticos-diario`, `criticos-semanal`.
+
+**Regras do JSON:** válido (aspas duplas, sem comentários, sem vírgula final); números como número (nunca `"72,2%"`); `null` quando o dado não existir; textos em português; **nenhum dado pessoal** (nome, e-mail, telefone, CPF, cartão) e **nenhuma transcrição** — conversas só por `ticket_id`; percentuais com 1 casa decimal; todos os números vêm do prompt do orquestrador (SQL), nunca calculados por você, exceto `ic95`, `pct_total` e `estimado` das oportunidades, que você calcula como descrito abaixo.
 
 ```
-[emoji rotina] *[TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS]*
-[DD/MM] a [DD/MM/AAAA] | [N_total] conversas
-BQS: *[X]%* ([n_ok_final]/[n_avaliaveis]) — [+/-]Xpp vs período anterior ([X]%, sem auditoria)   (ou: sem base de comparação)
-Auditoria: [n_auditados] tickets lidos na transcrição · [n_revisados] notas revisadas · BQS original [X]%
-TFC: *[X]%* · CE: *[X]%* das classificadas (≈ [Y]% do total)
-[Somente Cartão HP:] HP pleno: [X]% · HP degradado: *[X]%* (limite: 5%)
-Distribuição: Excelente [N] · Bom [N] · Regular [N] · Ruim [N] · Crítico [N]
-Retention: Resolutiva [N] · Abandono [N] · Transbordo [N] · Loop [N]
-[Somente se houver cobertura baixa:] ⚠️ *Cobertura baixa:* [texto curto — ex.: "dados em 2 de 7 dias; buraco de 14/09 a 14/10"] — leia como amostra reduzida
+{
+  "schema": "bqs-run/1",
+  "chave": "cartao-hp | aleatorio | criticos-diario | criticos-semanal",
+  "rotina": "nome legível da rotina",
+  "meta": { "origem": "rotina" },                     // "teste" só em rodadas de validação manual; "nota" opcional
+  "periodo": { "tipo": "semanal | diario", "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "label": "12/10 a 18/10/2026" },
+  "gerado_em": "AAAA-MM-DDThh:mm:ss-03:00",
+  "cobertura": { "baixa": true|false, "comparacao_indisponivel": true|false, "texto": "frase curta (dias com dado, buracos, ingestão atrasada)" },
+  "metricas": {
+    "n_total": 0, "n_avaliaveis": 0, "n_ok_final": 0,
+    "bqs_final": 0.0, "bqs_original": 0.0, "bqs_anterior": null, "bqs_legado": 0.0,
+    "tfc": 0.0, "pct_pediu_humano": 0.0, "pct_transbordo": 0.0, "n_transbordo_nota_ok": 0,
+    "labels": { "excelente": 0, "bom": 0, "regular": 0, "ruim": 0, "critico": 0 },
+    "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 0, "loop": 0 },
+    "criterios": { "understanding": 0.0, "resolution": 0.0, "clarity": 0.0, "tone": 0.0, "efficiency": 0.0, "escalation": 0.0 },
+    "hp": { "pleno": 0, "degradado": 0, "pct_degradado": 0.0, "bqs_pleno": 0.0, "bqs_degradado": 0.0 }   // só no cartao-hp
+  },
+  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": ["frase sem dados pessoais"] },
+  "dimensoes": {                                        // top 12 do Passo 3.2, valores ORIGINAIS (sem auditoria)
+    "effective_vertical": [ { "valor": "", "rotulo": "nome legível (opcional)", "n": 0, "pct_volume": 0.0, "bqs": 0.0, "tfc": 0.0, "pct_pediu_humano": 0.0, "pct_degradado": 0.0 } ],
+    "topic": [ ... ], "product": [ ... ]                // só as dimensões da rotina
+  },
+  "contencao": {                                        // do Passo 6.1; omita o objeto se não houve classificação
+    "n_classificadas": 0, "n_elegiveis": 0, "pct_evitavel": 0.0, "ic95": [0, 0], "ce_pct_total": 0.0,
+    "classes": { "A": 0, "B": 0, "C": 0, "D": 0, "R": 0, "E": 0 },
+    "causas": [ { "classe": "A", "causa": "prompt_resposta", "causa_rotulo": "texto legível", "n": 0 } ],
+    "por_dono": { "Produto CX": 0, "Help Design": 0 },
+    "handoff": { "correto": 0, "improvisado": 0, "tardio": 0 }
+  },
+  "pontos_atencao": [ { "tipo": "crit | warn | info", "texto": "frase" } ],      // máx. 4 + o de cobertura
+  "oportunidades": [ {
+    "id": "OPO-001", "prioridade": "alta | media | baixa", "classe": "A|B|C|D", "causa": "…", "tipo": "cross-domain | fluxo | politica | variavel | capacidade | integracao | handoff | artigo",
+    "frente": "artigo | variavel_hp | prompt | fluxo | politica | capacidade | handoff",
+    "titulo": "…", "vertical_tema": "…", "problema": "…", "evidencia": "…", "tickets": ["ticket_id"],
+    "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 }, "nota_impacto": "…",
+    "antes": "o que o bot fez (sem dados pessoais)", "depois": "o que teria retido (texto da resposta ou regra)",
+    "proposta": "…", "no": "nó/artigo confirmado ou 'nó a confirmar pelo Produto CX'",
+    "dono": "Produto CX | Help Design", "prazo": "Imediato | Sprint | Backlog", "dependencias": "…", "como_medir": "…"
+  } ],
+  "artigos": [ { "acao": "criar | atualizar", "titulo": "título exato do artigo público", "secao": "…", "problema": "…", "primeira_frase": "resposta direta sugerida", "conversas": 0, "prioridade": "alta | media | baixa" } ]
+}
+```
 
-⚠️ *PONTOS DE ATENÇÃO*
-• [insight 1]
-• [insight 2]
-• [insight 3]
+**Como preencher o que exige conta (apenas estes):**
+- `contatos.estimado` = `observado × (n_elegiveis / n_classificadas)`, arredondado; `contatos.pct_total` = `estimado / n_total × 100` (1 casa).
+- `contencao.ic95` = intervalo de Wilson de 95% da proporção `pct_evitavel` (em %, inteiros) com `n = n_classificadas`.
+- `contencao.ce_pct_total` = `pct_evitavel × n_elegiveis / n_total` (vem pronto do SQL do Passo 6.1; copie).
+- Só entram em `oportunidades` itens com dono **Produto CX** ou **Help Design**; nada sobre atendimento humano; nenhum artigo cujo título comece com 🔒 ou 🔍.
+- Em `artigos`, só títulos exatos que vieram do `output_kb`; nunca invente título, ID ou URL (a URL costuma chegar redigida: omita).
+- `dimensoes`: copie as linhas do SQL; se `n < 30` mantenha a linha (o painel marca "amostra pequena").
+- Sem classificação/auditoria/oportunidades nesta rodada: omita `contencao`, use `auditoria` com `auditados: 0` e `oportunidades: []`. O painel mostra o estado vazio.
 
-_Plano de ação na mensagem abaixo ↓ · Relatório completo: [LINK_DOC_ANALISE]_
-_BQS legado (approved): [X]% — só para comparação histórica · limiares de alerta provisórios · Relatório gerado automaticamente · [rotina] · Bot: RecargaBot_
+**`history.json`** (array ordenado por `fim`; substitua o item de mesmo `fim`; mantenha os 60 mais recentes):
+`{ "fim": "AAAA-MM-DD", "periodo_label": "…", "bqs_final": 0.0, "bqs_original": 0.0, "tfc": 0.0, "ce_pct_total": 0.0, "n_total": 0, "cobertura_baixa": true|false }`
+<!-- SCHEMA_PAINEL:END -->
+
+---
+
+#### PASSO B — Mensagem 1 no Slack (resumo visual)
+
+Poste com `slack_send_message` em `#bot-quality-score` (`channel_id: C0BP08WPMLP`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). O conector aceita markdown (títulos, tabelas, citações). Capture o `ts` retornado.
+
+Modelo (preencha com os números do prompt; remova as linhas que não se aplicam):
+
+```
+## [emoji da rotina] [TÍTULO — CARTÃO HP / ALEATÓRIO / CASOS CRÍTICOS] · [período]
+[N_total] conversas · [n_avaliaveis] avaliáveis
+
+> ⚠️ *Cobertura baixa:* [texto curto]. Leia como amostra reduzida.        ← só se houver
+> 🧪 *Rodada de teste:* [nota]                                              ← só se meta.origem = teste
+
+| BQS final | TFC | Contatos evitáveis | Pediram atendente |
+|:-:|:-:|:-:|:-:|
+| **[X]%** [🟢/🟡/🔴] | **[X]%** | **≈[Y]%** | **[Z]%** |
+| [▲/▼][X] pp vs anterior · original [X]% | falha de condução | IC [a]–[b]% das classificadas | [N] conversas |
+
+**Desfecho**  [10 quadrados: 🟩 resolutiva · 🟨 abandono · 🟦 transbordo · 🟥 loop]
+🟩 Resolutiva [N] · 🟨 Abandono [N] · 🟦 Transbordo [N] · 🟥 Loop [N]
+**Contexto (HP)** pleno [X]% · degradado **[X]%** (limite 5%) [🔴 se > 5%]           ← só Cartão HP
+**Auditoria** [n] tickets lidos na transcrição · [m] notas revisadas · [a] aprovado→reprovado
+
+### Pontos de atenção
+🔴 [bullet crítico]
+🟠 [bullet de atenção]
+🔵 [bullet informativo]
+
+[Abrir o painel →]([LINK_PAINEL]) · _BQS legado (approved): [X]% (só comparação histórica) · limiares de alerta provisórios · Bot: RecargaBot_
 ```
 
 **Regras:**
-- Não misturar ações aqui — só métricas e alertas.
-- **BQS = BQS final (estrito, com a nota revisada pelo auditor nos tickets auditados), denominador `n_avaliaveis`, para todos os fluxos.** Formato: `BQS: *X%* (n_ok_final/n_avaliaveis)`. A linha de auditoria mostra o original, o nº de tickets auditados e de notas revisadas; se o auditor trocou aprovações, cite o saldo (ex.: "3 aprovados→reprovados, 0 reprovados→aprovados") em um dos pontos de atenção e as **divergências do avaliador** que ele relatou (ex.: "o avaliador aprova transbordo mesmo quando a resposta anterior falhou"). Sem auditoria no período: `Auditoria: nenhum ticket auditado neste período`.
-- Variação vs período anterior é obrigatória **quando houver dado anterior**; quando o orquestrador informar "sem base de comparação", escreva exatamente isso (nunca omita sem avisar e nunca invente).
-- TFC e CE aparecem sempre na linha de números; surfaçar inline nos bullets quando explicam o problema (ex.: "tópico X (BQS 48,4% · TFC 88,6%)").
-- **O primeiro bullet** é, nesta ordem de prioridade, o primeiro que se aplicar: (1) cobertura baixa / buraco de dados / ingestão atrasada; (2) se `pct_transbordo ≥ 90`: _"amostra composta por transbordos: o BQS mede a conduta até o transbordo, não a qualidade geral do bot"_; (3) se BQS > 80% e TFC > 40%: _"BQS alto mascara falha de condução real: X% das conversas terminaram em transbordo, abandono ou loop sem pedido do cliente"_; (4) o padrão de maior contato evitável (causa, quantidade estimada e dono).
-- Um bullet deve mostrar o **maior bloco de contatos evitáveis** (causa × dono × ≈N) e, se aplicável, a parcela de transbordos bem conduzidos que ainda eram evitáveis.
-- Para Casos Críticos: não abrir com "BQS baixo é crítico" — é esperado. Destacar o padrão de falha mais recorrente.
-- Se não houver nenhum alerta (inclusive de cobertura): `✅ Nenhum ponto de atenção disparado`.
-- Máximo 4 bullets nos PONTOS DE ATENÇÃO.
+- Emoji do BQS: 🟢 ≥ 80% · 🟡 60–79% · 🔴 < 60%. Sem período anterior: escreva `sem base de comparação` no lugar do `▲/▼`.
+- Os 10 quadrados do desfecho dividem-se proporcionalmente (maior resto); qualquer desfecho com ≥ 3% ganha ao menos 1 quadrado.
+- Sem auditoria no período: `**Auditoria** nenhum ticket auditado neste período`. Sem classificação de contenção: troque a coluna "Contatos evitáveis" por `—` e diga `classificação ainda não rodou` na legenda.
+- **Pontos de atenção:** máximo 4, nesta ordem de prioridade: (1) cobertura/buraco de dados/ingestão atrasada; (2) se `pct_transbordo ≥ 90`: _"amostra composta por transbordos: o BQS mede a conduta até o transbordo, não a qualidade geral do bot"_; (3) se BQS > 80% e TFC > 40%: _"BQS alto mascara falha de condução real"_; (4) o maior bloco de contatos evitáveis (causa, ≈N, dono) e, se aplicável, a parcela de transbordos bem conduzidos que ainda eram evitáveis; depois, o saldo da auditoria e as divergências do avaliador. 🔴 só para o que for crítico (BQS < 60%, HP degradado > 5%, `critico` > 5%); 🟠 atenção; 🔵 informativo. Sem nenhum alerta: `✅ Nenhum ponto de atenção disparado`.
+- Casos críticos: não abra com "BQS baixo é crítico" (é esperado); destaque o padrão de falha mais recorrente.
+- Nunca misture ações aqui: só métricas e alertas.
 
 ---
 
-#### MENSAGEM 2 — Plano de ação (agrupado por time responsável, ordenado por contatos evitáveis)
+#### PASSO C — Mensagem 2 na thread (plano de ação)
 
-Responde a: *"o que cada time precisa mudar no bot para ele reter mais clientes e transferir só o que é realmente humano?"*
+Poste com `slack_send_message` em `#bot-quality-score`, com `thread_ts` igual ao `ts` da Mensagem 1. **Esta mensagem deve ser postada sempre**, mesmo se o painel falhar.
 
 ```
-🎯 *PLANO DE AÇÃO — [rotina] · [período]*
-_Ordenado por contatos evitáveis estimados (limiares provisórios)_
+## 🎯 Plano de ação · [rotina] · [período]
+_Ordenado por contatos evitáveis estimados. Limiares provisórios._
 
-🔵 *PRODUTO CX — TOP 3*
-• 🚨 1. [título] ([nó confirmado ou "nó a confirmar"]): [descrição — risco regulatório/compliance] | Prazo: Imediato
-  → [o que teria retido, em 1 linha]
-• 2. [título] ([nó]): [descrição] | ≈[N] contatos evitáveis ([X]% do total) | Referência: tópico [Y] (vol. [N], BQS [X]%, TFC [X]%) | Prazo: Sprint
-  → [o que teria retido, em 1 linha]
-• 3. [título] ([nó]): [descrição] | ≈[N] contatos evitáveis | Prazo: Sprint
-  → [o que teria retido, em 1 linha]
+### 🔵 Produto CX · top 3
+| # | O que mudar | Contatos (est.) | Prazo |
+|:-:|---|:-:|:-:|
+| 🚨 1 | **[título]** — [descrição]. _[nó confirmado ou "nó a confirmar"]_ | [risco regulatório/compliance] | Imediato |
+| 2 | **[título]** — [descrição]. _[nó]_ | ≈[N] ([X]%) | Sprint |
+| 3 | **[título]** — [descrição]. _[nó]_ | ≈[N] ([X]%) | Sprint |
+> Teria retido: "[frase ou regra, 1 linha]"
 
-📗 *HELP DESIGN — TOP 3*
-• 1. Criar: "[Título exato do artigo]" — Seção: [seção] | ≈[N] contatos | 1ª frase: "[resposta direta]" | Tickets: [IDs]
-• 2. Atualizar: "[Título exato do artigo]" — [o que adicionar/corrigir] | ≈[N] contatos | Tickets: [IDs]
-• 3. ...
+### 📗 Help Design · top 3
+| # | Artigo | Ação | Conversas |
+|:-:|---|:-:|:-:|
+| 1 | **[título exato]** | Criar / Atualizar | [N] |
+> Primeira frase sugerida: "[resposta direta]"
 
-_Propostas detalhadas (o que e onde mudar): [LINK_DOC_ANALISE]_
+[Detalhes de cada oportunidade, com antes e depois →]([LINK_PAINEL])
 ```
 
 **Regras:**
-- **Cada bloco: máximo 3 ações**, escolhidas pelo maior número de **contatos evitáveis estimados** (classes A+B+C). Melhorias de handoff do bot (classe D: o que coletar e informar antes de transferir) entram no bloco Produto CX. Os demais itens ficam só no artefato — não há Mensagem 3.
-- **Help Design:** priorizar lacunas totais (artigo inexistente) antes de atualizações; usar o **título exato** do output_kb, nunca nome genérico do tema.
-- **Compliance e risco regulatório:** itens urgentes entram no bloco Produto CX como o primeiro bullet, marcados com 🚨 e "Prazo: Imediato".
-- Itens de política de transbordo (pedido de humano / sondagem) devem trazer a nota: _"depende de validação com Compliance/Jurídico (SAC)"_.
-- Omitir o bloco de um time se ele não tiver nenhuma ação neste ciclo. Não agrupar por nível (Crítico/Alto/Médio) dentro das seções.
-- Nunca citar nome de nó que não conste no output dos agentes; use "nó a confirmar".
-
----
-
-### Como publicar
-
-**Ordem de execução obrigatória: PASSO A primeiro, PASSO B depois.**
-
----
-
-#### PASSO A — Artefato (executar PRIMEIRO, antes de qualquer mensagem Slack)
-
-O artefato de cada rotina tem URL fixa e é atualizado a cada execução.
-
-1. Use a ferramenta `Write` para criar o arquivo `./relatorio-analise.html` com o HTML abaixo preenchido com os dados desta execução
-
-2. Descubra se já existe um artefato para esta rotina:
-   - Chame `Artifact` com `action: "list", limit: 50`
-   - Procure na lista um artefato cujo `title` seja **exatamente** `BQS · [chave_artefato]` (chaves: `aleatorio`, `cartao-hp`, `criticos-diario`, `criticos-semanal` — vêm no prompt do orquestrador). Nunca procure por "contém": "Críticos" casaria com o diário e o semanal, e um sobrescreveria o outro.
-   - Se encontrar: guarde a URL como `[URL_ARTEFATO]`
-   - Se não encontrar ou se a chamada falhar: `[URL_ARTEFATO]` = _não definida_
-
-3. Publique o artefato via ferramenta `Artifact`:
-   - `file_path`: `./relatorio-analise.html`
-   - `favicon`: `🤖`
-   - `description`: "[ROTINA] · [período] · BQS [X]%"
-   - `capabilities`: `{"db": {}}`
-   - **Se `[URL_ARTEFATO]` foi encontrada:** adicionar `url: "[URL_ARTEFATO]"` para atualizar o artefato existente
-   - **Se não definida:** publicar sem `url` (primeira execução — será criado com URL nova)
-
-4. Capture a URL retornada pelo `Artifact` e salve como `[LINK_DOC_ANALISE]`
-   - Se o `Artifact` falhar por qualquer motivo: `[LINK_DOC_ANALISE]` = `_(artefato indisponível neste ciclo)_`
-
----
-
-#### PASSO B — Slack (executar DEPOIS do PASSO A, com `[LINK_DOC_ANALISE]` preenchido)
-
-1. Poste a Mensagem 1 com `slack_send_message` no canal `#bot-quality-score` (channel_id: `C0BP08WPMLP`)
-2. Capture o `ts` (timestamp) retornado
-3. Poste a Mensagem 2 como reply da thread com `slack_send_message` usando `thread_ts: [ts capturado]`
-
-> ⚠️ **A Mensagem 2 DEVE ser postada sempre** — mesmo se o PASSO A falhar. Nesse caso, usar `_(artefato indisponível neste ciclo)_` no lugar de `[LINK_DOC_ANALISE]`.
-
-Se o canal não for encontrado pelo ID, use `slack_search_channels` com query `bot-quality-score`.
-
-**Regras de formatação Slack:**
-- Negrito: `*texto*`
-- Itálico: `_texto_`
-- Código: `` `texto` ``
-- Tabelas: use lista com traço (Slack não renderiza markdown de tabelas)
-
-> ⚠️ O arquivo HTML não deve ter tags `<!DOCTYPE>`, `<html>`, `<head>` nem `<body>` — o Artifact as adiciona automaticamente.
-> ⚠️ **VERBATIM obrigatório**: inclua cada output de subagente na íntegra dentro da `<div class="sec-body">` correspondente — não resuma, não condense. **Exceção:** remova qualquer nome de cliente, e-mail, telefone ou número de cartão que apareça no texto (substitua por `[dado pessoal omitido]`); conversas se identificam só por `ticket_id`.
-
-**Formato do HTML:**
-
-```html
-<title>BQS · [chave_artefato]</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<style>
-/* ── RecargaPay brand tokens ── */
-:root{
-  --bg:#0A2540; --card:#0F2D4A; --deep:#0D1F35; --line:#1E3A54; --line-soft:#1A3450;
-  --blue:#1A73E8; --blue-lt:#5BA7F5; --orange:#F5A623; --amber:#F5C842;
-  --white:#FFFFFF; --gray:#7BA8CC; --gray-dk:#4A6A8A; --gray-mid:#6B8FAF;
-  --pos:#1DB954; --neg:#E84040;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{
-  background:var(--bg);color:var(--white);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:14px;line-height:1.62;-webkit-font-smoothing:antialiased;
-  padding-bottom:80px;
-}
-.wrap{max-width:980px;margin:0 auto}
-.brand-bar{
-  background:var(--orange);padding:.42rem 1.5rem;
-  font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#000;
-  display:flex;align-items:center;gap:.5rem;
-}
-.page-head{
-  padding:26px 24px 20px;
-  border-bottom:1px solid rgba(91,167,245,.12);
-  display:flex;flex-direction:column;gap:13px;
-}
-.dots{display:flex;gap:6px}
-.dots i{width:9px;height:9px;border-radius:50%;display:block}
-.page-tag{
-  color:var(--orange);font-weight:700;font-size:9.5px;
-  text-transform:uppercase;letter-spacing:1.8px;font-family:"IBM Plex Mono",monospace;
-}
-.page-title{
-  font-size:clamp(20px,3.5vw,28px);font-weight:800;
-  letter-spacing:-.02em;line-height:1.15;text-wrap:balance;
-}
-.stamps{display:flex;flex-wrap:wrap;gap:7px}
-.stamp{
-  font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-variant-numeric:tabular-nums;
-  background:var(--card);border:1px solid var(--line);border-radius:5px;
-  padding:3px 9px;color:var(--gray);
-}
-.stamp b{color:var(--amber);font-weight:600}
-.kpis-wrap{padding:20px 24px 4px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
-.kpi{
-  background:var(--card);border:1px solid rgba(91,167,245,.1);border-radius:9px;
-  padding:14px 15px;display:flex;flex-direction:column;gap:4px;
-}
-.kpi-label{color:var(--gray);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
-.kpi-value{
-  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
-  font-size:28px;font-weight:700;line-height:1.1;
-}
-.kpi-value.bad{color:var(--neg)}
-.kpi-value.ok{color:var(--pos)}
-.kpi-value.warn{color:var(--orange)}
-.kpi-value.neutral{color:var(--white)}
-.kpi-sub{font-size:10.5px;color:var(--gray-dk);font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
-.tab-nav{
-  display:flex;border-bottom:1px solid var(--line);
-  padding:0 24px;margin-top:18px;
-}
-.tab-btn{
-  background:none;border:none;border-bottom:2px solid transparent;
-  padding:.62rem 1rem;font-size:.875rem;font-weight:600;cursor:pointer;
-  color:var(--gray-mid);margin-bottom:-1px;
-  transition:color .15s,border-color .15s;font-family:Inter,sans-serif;
-}
-.tab-btn:hover{color:var(--white)}
-.tab-btn.active{color:var(--amber);border-bottom-color:var(--amber)}
-.tab-pane{display:none;padding:20px 24px}
-.tab-pane.active{display:block}
-details.sec{
-  background:var(--card);border:1px solid var(--line);border-radius:9px;
-  margin-bottom:10px;overflow:hidden;
-}
-details.sec summary{
-  cursor:pointer;padding:13px 16px;
-  font-weight:600;font-size:13px;
-  display:flex;align-items:center;gap:8px;
-  list-style:none;background:transparent;color:var(--white);
-  transition:background .12s;user-select:none;
-}
-details.sec summary::-webkit-details-marker{display:none}
-details.sec summary::after{
-  content:'›';font-size:1.1rem;margin-left:auto;
-  transition:transform .15s;color:var(--orange);font-weight:700;
-}
-details.sec[open]>summary::after{transform:rotate(90deg)}
-details.sec summary:hover{background:rgba(255,255,255,.03)}
-.sec-body{
-  border-top:1px solid var(--line);background:var(--deep);
-  font-family:"IBM Plex Mono",monospace;font-size:.77rem;line-height:1.68;
-  color:rgba(255,255,255,.68);white-space:pre-wrap;overflow-x:auto;
-  padding:14px 16px;
-}
-.h-entry{
-  background:var(--card);border:1px solid var(--line);border-radius:9px;
-  padding:13px 15px;margin-bottom:8px;
-  display:flex;flex-direction:column;gap:8px;
-}
-.h-entry-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%}
-.h-date{
-  font-family:"IBM Plex Mono",monospace;font-size:10.5px;
-  color:var(--gray-mid);min-width:90px;font-variant-numeric:tabular-nums;flex-shrink:0;
-}
-.h-rotina{flex:1;font-size:.85rem;font-weight:600;color:var(--white);min-width:120px}
-.h-chips{display:flex;gap:5px;flex-wrap:wrap}
-.chip{
-  font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;
-  border-radius:4px;padding:2px 7px;border:1px solid;
-}
-.chip.ok{border-color:rgba(29,185,84,.45);color:var(--pos);background:rgba(29,185,84,.08)}
-.chip.warn{border-color:rgba(245,166,35,.45);color:var(--orange);background:rgba(245,166,35,.07)}
-.chip.bad{border-color:rgba(232,64,64,.45);color:var(--neg);background:rgba(232,64,64,.08)}
-.chip.neutral{border-color:var(--line-soft);color:var(--gray-mid);background:var(--deep)}
-.h-insights{
-  margin:0;padding:0 0 0 10px;
-  font-size:.75rem;color:var(--gray);line-height:1.65;
-  border-left:2px solid var(--line);list-style:none;
-}
-.h-insights li{margin-bottom:3px;padding-left:8px;position:relative}
-.h-insights li::before{content:'·';position:absolute;left:-2px;color:var(--orange);font-size:1rem;line-height:1.3}
-.opnote{
-  background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.2);
-  border-left:2px solid var(--orange);border-radius:8px;
-  padding:12px 15px;font-size:.77rem;color:var(--gray);line-height:1.65;margin-top:14px;
-}
-.opnote code{
-  font-family:"IBM Plex Mono",monospace;font-size:.74rem;
-  background:var(--deep);color:var(--blue-lt);border-radius:3px;padding:1px 5px;
-}
-.empty{color:var(--gray-mid);font-size:.88rem;padding:.4rem 0}
-@media(max-width:640px){
-  .page-head,.kpis-wrap,.tab-pane{padding-left:14px;padding-right:14px}
-  .tab-nav{padding:0 14px}
-}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
-
-<script>
-const RUN={
-  run_id:'[AAAA-MM-DDThh-mm]',
-  rotina:'[ROTINA]',
-  periodo:'[data_inicio] a [data_fim]',
-  bqs:[BQS_NUM],
-  tfc:[TFC_NUM],
-  n_total:[N_TOTAL_NUM],
-  saved_at:'[ISO_TIMESTAMP]',
-  top_insights:['[bullet 1 dos PONTOS DE ATENÇÃO, sem o • inicial]','[bullet 2]','[bullet 3]']
-};
-</script>
-
-<div class="brand-bar">⚡ RecargaPay · Bot Quality Score</div>
-
-<div class="wrap">
-  <div class="page-head">
-    <div class="dots">
-      <i style="background:var(--orange)"></i>
-      <i style="background:var(--blue)"></i>
-      <i style="background:var(--amber)"></i>
-    </div>
-    <div class="page-tag">BQS [TIPO] · [ROTINA]</div>
-    <h1 class="page-title">[EMOJI_ROTINA] [ROTINA] — [DD/MM] a [DD/MM/AAAA]</h1>
-    <div class="stamps">
-      <span class="stamp"><b>[N_total]</b> conversas analisadas</span>
-      <span class="stamp">Gerado em <b>[data e hora BRT]</b></span>
-    </div>
-  </div>
-
-  <div class="kpis-wrap">
-    <div class="kpis">
-      <div class="kpi">
-        <span class="kpi-label">BQS</span>
-        <span class="kpi-value [ok|warn|bad]">[X]%</span>
-        <span class="kpi-sub">[N_aprovados]/[N_total] aprovados</span>
-      </div>
-      <div class="kpi">
-        <span class="kpi-label">TFC</span>
-        <span class="kpi-value [ok|warn|bad]">[X]%</span>
-        <span class="kpi-sub">Taxa de falha condução</span>
-      </div>
-      <div class="kpi">
-        <span class="kpi-label">Conversas</span>
-        <span class="kpi-value neutral">[N]</span>
-        <span class="kpi-sub">[resumo retention]</span>
-      </div>
-      <!-- Apenas Cartão HP — descomentar se aplicável: -->
-      <!-- <div class="kpi"><span class="kpi-label">BQS Pleno</span><span class="kpi-value [ok|warn|bad]">[X]%</span><span class="kpi-sub">[N] conversas</span></div> -->
-      <!-- <div class="kpi"><span class="kpi-label">HP Degradado</span><span class="kpi-value [warn|bad]">[X]%</span><span class="kpi-sub">limite: 5%</span></div> -->
-    </div>
-  </div>
-
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="showTab('analise',this)">📊 Análise atual</button>
-    <button class="tab-btn" onclick="showTab('historico',this)">🕐 Histórico</button>
-  </div>
-
-  <div id="tab-analise" class="tab-pane active">
-
-    <details class="sec" open>
-      <summary>📋 Resumo executivo</summary>
-      <div class="sec-body">[Mensagem 1 e Mensagem 2 do Slack — texto completo, verbatim]</div>
-    </details>
-
-    <details class="sec" open>
-      <summary>🔧 Análise de fluxo do bot</summary>
-      <div class="sec-body">[output_fluxo COMPLETO e VERBATIM — não resumir; incluir todos os padrões, tickets, nomes de nó Botmaker, textos antes/depois e diagnósticos]</div>
-    </details>
-
-    <details class="sec">
-      <summary>📚 Base de conhecimento</summary>
-      <div class="sec-body">[output_kb COMPLETO e VERBATIM — não resumir; incluir IDs de artigos, títulos exatos e análise de gap]</div>
-    </details>
-
-    <details class="sec">
-      <summary>🎯 Oportunidades identificadas</summary>
-      <div class="sec-body">[output_oportunidades COMPLETO e VERBATIM — todos os itens, não apenas top 3]</div>
-    </details>
-
-    <details class="sec">
-      <summary>✏️ Propostas de ajuste</summary>
-      <div class="sec-body">[output_propostas COMPLETO e VERBATIM — incluir texto exato de cada proposta de prompt, artigo ou fluxo]</div>
-    </details>
-
-    <!-- Incluir apenas se houver nota operacional (ex: subagente indisponível): -->
-    <!-- <div class="opnote">⚙️ [nota operacional]</div> -->
-
-  </div>
-
-  <div id="tab-historico" class="tab-pane">
-    <div id="hist"><p class="empty">Carregando histórico…</p></div>
-  </div>
-</div>
-
-<script>
-function showTab(n,b){
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
-  document.getElementById('tab-'+n).classList.add('active');
-  b.classList.add('active');
-}
-
-async function getDb(){try{return await window.claude?.use?.('db')??null;}catch{return null;}}
-
-async function saveRun(){
-  const db=await getDb();if(!db)return;
-  try{
-    const s=await db.doc('analyses/'+RUN.run_id).get();
-    if(s.exists)return;
-    await db.doc('analyses/'+RUN.run_id).set(RUN);
-  }catch(e){}
-}
-
-async function loadHist(){
-  const el=document.getElementById('hist');
-  const db=await getDb();
-  if(!db){el.innerHTML='<p class="empty">Histórico disponível apenas para membros da organização.</p>';return;}
-  try{
-    const snap=await db.collection('analyses').orderBy('saved_at','desc').limit(50).get();
-    if(snap.empty){el.innerHTML='<p class="empty">Nenhuma análise anterior registrada.</p>';return;}
-    const cls=v=>v>=75?'ok':v>=60?'warn':'bad';
-    const clsTfc=v=>v<=20?'ok':v<=40?'warn':'bad';
-    el.innerHTML=snap.docs.map(d=>{
-      const r=d.data();
-      const bqs=typeof r.bqs==='number'?r.bqs.toFixed(1):'—';
-      const tfc=typeof r.tfc==='number'?r.tfc.toFixed(1):'—';
-      const dt=r.saved_at?new Date(r.saved_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}):'—';
-      const insights=Array.isArray(r.top_insights)&&r.top_insights.length
-        ?`<ul class="h-insights">${r.top_insights.map(i=>`<li>${i}</li>`).join('')}</ul>`
-        :'';
-      return `<div class="h-entry">
-        <div class="h-entry-top">
-          <span class="h-date">${dt}</span>
-          <span class="h-rotina">${r.rotina||'—'} &mdash; ${r.periodo||''}</span>
-          <div class="h-chips">
-            <span class="chip ${cls(r.bqs)}">BQS ${bqs}%</span>
-            <span class="chip ${clsTfc(r.tfc)}">TFC ${tfc}%</span>
-            <span class="chip neutral">${r.n_total||'—'} conv.</span>
-          </div>
-        </div>
-        ${insights}
-      </div>`;
-    }).join('');
-  }catch(e){el.innerHTML='<p class="empty">Erro ao carregar histórico.</p>';}
-}
-
-saveRun();
-loadHist();
-</script>
+- **Máximo 3 ações por bloco**, escolhidas pelo maior número de contatos evitáveis estimados (classes A+B+C). Melhorias de handoff do bot (classe D) entram no bloco Produto CX. O restante fica só no painel. Omita o bloco de um time sem ações.
+- Donos válidos: **Produto CX** e **Help Design** (Engenharia e integração entram em Produto CX). Nunca "Operação CX", "Time de bot", "Curadoria" ou nome de time humano.
+- Help Design: priorize lacunas totais antes de atualizações; use o título exato do `output_kb`; nunca cite artigo cujo título comece com 🔒 ou 🔍.
+- Itens de política de transbordo trazem: _depende de validação com Compliance/Jurídico (SAC)_. Itens urgentes de compliance entram como o primeiro do bloco Produto CX, com 🚨 e prazo Imediato.
+- Nunca cite nome de nó que não conste no output dos agentes; use "nó a confirmar".

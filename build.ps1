@@ -89,7 +89,10 @@ WITH {{PAR}}
 SELECT DATE_FORMAT(ini_atual, 'dd/MM/yyyy') AS data_inicio,
        DATE_FORMAT(fim_atual - INTERVAL 1 DAY, 'dd/MM/yyyy') AS data_fim,
        DATE_FORMAT(ini_ant, 'dd/MM/yyyy') AS ant_inicio,
-       DATE_FORMAT(fim_ant - INTERVAL 1 DAY, 'dd/MM/yyyy') AS ant_fim
+       DATE_FORMAT(fim_ant - INTERVAL 1 DAY, 'dd/MM/yyyy') AS ant_fim,
+       DATE_FORMAT(ini_atual, 'yyyy-MM-dd') AS inicio_iso,
+       DATE_FORMAT(fim_atual - INTERVAL 1 DAY, 'yyyy-MM-dd') AS fim_iso,
+       CONCAT(DATE_FORMAT(CURRENT_TIMESTAMP() - INTERVAL 3 HOURS, 'yyyy-MM-dd'), 'T', DATE_FORMAT(CURRENT_TIMESTAMP() - INTERVAL 3 HOURS, 'HH:mm:ss')) AS gerado_em_brt
 FROM par
 ```
 '@
@@ -101,7 +104,10 @@ A rotina executa todos os dias. O período **atual** é D-1 (ontem, BRT) e o **a
 WITH {{PAR}}
 SELECT DATE_FORMAT(ini_atual, 'dd/MM/yyyy') AS data_inicio,
        DATE_FORMAT(ini_atual, 'dd/MM/yyyy') AS data_fim,
-       DATE_FORMAT(ini_ant, 'dd/MM/yyyy') AS ant_inicio
+       DATE_FORMAT(ini_ant, 'dd/MM/yyyy') AS ant_inicio,
+       DATE_FORMAT(ini_atual, 'yyyy-MM-dd') AS inicio_iso,
+       DATE_FORMAT(ini_atual, 'yyyy-MM-dd') AS fim_iso,
+       CONCAT(DATE_FORMAT(CURRENT_TIMESTAMP() - INTERVAL 3 HOURS, 'yyyy-MM-dd'), 'T', DATE_FORMAT(CURRENT_TIMESTAMP() - INTERVAL 3 HOURS, 'HH:mm:ss')) AS gerado_em_brt
 FROM par
 ```
 '@
@@ -349,6 +355,17 @@ foreach ($name in @('bqs-contencao', 'bqs-auditor', 'chatbot-proposta-ajustes'))
     Write-Host ("playbook injetado em {0}" -f $name)
 }
 
+# ---------------------------------------------------------------- injecao do contrato do painel (fonte unica: templates/painel-schema.md)
+$schema = [System.IO.File]::ReadAllText((Join-Path $root 'templates\painel-schema.md'), [System.Text.Encoding]::UTF8).Replace("`r`n", "`n").Trim()
+$path = Join-Path $outDir 'chatbot-relatorio-cx.md'
+$txt = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8).Replace("`r`n", "`n")
+$pattern = '(?s)<!-- SCHEMA_PAINEL:START -->.*?<!-- SCHEMA_PAINEL:END -->'
+if ($txt -notmatch $pattern) { throw "Marcadores do contrato do painel ausentes em chatbot-relatorio-cx" }
+$new = "<!-- SCHEMA_PAINEL:START -->`n" + $schema + "`n<!-- SCHEMA_PAINEL:END -->"
+$txt = [regex]::Replace($txt, $pattern, { param($m) $new })
+[System.IO.File]::WriteAllText($path, $txt, $utf8)
+Write-Host 'contrato do painel injetado em chatbot-relatorio-cx'
+
 # ---------------------------------------------------------------- geracao
 foreach ($f in $flows) {
     $map = [ordered]@{}
@@ -357,6 +374,7 @@ foreach ($f in $flows) {
     $map['ROTINA'] = $f.ROTINA
     $map['PERIODICIDADE'] = $f.PERIODICIDADE
     $map['CHAVE_ARTEFATO'] = $f.CHAVE
+    $map['TIPO_PERIODO'] = $(if ($f.WEEKLY) { 'semanal' } else { 'diario' })
     $map['CONTEXTO_FLUXO'] = $f.CTX
     $map['PERIODO_TEXTO'] = $(if ($f.WEEKLY) { $PERIODO_WEEK } else { $PERIODO_DAY })
     $map['COBERTURA_SQL'] = $(if ($f.WEEKLY) { $COBERTURA_WEEK } else { $COBERTURA_DAY }).TrimEnd()

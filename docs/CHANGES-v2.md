@@ -68,7 +68,7 @@ Teste real: 30 conversas HP não-sucesso (semana 12–18/10) → A 16 · B 4 · 
 
 - Confirmar com Produto CX: cancelamento de cartão **físico** só com atendimento (observado em conversas/artigos, não consta na documentação do agente); variáveis `agcc_desambiguacao` × `cc_desambiguacao` (nomes divergentes na doc); modelo do agente de cartão.
 - Compliance/Jurídico (SAC) antes de qualquer mudança na regra de transbordo por pedido de humano.
-- O n8n precisa de PR do time cyber (v2 em `Downloads\bqs-n8n-v2`) para gravar `approved` coerente; até lá o BQS estrito neutraliza o problema.
+- **Decisão: não alterar o fluxo do n8n** (complexidade). O que dependeria dele é resolvido na rotina, com SQL e conectores: o BQS é recalculado a partir das notas (não do `approved`), a cobertura e os buracos de dados são detectados por consulta, o piso de resolução/transbordo é aplicado em SQL, a nota revisada vem do auditor (transcrição) e o painel é publicado pelo agente de relatório. O que a rotina **não** corrige (ex.: ausência de registros em fim de semana, `botmaker_chatbot_flow` vazio) é sinalizado como limitação no relatório.
 - Canal: **decidido** — todos os relatórios (inclusive críticos) vão para `#bot-quality-score` (C0BP08WPMLP). O Confluence ainda cita `#casos-criticos-bot` e precisa ser corrigido.
 - Os agentes de rotina em nuvem precisam enxergar `bqs-contencao` (está em `.claude/agents`) e ter o MCP de dados disponível para subagentes.
 - Atualizar a página do Confluence do BQS (fórmula, campos, agentes) depois da validação.
@@ -97,5 +97,17 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 - **Ajustes após o teste:** fim do trecho do bot (falas `RecargaPay:`/`RecargaPay Ajuda:` e "você será conectado…"), transferência anunciada e não executada, pergunta SIM/NÃO do fluxo ≠ CSAT, regra para conversa em fases, `REVISA` só quando muda aprovação, `resolution`/`escalation` ≥ 2 pontos ou a classe.
 - **Não testado:** a reserva via Zendesk (todas as transcrições do teste estavam na tabela; cobertura da tabela 66–78% nos tickets avaliados) e a execução dentro da rotina em nuvem (nome do conector Zendesk `mcp__MCP_Proxy_RecargaPay__zendesk` e limite de consultas simultâneas ao Databricks).
 
+## Passo 5 — Painel (artefato) e Slack visual
+
+- **Painel único** `artifact/painel.html` ("BQS RecargaBot"): página fixa, sem biblioteca externa, tema claro/escuro, responsiva. Abas: **Visão geral** (cartões por rotina, onde estão os contatos evitáveis, tendência, o que mais pesa, auditoria), **Cartão HP**, **Aleatório**, **Casos críticos** (semanal/diário) e **Como ler**. Cada aba de fluxo traz KPIs, pontos de atenção, desfecho, qualidade por agente e tema, contatos evitáveis por causa e dono, e **"O que mudar"** com filtro por frente (Artigos, Variáveis e prompts, Fluxo e regras, Capacidades novas, Handoff) e cada oportunidade com antes → depois.
+- **Como as rotinas atualizam:** cada rotina publica só os **seus dois arquivos** (`data/<chave>/latest.json` e `history.json`) ao lado da página, com a ferramenta de artefato que o agente de relatório já usa. Não depende de banco, de n8n nem de capacidade especial. Contrato em `templates/painel-schema.md` (injetado no `chatbot-relatorio-cx` pelo build). Conflito entre rotinas: relê e publica de novo uma vez.
+- **Slack:** duas mensagens em `#bot-quality-score` (canal único). A 1ª é um resumo visual em markdown (título, tabela de KPIs, barra de desfecho em quadrados, auditoria, pontos de atenção com 🔴🟠🔵, link do painel); a 2ª, na thread, traz o plano de ação em tabelas por dono (Produto CX e Help Design, máx. 3 cada) com "teria retido". O HTML antigo saiu do agente de relatório.
+- **Primeira publicação (rodada de teste, 20/10/2026):** https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ (privado). Cartão HP com métricas reais, contenção por amostra de 30, auditoria de 4 tickets, 9 oportunidades e 8 artigos; Aleatório e Casos críticos só com métricas; sem histórico (a tendência aparece na 2ª rodada). Banner "Rodada de teste" nos dados com `meta.origem = "teste"`.
+- **Verificação:** a página rodou sem erros de console em desktop e celular (tema claro e escuro) com os mesmos JSONs; os 4 arquivos conferem no artefato publicado. Não testado: a publicação feita por uma rotina em nuvem (permissões da ferramenta de artefato e do Slack no ambiente da rotina).
+- **Datas para o JSON:** o Passo 1 dos orquestradores passou a devolver `inicio_iso`, `fim_iso` e `gerado_em_brt` (Spark junta literais adjacentes, então `''T''` falha; usa-se `CONCAT`).
+
 ## Próximos passos
-5. Artefato consolidado (tela inicial com dashboards; abas por fluxo com o que mudar: artigos, variáveis HP, ajustes de fluxo) + Slack mais visual · depois: rodada de teste (modo sombra) antes de publicar, reteste da auditoria seletiva da contenção, atualização do Confluence, push/PR.
+- Rodada de teste ponta a ponta (modo sombra) dos orquestradores em paralelo ao que existe hoje, sem postar no canal; reteste da auditoria seletiva da contenção.
+- Atualizar o Confluence (fórmula do BQS, campos, agentes, escopo só-bot, canal único, regra de conteúdo externo, painel).
+- Enviar ao GitHub e abrir PR para revisão, só com autorização.
+- Pendências com terceiros: validação do Produto CX sobre as respostas-modelo do playbook; Compliance/Jurídico (SAC) sobre qualquer mudança na regra de transbordo; compartilhar o painel com quem for consultar (hoje privado).
