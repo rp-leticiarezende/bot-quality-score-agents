@@ -561,6 +561,7 @@ Teste: números ainda não oficiais                                          ←
 **BQS 2.0: [X]%** [✅/⚠️/🚨] · Contatos evitáveis: ≈[Y]% · Transbordos sem pedido do cliente: [N] ([Z]%)
 
 **Principais ações**
+🚨 [Item urgente, se houver]: [o que mudar] — ≈[N] · [Dono]            ← só se houver item urgente; não numerado
 1. [Onde]: [o que mudar, ≤ 12 palavras] — ≈[N] contatos · [Dono]
 2. [Onde]: [o que mudar] — ≈[N] · [Dono]
 3. [Onde]: [o que mudar] — ≈[N] · [Dono]
@@ -576,7 +577,7 @@ Help Design: [N] artigos novos e [M] para atualizar
 **Regras:**
 - Sem período anterior, não escreva variação; com período anterior, acrescente ` (▲/▼ [X] pp)` depois do BQS.
 - **O link do painel aparece uma única vez**, na última linha, como texto de link ("Abrir o painel"). Não escreva que o painel é privado.
-- **Principais ações**: no máximo **3**, escolhidas pelos contatos evitáveis estimados (A+B+C), cada uma em **uma linha**: onde mexer + o que mudar + contatos + dono (`Produto CX` ou `Help Design`). Use o `titulo_curto` da oportunidade quando existir; senão resuma o título em até 12 palavras. Um item urgente (risco regulatório, segurança ou fraude) vai primeiro, com 🚨 no lugar do número. A linha "Help Design" resume o total de artigos (use `artigos`).
+- **Principais ações**: no máximo **3**, escolhidas pelos contatos evitáveis estimados (A+B+C), cada uma em **uma linha**: onde mexer + o que mudar + contatos + dono (`Produto CX` ou `Help Design`). Use o `titulo_curto` da oportunidade quando existir; senão resuma o título em até 12 palavras. Um item urgente (risco regulatório, segurança ou fraude) vai **primeiro, com 🚨 e sem número, e não conta nas 3**: a numeração das demais ações recomeça em 1. A linha "Help Design" resume o total de artigos (use `artigos`).
 - **Atenção**: no máximo **2** marcadores (•), nesta ordem: (1) transbordos sem pedido, com 3 `ticket_id`; (2) cobertura baixa, hiato ou ingestão atrasada. Sem nenhum alerta: "Nenhum ponto de atenção".
 - Fora da mensagem (ficam só no painel): auditoria, recontato em 24h, desfecho, limiares, divergências do avaliador, tabelas por dimensão.
 - **Rotinas sem análise completa** (sem contenção/oportunidades): omita "Principais ações" e deixe só a linha de números (sem "Contatos evitáveis"), "Atenção" e o link.
