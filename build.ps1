@@ -280,7 +280,7 @@ $HP_OUTPUT_RELATORIO = @'
 # ---------------------------------------------------------------- definicao de cada fluxo
 $CTX_ALEATORIO = @'
 
-**Atenção ao universo deste fluxo:** na série histórica, ~100% das conversas da aba aleatória terminam em transbordo e ~96% foram pedidos explícitos de atendente. Se `pct_transbordo ≥ 90`, o BQS deste fluxo mede a conduta **até o transbordo**, não a qualidade geral do bot — diga isso no relatório e trate o CE (contatos evitáveis) como o número principal. Cubra todas as verticais presentes; não foque só nas piores.
+**Universo deste fluxo:** a amostra aleatória vem de um filtro do Zendesk (decisão mantida). Nas medições de 12–20/10, ~100% das conversas dessa amostra terminaram em transbordo e ~96% foram pedidos explícitos de atendente. Isso é um fato dos dados, não um defeito: se `pct_transbordo ≥ 90`, registre uma nota informativa de que o BQS mede a conduta **até o transbordo** (e não a qualidade geral do bot) e trate o CE (contatos evitáveis) como o número principal. Se a mistura de desfechos mudar, a nota deixa de aparecer. Cubra todas as verticais presentes; não foque só nas piores.
 '@
 
 $CTX_HP = @'

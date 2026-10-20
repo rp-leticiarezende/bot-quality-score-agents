@@ -12,7 +12,7 @@ A taskforce quer reduzir contatos. O BQS respondia "o bot conduziu bem?", mas n�
 |---|---|---|---|
 | 1 | `approved` não é confiável | No Databricks é booleano, na origem é 1/0.5/0. Conversas `regular` (0.5) chegam como `NULL` e saem do denominador. Há combinações incoerentes (`regular` com `approved = true`; `bom` com `NULL`). Em 60 dias: 1.273 `regular` + 169 `bom` + 13 `ruim` com `approved = NULL`. | O BQS reportado (approved) superestima. Semana 12–18/10, HP: **81,4% (legado) × 72,4% (estrito)**; 43 conversas fora do denominador. |
 | 2 | Transbordo bem executado é aprovado mesmo com resposta falha | Amostra HP 12–18/10: muitos transbordos `excelente/bom` em que o cliente respondeu "Não" à confirmação de resolução e pediu atendente; o avaliador aprova "por atender ao pedido de transferência". | BQS alto convive com contato evitável. |
-| 3 | Aba "aleatório" não é aleatória | 12–20/10: **100% transbordo** e **~96% pediram atendente** (120 de 120). | O BQS do aleatório mede a conduta até o transbordo, não a qualidade geral. |
+| 3 | Composição da aba "aleatório" | 12–20/10: **100% transbordo** e **~96% pediram atendente** (120 de 120). A amostra é aleatória e o filtro vem do Zendesk (**decisão: manter**). | Só uma nota informativa quando `pct_transbordo ≥ 90`: o BQS mede a conduta até o transbordo; o CE vira o número principal. |
 | 4 | Buraco de dados e cobertura baixa | Sem dados de **11/09 a 14/10** (retomou em 15/10, sem fim de semana). Semana 12–18/10 do HP tem dado em só 2 dias. | Comparação semana a semana indisponível; números atuais são amostra reduzida. |
 | 5 | Agente de KB recebia pacote sem os campos de KB | Os orquestradores diziam que `kb_*` eram sempre NULL. Na verdade estão preenchidos (`kb_alignment`, `kb_score`, `kb_matched_article_title`, `kb_discrepancies`); só `issues` e `improvement_suggestions` estão vazios. | A análise de KB não conseguia nomear artigos. Hoje: 66% das conversas do agente de cartão têm algum problema de KB. |
 | 6 | `chatbot-hp-variaveis` consultava colunas inexistentes | `hp_personalization_*` / `hp_variable_errors` não existem na tabela; o arquivo também não tinha frontmatter. | Análise de HP não funcionava. |
@@ -63,7 +63,7 @@ Teste real: 30 conversas HP não-sucesso (semana 12–18/10) → A 16 · B 4 · 
 - Confirmar com Produto CX: cancelamento de cartão **físico** só com atendimento (observado em conversas/artigos, não consta na documentação do agente); variáveis `agcc_desambiguacao` × `cc_desambiguacao` (nomes divergentes na doc); modelo do agente de cartão.
 - Compliance/Jurídico (SAC) antes de qualquer mudança na regra de transbordo por pedido de humano.
 - O n8n precisa de PR do time cyber (v2 em `Downloads\bqs-n8n-v2`) para gravar `approved` coerente; até lá o BQS estrito neutraliza o problema.
-- Canal do relatório de críticos: o Confluence cita `#casos-criticos-bot`; o agente posta em `#bot-quality-score` (C0BP08WPMLP). Decidir.
+- Canal: **decidido** — todos os relatórios (inclusive críticos) vão para `#bot-quality-score` (C0BP08WPMLP). O Confluence ainda cita `#casos-criticos-bot` e precisa ser corrigido.
 - Os agentes de rotina em nuvem precisam enxergar `bqs-contencao` (está em `.claude/agents`) e ter o MCP de dados disponível para subagentes.
 - Atualizar a página do Confluence do BQS (fórmula, campos, agentes) depois da validação.
 
