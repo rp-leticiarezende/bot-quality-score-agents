@@ -1,845 +1,815 @@
 {
-  "schema": "bqs-run/1",
-  "chave": "criticos-diario",
-  "rotina": "Casos Críticos (diário)",
-  "meta": {
-    "origem": "rotina",
-    "nota": "BQS 2.0 desta rodada não calibrado (transcrições de 20/10 ainda não carregadas). Zendesk indisponível: artigos sem verificação no Guide."
-  },
-  "periodo": {
-    "tipo": "diario",
-    "inicio": "2026-10-20",
-    "fim": "2026-10-20",
-    "label": "20/10/2026"
-  },
-  "gerado_em": "2026-10-21T09:40:59-03:00",
-  "cobertura": {
-    "baixa": false,
-    "comparacao_indisponivel": true,
-    "texto": "29 conversas (média dos dias com dado de D-15 a D-2 ≈ 16). Sem dados em 13/10: sem base de comparação. Dias sem dado nos últimos 14 dias: 07 a 14/10, 17 e 18/10. Ingestão em dia; transcrições de 20/10 ainda não carregadas."
-  },
-  "metricas": {
-    "n_total": 29,
-    "n_avaliaveis": 29,
-    "n_ok": 17,
-    "bqs": 58.6,
-    "bqs_avaliador": 58.6,
-    "bqs_anterior": null,
-    "ultimo_ponto_anterior": null,
-    "calibracao": {
-      "calibrado": false,
-      "n_amostra": 0,
-      "n_revertidos": 0,
-      "taxa_falso_aprovado": 0.0,
-      "faixa": [
-        58.6,
-        58.6
-      ]
-    },
-    "prompt_version": "v1",
-    "tfc": 10.3,
-    "pct_pediu_humano": 10.3,
-    "pct_transbordo": 0.0,
-    "n_transbordo_nota_ok": 0,
-    "labels": {
-      "excelente": 14,
-      "bom": 3,
-      "regular": 4,
-      "ruim": 3,
-      "critico": 5
-    },
-    "retention": {
-      "resolutiva": 26,
-      "abandono": 3,
-      "transbordo": 0,
-      "loop": 0
-    },
-    "criterios": {
-      "understanding": 7.21,
-      "resolution": 6.41,
-      "clarity": 7.24,
-      "tone": 7.62,
-      "efficiency": 6.59,
-      "escalation": 6.38
-    },
-    "pct_recontato_24h": 21.4,
-    "sinalizados": {
-      "transbordo_sem_pedido": {
-        "n": 0,
-        "pct": 0.0,
-        "tickets": []
-      }
-    }
-  },
-  "auditoria": {
-    "auditados": 0,
-    "revisados": 0,
-    "aprovado_para_reprovado": 0,
-    "reprovado_para_aprovado": 0,
-    "divergencias": [
-      "5 tickets enviados à auditoria seletiva e 6 à calibração ficaram sem leitura: a tabela de transcrições só vai até o ticket 46629421 (atraso de carga).",
-      "Escalation 7 a 8 em conversas que ignoraram pedido de atendente (46635904, 46630942).",
-      "Escalation 10 em conversa com empréstimo não reconhecido (46634762).",
-      "Resolution 8 a 9 com prazo de 80 dias para contestar Pix sem respaldo (46631761, 46635028).",
-      "Resolution 9 com 'Não' à confirmação e com a variável de prazo em branco (46631948, 46630957); 6 ou mais aprovadas tiveram CSAT 1."
-    ]
-  },
-  "dimensoes": {
-    "effective_vertical": [
-      {
-        "valor": "n8n_critico",
-        "n": 26,
-        "pct_volume": 89.7,
-        "bqs": 57.7,
-        "tfc": 11.5,
-        "pct_pediu_humano": 7.7
-      },
-      {
-        "valor": "assinatura_prime",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 100.0
-      },
-      {
-        "valor": "emprestimo",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 100.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "investimentos",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 100.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      }
-    ],
-    "product": [
-      {
-        "valor": "perfil-seguranca",
-        "n": 8,
-        "pct_volume": 27.6,
-        "bqs": 62.5,
-        "tfc": 12.5,
-        "pct_pediu_humano": 12.5
-      },
-      {
-        "valor": "cartao-recargapay",
-        "n": 5,
-        "pct_volume": 17.2,
-        "bqs": 60.0,
-        "tfc": 40.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "pix",
-        "n": 4,
-        "pct_volume": 13.8,
-        "bqs": 75.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "global",
-        "n": 3,
-        "pct_volume": 10.3,
-        "bqs": 66.7,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "ajuda-login",
-        "n": 2,
-        "pct_volume": 6.9,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "recarga-de-transporte",
-        "n": 2,
-        "pct_volume": 6.9,
-        "bqs": 50.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "emprestimo",
-        "n": 2,
-        "pct_volume": 6.9,
-        "bqs": 50.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 50.0
-      },
-      {
-        "valor": "seguro-protecao-pix-e-cartoes",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 100.0
-      },
-      {
-        "valor": "cashback-e-rendimento",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 100.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "contas-e-boleto",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 100.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      }
-    ],
-    "topic": [
-      {
-        "valor": "wallet-blocked",
-        "n": 11,
-        "pct_volume": 37.9,
-        "bqs": 81.8,
-        "tfc": 9.1,
-        "pct_pediu_humano": 9.1
-      },
-      {
-        "valor": "cliente-nao-logado",
-        "n": 2,
-        "pct_volume": 6.9,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "cartao-recargapay",
-        "n": 2,
-        "pct_volume": 6.9,
-        "bqs": 100.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "self-wallet-credit",
-        "n": 2,
-        "pct_volume": 6.9,
-        "bqs": 0.0,
-        "tfc": 100.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "por-selfie-reconhecimento-facial",
-        "n": 2,
-        "pct_volume": 6.9,
-        "bqs": 50.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "loan-payment",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "overdraft-direct",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 100.0
-      },
-      {
-        "valor": "dúvidas sobre seguro",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 100.0
-      },
-      {
-        "valor": "cashin-boleto",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 100.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "transport",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "nao-consigo-usar-o-saldo-da-minha-carteira",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 0.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      },
-      {
-        "valor": "emprestimo",
-        "n": 1,
-        "pct_volume": 3.4,
-        "bqs": 100.0,
-        "tfc": 0.0,
-        "pct_pediu_humano": 0.0
-      }
-    ]
-  },
-  "contencao": {
-    "n_classificadas": 29,
-    "n_elegiveis": 29,
-    "pct_evitavel": 55.2,
-    "ic95": [
-      38,
-      72
-    ],
-    "ce_pct_total": 55.2,
-    "classes": {
-      "A": 12,
-      "B": 4,
-      "C": 0,
-      "D": 3,
-      "R": 8,
-      "E": 2
-    },
-    "causas": [
-      {
-        "classe": "A",
-        "causa": "loop_fluxo",
-        "causa_rotulo": "Loop de fluxo (CSAT e CC Error)",
-        "n": 5,
-        "tickets": [
-          "46635028",
-          "46631347",
-          "46631124"
-        ]
-      },
-      {
-        "classe": "A",
-        "causa": "nlu_roteamento",
-        "causa_rotulo": "NLU e roteamento da 1ª mensagem",
-        "n": 4,
-        "tickets": [
-          "46628685",
-          "46629630",
-          "46630890"
-        ]
-      },
-      {
-        "classe": "A",
-        "causa": "prompt_resposta",
-        "causa_rotulo": "Resposta do prompt",
-        "n": 3,
-        "tickets": [
-          "46632187",
-          "46632165",
-          "46634324"
-        ]
-      },
-      {
-        "classe": "B",
-        "causa": "variavel_hp",
-        "causa_rotulo": "Variável vazia (prazo do Wallet Bloqueado)",
-        "n": 4,
-        "tickets": [
-          "46630957",
-          "46633940",
-          "46631948"
-        ]
-      },
-      {
-        "classe": "D",
-        "causa": "acao_humana_obrigatoria",
-        "causa_rotulo": "Ação humana obrigatória",
-        "n": 3,
-        "tickets": [
-          "46630735",
-          "46634762",
-          "46631797"
-        ]
-      },
-      {
-        "classe": "R",
-        "causa": "nenhuma",
-        "causa_rotulo": "Retido provável",
-        "n": 8,
-        "tickets": [
-          "46632289",
-          "46631063",
-          "46630540"
-        ]
-      },
-      {
-        "classe": "E",
-        "causa": "indeterminada",
-        "causa_rotulo": "Indeterminado (a auditar)",
-        "n": 2,
-        "tickets": [
-          "46635904",
-          "46630942"
-        ]
-      }
-    ],
-    "por_dono": {
-      "Produto CX": 16,
-      "Help Design": 0
-    },
-    "handoff": {
-      "correto": 0,
-      "improvisado": 2,
-      "tardio": 1
-    }
-  },
-  "pontos_atencao": [
-    {
-      "tipo": "crit",
-      "texto": "Risco regulatório: ameaça de processo com bloqueio judicial sem detecção e com handoff improvisado; outros sinais de risco não detectados (empréstimo não contratado, roubo).",
-      "tickets": [
-        "46630735",
-        "46634762",
-        "46631761"
-      ]
-    },
-    {
-      "tipo": "crit",
-      "texto": "Pelo menos 4 pedidos explícitos de atendente não foram atendidos (0 transbordos no dia); pesquisa CSAT ignorou texto livre em 12 conversas.",
-      "tickets": [
-        "46635904",
-        "46630942",
-        "46628685"
-      ]
-    },
-    {
-      "tipo": "warn",
-      "texto": "BQS 2.0 desta rodada não calibrado: nenhuma transcrição disponível (0 auditados). O avaliador tende a superestimar: 6 ou mais aprovadas tiveram CSAT 1.",
-      "tickets": [
-        "46630957",
-        "46633940",
-        "46631948"
-      ]
-    },
-    {
-      "tipo": "info",
-      "texto": "Sem base de comparação (sem dados em 13/10). Limiares de TFC e pedido de atendente são provisórios (menos de 4 períodos de série)."
-    }
-  ],
-  "oportunidades": [
-    {
-      "id": "OPO-001",
-      "prioridade": "alta",
-      "classe": "A",
-      "causa": "nlu_roteamento",
-      "tipo": "fluxo",
-      "frente": "fluxo",
-      "titulo": "Fluxos estáticos: checar aderência da 1ª mensagem ao tema pré-selecionado e desambiguar antes de responder",
-      "titulo_curto": "Primeira mensagem: desambiguar tema pré-selecionado do fluxo estático",
-      "vertical_tema": "Fluxos estáticos / NLU (n8n_critico)",
-      "problema": "A primeira mensagem fica presa no tema pré-selecionado do fluxo estático; texto fora do Sim/Não e mensagens curtas recebem escopo ou 'Não consegui responder' repetido, sem transbordo.",
-      "evidencia": "Classe A nlu_roteamento: 4 evitáveis; 1ª mensagem presa no tema em 5 conversas e mensagem curta sem transbordo em 6.",
-      "tickets": [
-        "46628685",
-        "46629630",
-        "46630890"
-      ],
-      "contatos": {
-        "observado": 4,
-        "estimado": 4,
-        "pct_total": 13.8
-      },
-      "nota_impacto": "Classificação de todas as 29 elegíveis (sem extrapolação).",
-      "antes": "Cliente escreve 'Desbloquear carteira' ou pede para cancelar um empréstimo feito sem querer e o bot segue no tema pré-selecionado ou responde 'Conversa encerrada!'.",
-      "depois": "'Sua dúvida é sobre o pagamento que não foi concluído ou sobre outro assunto? Escreva em poucas palavras o que precisa.' Sinônimos mapeados (ex.: 'Desbloquear carteira' leva ao Wallet Bloqueado); após 2 falhas, transbordo.",
-      "proposta": "Checagem de aderência da 1ª mensagem ao tema do fluxo estático; NLU para texto fora do Sim/Não; sinônimos ('desbloquear carteira', 'CPF ruim'); contador de 2 'Não consegui responder' que oferece transbordo.",
-      "no": "Fluxos estáticos de pagamento negado e Wallet Bloqueado (nó a confirmar pelo Produto CX)",
-      "dono": "Produto CX",
-      "prazo": "Sprint",
-      "dependencias": "Nós reais por trás dos stages (botmaker_chatbot_flow vazio)",
-      "como_medir": "Conversas com 2 ou mais 'Não consegui responder' e abandonos com 'Conversa encerrada!' após pedido válido; classe A nlu_roteamento na próxima rodada."
-    },
-    {
-      "id": "OPO-002",
-      "prioridade": "alta",
-      "classe": "B",
-      "causa": "variavel_hp",
-      "tipo": "variavel",
-      "frente": "variavel_hp",
-      "titulo": "Wallet Bloqueado: corrigir a variável de prazo em branco, criar fallback sem data e tratar o 'Não'",
-      "titulo_curto": "Wallet Bloqueado: corrigir variável de prazo em branco e fallback",
-      "vertical_tema": "Wallet Bloqueado (wallet-blocked)",
-      "problema": "A mensagem do Wallet Bloqueado sai com a data do prazo vazia ('até o final do dia ,') e, após 'Não' na confirmação, o bot só faz uma oferta passiva.",
-      "evidencia": "Classe B variavel_hp: 4 evitáveis; conversas aprovadas pelo avaliador (resolution 9) com CSAT 1.",
-      "tickets": [
-        "46630957",
-        "46633940",
-        "46631948"
-      ],
-      "contatos": {
-        "observado": 4,
-        "estimado": 4,
-        "pct_total": 13.8
-      },
-      "nota_impacto": "Correção de variável: impacto imediato no tema de maior volume (11 conversas).",
-      "antes": "Resposta com o prazo em branco ('até o final do dia ,'); após 'Não', oferta passiva.",
-      "depois": "Com data: 'A análise da sua carteira tem prazo até *DD/MM*. Quando ela terminar, o desbloqueio acontece automaticamente, sem necessidade de novo contato.' Sem data: 'A análise da sua carteira está em andamento. Quando ela terminar, o desbloqueio acontece automaticamente, sem necessidade de novo contato.'",
-      "proposta": "Corrigir a variável de prazo do nó; quando vier nula, usar o texto de fallback sem data; após 'Não', explicar a liberação automática em vez de oferta passiva.",
-      "no": "Nó Wallet Bloqueado (nome e origem da variável de prazo a confirmar pelo Produto CX)",
-      "dono": "Produto CX",
-      "prazo": "Imediato",
-      "dependencias": "Nome e origem da variável de prazo",
-      "como_medir": "Mensagens do Wallet Bloqueado com data vazia (meta 0); CSAT 1 e BQS 2.0 no tema wallet-blocked."
-    },
-    {
-      "id": "OPO-003",
-      "prioridade": "alta",
-      "classe": "A",
-      "causa": "loop_fluxo",
-      "tipo": "fluxo",
-      "frente": "fluxo",
-      "titulo": "Pesquisa CSAT: ler o texto livre e reabrir o atendimento em nova intenção, problema reaberto ou pedido de atendente",
-      "titulo_curto": "Pesquisa CSAT: ler texto livre e reabrir atendimento",
-      "vertical_tema": "Encerramento / CSAT (transversal)",
-      "problema": "A pesquisa CSAT ignora pedido de atendente, nova intenção ou problema reaberto escritos em texto livre.",
-      "evidencia": "Classe A loop_fluxo: 3 evitáveis neste padrão; pesquisa CSAT 'cega' em 12 conversas do dia.",
-      "tickets": [
-        "46635028",
-        "46631347",
-        "46631761"
-      ],
-      "contatos": {
-        "observado": 3,
-        "estimado": 3,
-        "pct_total": 10.3
-      },
-      "nota_impacto": "Também reduz o recontato em 24h (21,4% no dia).",
-      "antes": "Cliente escreve 'cancelar minha conta' ou uma nova dúvida de empréstimo na pesquisa e o bot repete a confirmação.",
-      "depois": "Texto livre que não é nota sai da pesquisa e volta para a validação de conteúdo com a nova intenção; pedido de atendente segue a regra de transbordo.",
-      "proposta": "NLU no texto livre da pesquisa CSAT; nova intenção sai da pesquisa e reabre o atendimento.",
-      "no": "Nós de CSAT/encerramento (a confirmar pelo Produto CX); CX_CA - Validacao_Conteudo",
-      "dono": "Produto CX",
-      "prazo": "Sprint",
-      "dependencias": "—",
-      "como_medir": "Conversas com texto livre na CSAT seguidas de nova resposta do bot; recontato em 24h (baseline 21,4%)."
-    },
-    {
-      "id": "OPO-004",
-      "prioridade": "alta",
-      "classe": "D",
-      "causa": "acao_humana_obrigatoria",
-      "tipo": "handoff",
-      "frente": "handoff",
-      "titulo": "Regra global de risco: detectar ameaça judicial, contratação não reconhecida e roubo e transferir com tipo, valor e data",
-      "titulo_curto": "Gatilhos de risco: transferir ameaça judicial e empréstimo não reconhecido com contexto",
-      "vertical_tema": "Risco regulatório (transversal)",
-      "problema": "Sinais de risco (ameaça de processo com bloqueio judicial, 'não contratei', estorno de seguro) não foram detectados; handoff improvisado ou tardio.",
-      "evidencia": "Classe D: 3 conversas (2 handoffs improvisados, 1 tardio); risco regulatório em 46630735.",
-      "tickets": [
-        "46630735",
-        "46634762",
-        "46631797"
-      ],
-      "contatos": {
-        "observado": 0,
-        "estimado": 0,
-        "pct_total": 0.0
-      },
-      "nota_impacto": "Não reduz contatos: mede a qualidade do handoff e o risco regulatório.",
-      "antes": "Cliente ameaça processo por bloqueio judicial ou diz que não contratou o empréstimo e o bot segue o fluxo padrão, sem transferência estruturada.",
-      "depois": "'Seu caso de *[tipo]* no valor de *R$ [valor]*, em *DD/MM*, segue agora para um especialista, com essas informações registradas. Não é necessário repetir os dados.'",
-      "proposta": "Gatilhos de risco (processo, judicial, 'não contratei', roubo) com transbordo no 1º pedido e sem CSAT; handoff com tipo, valor e data; desambiguar seguro e Prime+.",
-      "no": "Regra global de transbordo (nó a confirmar pelo Produto CX)",
-      "dono": "Produto CX",
-      "prazo": "Sprint",
-      "dependencias": "Texto de prazo/protocolo do handoff",
-      "como_medir": "Conversas com termos de risco transferidas na mesma mensagem e com tipo, valor e data registrados."
-    },
-    {
-      "id": "OPO-005",
-      "prioridade": "alta",
-      "classe": "B",
-      "causa": "prompt_resposta",
-      "tipo": "politica",
-      "frente": "prompt",
-      "titulo": "Prompt de Pix: não citar prazo de contestação que não esteja no artigo (80 dias sem respaldo)",
-      "titulo_curto": "Prompt de Pix: travar prazo de contestação fora da KB",
-      "vertical_tema": "Pix / contestação",
-      "problema": "O bot informou um prazo de 80 dias para contestar Pix sem respaldo na Central de Ajuda.",
-      "evidencia": "2 conversas aprovadas pelo avaliador (resolution 8 a 9) apesar do prazo sem respaldo.",
-      "tickets": [
-        "46631761",
-        "46635028"
-      ],
-      "contatos": {
-        "observado": 0,
-        "estimado": 0,
-        "pct_total": 0.0
-      },
-      "nota_impacto": "Risco de informação incorreta; sem contatos adicionais além dos já contados.",
-      "antes": "Bot afirma que o cliente tem 80 dias para contestar um Pix.",
-      "depois": "Sem prazo no material, a resposta não cita prazo; com o prazo oficial confirmado no artigo, cita exatamente o do artigo.",
-      "proposta": "Regra no prompt: nunca citar prazo de contestação de Pix que não esteja no artigo vinculado.",
-      "no": "Prompt do nó de Pix (a confirmar pelo Produto CX)",
-      "dono": "Produto CX",
-      "prazo": "Imediato",
-      "dependencias": "Prazo oficial de contestação de Pix",
-      "como_medir": "Respostas com prazo de contestação fora da KB (meta 0)."
-    },
-    {
-      "id": "OPO-006",
-      "prioridade": "media",
-      "classe": "A",
-      "causa": "loop_fluxo",
-      "tipo": "fluxo",
-      "frente": "fluxo",
-      "titulo": "Cartão: corrigir ccerror-empty-message e impedir que CC Error encerre a conversa",
-      "titulo_curto": "Cartão: CC Error não pode encerrar a conversa",
-      "vertical_tema": "Cartão RecargaPay",
-      "problema": "CC Error e ccerror-empty-message encerram com 'Conversa encerrada!' pedidos válidos como 'quero resgatar o valor'.",
-      "evidencia": "Classe A loop_fluxo: 2 evitáveis (2 dos 3 abandonos do dia).",
-      "tickets": [
-        "46631124",
-        "46629952"
-      ],
-      "contatos": {
-        "observado": 2,
-        "estimado": 2,
-        "pct_total": 6.9
-      },
-      "nota_impacto": "",
-      "antes": "Cliente pede para resgatar o valor e recebe 'Conversa encerrada!'.",
-      "depois": "'Não recebi sua mensagem completa. Escreva novamente o que precisa sobre o cartão.' Na 2ª vez, transferir; 'resgatar o valor' vai para o resgate do saldo garantido.",
-      "proposta": "Corrigir ccerror-empty-message; CC Error nunca encerra a conversa; rotear 'resgatar o valor' ao Agente CC Produção.",
-      "no": "Nós CC Error / ccerror-empty-message; roteamento ao Agente CC Produção",
-      "dono": "Produto CX",
-      "prazo": "Sprint",
-      "dependencias": "—",
-      "como_medir": "Conversas encerradas por CC Error após mensagem do cliente (meta 0)."
-    },
-    {
-      "id": "OPO-007",
-      "prioridade": "media",
-      "classe": "A",
-      "causa": "prompt_resposta",
-      "tipo": "fluxo",
-      "frente": "prompt",
-      "titulo": "Prompt Perfil/Segurança: resposta própria para cliente não logado (sem caminho de menu interno, com recuperação de acesso)",
-      "titulo_curto": "Perfil/Segurança: resposta própria para cliente não logado",
-      "vertical_tema": "Perfil/Segurança (cliente-nao-logado)",
-      "problema": "Cliente não logado recebe passo a passo de quem está logado e link de encerramento.",
-      "evidencia": "Classe A prompt_resposta: 2 evitáveis; BQS 2.0 de 0% no tema cliente-nao-logado (amostra pequena).",
-      "tickets": [
-        "46632187",
-        "46632165"
-      ],
-      "contatos": {
-        "observado": 2,
-        "estimado": 2,
-        "pct_total": 6.9
-      },
-      "nota_impacto": "",
-      "antes": "Bot orienta ir em Perfil > Meus dados a quem não consegue entrar e envia link de encerramento.",
-      "depois": "Resposta voltada às formas de recuperação de acesso, sem caminho de menu do app logado; link correto.",
-      "proposta": "Regra no prompt de Perfil/Segurança: se o cliente não está logado ou o código não chega, responder com as formas de recuperação de acesso; corrigir o link.",
-      "no": "Prompt do nó Perfil/Segurança (a confirmar pelo Produto CX)",
-      "dono": "Produto CX",
-      "prazo": "Sprint",
-      "dependencias": "Revisão dos artigos de acesso pela Help Design",
-      "como_medir": "BQS 2.0 dos temas cliente-nao-logado e ajuda-login."
-    },
-    {
-      "id": "OPO-008",
-      "prioridade": "media",
-      "classe": "A",
-      "causa": "politica_produto",
-      "tipo": "politica",
-      "frente": "politica",
-      "titulo": "Regra transversal de pedido de atendente: uma sondagem e transbordo no 2º pedido (risco e CSAT no 1º)",
-      "titulo_curto": "Pedido de atendente: sondar uma vez e transferir no 2º pedido",
-      "vertical_tema": "Transversal",
-      "problema": "Pelo menos 4 pedidos explícitos de atendente não foram atendidos; 0 transbordos no dia.",
-      "evidencia": "Escalation é o critério mais baixo (6,38); o avaliador deu 7 a 8 em conversas que ignoraram o pedido.",
-      "tickets": [
-        "46635904",
-        "46630942",
-        "46631797"
-      ],
-      "contatos": {
-        "observado": 0,
-        "estimado": 0,
-        "pct_total": 0.0
-      },
-      "nota_impacto": "Sem contatos adicionais: evita CSAT 1 por pedido ignorado.",
-      "antes": "Cliente pede atendente duas vezes e o bot repete a orientação ou vai para a pesquisa.",
-      "depois": "1º pedido: uma pergunta de sondagem; 2º pedido: transferência. Em caso de risco ou na CSAT, transferência no 1º pedido.",
-      "proposta": "Política de transbordo: 1 sondagem e transbordo no 2º pedido; risco e pedido na CSAT transferem no 1º.",
-      "no": "Regra global de transbordo (nó a confirmar pelo Produto CX)",
-      "dono": "Produto CX",
-      "prazo": "Sprint",
-      "dependencias": "—",
-      "como_medir": "% de pedidos de atendente atendidos até o 2º pedido; critério escalation."
-    },
-    {
-      "id": "OPO-009",
-      "prioridade": "baixa",
-      "classe": "A",
-      "causa": "prompt_resposta",
-      "tipo": "fluxo",
-      "frente": "prompt",
-      "titulo": "Prompt de Transporte: com recarga há mais de 48h, ir direto ao contato com a central do operador",
-      "titulo_curto": "Transporte: regra para recarga há mais de 48h",
-      "vertical_tema": "Transporte",
-      "problema": "Com o prazo de 48h vencido, o bot não vai direto ao passo de contatar a central do operador.",
-      "evidencia": "Classe A prompt_resposta: 1 evitável.",
-      "tickets": [
-        "46634324"
-      ],
-      "contatos": {
-        "observado": 1,
-        "estimado": 1,
-        "pct_total": 3.4
-      },
-      "nota_impacto": "",
-      "antes": "Bot repete as orientações de espera mesmo com a recarga há mais de 48h.",
-      "depois": "Com mais de 48h, a resposta vai direto ao contato com a central do operador.",
-      "proposta": "Regra de 48h vencidas no prompt de Transporte.",
-      "no": "Prompt do nó de Transporte (a confirmar pelo Produto CX)",
-      "dono": "Produto CX",
-      "prazo": "Sprint",
-      "dependencias": "—",
-      "como_medir": "BQS 2.0 no tema transport."
-    },
-    {
-      "id": "OPO-010",
-      "prioridade": "media",
-      "classe": "D",
-      "causa": "artigo",
-      "tipo": "artigo",
-      "frente": "artigo",
-      "titulo": "Central de Ajuda: criar 3 artigos (Pix após roubo do celular, empréstimo não reconhecido, cancelar seguro do cartão)",
-      "titulo_curto": "Central de Ajuda: 3 artigos novos de Pix, empréstimo e seguro",
-      "vertical_tema": "Pix / Empréstimo / Seguro",
-      "problema": "Não há artigo externo para contestação de Pix após roubo, empréstimo não reconhecido e cancelamento do seguro do cartão com reembolso.",
-      "evidencia": "13 das 26 conversas de n8n_critico sem artigo (maioria Wallet Bloqueado); 3 temas de risco sem conteúdo.",
-      "tickets": [
-        "46631761",
-        "46634762",
-        "46631797"
-      ],
-      "contatos": {
-        "observado": 0,
-        "estimado": 0,
-        "pct_total": 0.0
-      },
-      "nota_impacto": "Sem contatos adicionais; dá respaldo ao bot nos temas de risco.",
-      "antes": "Bot responde sem material ou com artigo de outro produto.",
-      "depois": "Bot responde com o artigo público correspondente.",
-      "proposta": "Criar 'Como contestar um Pix que não reconheço depois de ter o celular roubado?', 'Não reconheço um empréstimo contratado na minha conta. O que fazer?' e 'Como cancelar o seguro de proteção do cartão e pedir reembolso?'.",
-      "no": "Artigos novos na Central de Ajuda (pendente verificação no Guide)",
-      "dono": "Help Design",
-      "prazo": "Sprint",
-      "dependencias": "Prazo oficial de contestação de Pix; regra e valores de reembolso do seguro; verificação no Guide (Zendesk indisponível nesta rodada)",
-      "como_medir": "Uso dos artigos pelo bot nos temas e BQS 2.0 dos temas na próxima rodada."
-    }
-  ],
-  "artigos": [
-    {
-      "acao": "criar",
-      "tickets": [
-        "46631761",
-        "46635028"
-      ],
-      "titulo": "Como contestar um Pix que não reconheço depois de ter o celular roubado?",
-      "secao": "",
-      "problema": "Sem artigo; o bot citou prazo de 80 dias sem respaldo. Pendente verificação no Guide.",
-      "primeira_frase": "Responder na primeira frase como contestar o Pix não reconhecido após o roubo, com o prazo oficial confirmado pelo produto.",
-      "conversas": 2,
-      "prioridade": "alta"
-    },
-    {
-      "acao": "criar",
-      "tickets": [
-        "46634762"
-      ],
-      "titulo": "Não reconheço um empréstimo contratado na minha conta. O que fazer?",
-      "secao": "",
-      "problema": "Sem artigo para contratação não reconhecida. Pendente verificação no Guide.",
-      "primeira_frase": "Responder na primeira frase o que acontece quando o cliente não reconhece um empréstimo e como o caso é analisado.",
-      "conversas": 1,
-      "prioridade": "media"
-    },
-    {
-      "acao": "criar",
-      "tickets": [
-        "46631797"
-      ],
-      "titulo": "Como cancelar o seguro de proteção do cartão e pedir reembolso?",
-      "secao": "",
-      "problema": "Sem artigo; o bot confundiu seguro com Prime+. Pendente verificação no Guide.",
-      "primeira_frase": "Responder na primeira frase como cancelar o seguro de proteção do cartão e quando há reembolso, com regra e valores confirmados pelo produto.",
-      "conversas": 1,
-      "prioridade": "media"
-    },
-    {
-      "acao": "atualizar",
-      "tickets": [
-        "46632187"
-      ],
-      "titulo": "Não consigo acessar a minha conta",
-      "secao": "",
-      "problema": "Não cobre o cliente não logado que não recebe o código.",
-      "primeira_frase": "Responder na primeira frase as formas de recuperar o acesso quando o código não chega.",
-      "conversas": 1,
-      "prioridade": "media"
-    },
-    {
-      "acao": "atualizar",
-      "tickets": [
-        "46632165"
-      ],
-      "titulo": "Problemas para acessar a conta em um novo dispositivo",
-      "secao": "",
-      "problema": "Orientação pressupõe cliente logado.",
-      "primeira_frase": "Responder na primeira frase o que fazer para acessar a conta em um novo dispositivo sem estar logado.",
-      "conversas": 1,
-      "prioridade": "media"
-    },
-    {
-      "acao": "atualizar",
-      "tickets": [
-        "46630331"
-      ],
-      "titulo": "É seguro investir em CDB no RecargaPay?",
-      "secao": "",
-      "problema": "A garantia do FGC não aparece na primeira frase.",
-      "primeira_frase": "Trazer a garantia do FGC já na primeira frase.",
-      "conversas": 1,
-      "prioridade": "baixa"
-    },
-    {
-      "acao": "atualizar",
-      "tickets": [
-        "46631347"
-      ],
-      "titulo": "Por qual motivo meu pagamento foi cancelado?",
-      "secao": "",
-      "problema": "O motivo do cancelamento não aparece de forma direta no início.",
-      "primeira_frase": "Responder o motivo do cancelamento já na primeira frase.",
-      "conversas": 1,
-      "prioridade": "baixa"
-    }
-  ]
+    "schema":  "bqs-run/1",
+    "chave":  "criticos-diario",
+    "rotina":  "Casos Críticos (diário)",
+    "meta":  {
+                 "origem":  "rotina",
+                 "nota":  "BQS 2.0 desta rodada não calibrado (transcrições de 20/10 ainda não carregadas). Zendesk indisponível: artigos sem verificação no Guide."
+             },
+    "periodo":  {
+                    "tipo":  "diario",
+                    "inicio":  "2026-10-20",
+                    "fim":  "2026-10-20",
+                    "label":  "20/10/2026"
+                },
+    "gerado_em":  "2026-10-21T09:40:59-03:00",
+    "cobertura":  {
+                      "baixa":  false,
+                      "comparacao_indisponivel":  true,
+                      "texto":  "29 conversas (média dos dias com dado de D-15 a D-2 ≈ 16). Sem dados em 13/10: sem base de comparação. Dias sem dado nos últimos 14 dias: 07 a 14/10, 17 e 18/10. Ingestão em dia; transcrições de 20/10 ainda não carregadas."
+                  },
+    "metricas":  {
+                     "n_total":  29,
+                     "n_avaliaveis":  29,
+                     "n_ok":  17,
+                     "bqs":  58.6,
+                     "bqs_avaliador":  58.6,
+                     "bqs_anterior":  null,
+                     "ultimo_ponto_anterior":  null,
+                     "calibracao":  {
+                                        "calibrado":  false,
+                                        "n_amostra":  0,
+                                        "n_revertidos":  0,
+                                        "taxa_falso_aprovado":  0.0,
+                                        "faixa":  [
+                                                      58.6,
+                                                      58.6
+                                                  ]
+                                    },
+                     "prompt_version":  "v1",
+                     "tfc":  10.3,
+                     "pct_pediu_humano":  10.3,
+                     "pct_transbordo":  0.0,
+                     "n_transbordo_nota_ok":  0,
+                     "labels":  {
+                                    "excelente":  14,
+                                    "bom":  3,
+                                    "regular":  4,
+                                    "ruim":  3,
+                                    "critico":  5
+                                },
+                     "retention":  {
+                                       "resolutiva":  26,
+                                       "abandono":  3,
+                                       "transbordo":  0,
+                                       "loop":  0
+                                   },
+                     "criterios":  {
+                                       "understanding":  7.21,
+                                       "resolution":  6.41,
+                                       "clarity":  7.24,
+                                       "tone":  7.62,
+                                       "efficiency":  6.59,
+                                       "escalation":  6.38
+                                   },
+                     "pct_recontato_24h":  21.4,
+                     "sinalizados":  {
+                                         "transbordo_sem_pedido":  {
+                                                                       "n":  0,
+                                                                       "pct":  0.0,
+                                                                       "tickets":  [
+
+                                                                                   ]
+                                                                   }
+                                     }
+                 },
+    "auditoria":  {
+                      "auditados":  0,
+                      "revisados":  0,
+                      "aprovado_para_reprovado":  0,
+                      "reprovado_para_aprovado":  0,
+                      "divergencias":  [
+                                           "5 tickets enviados à auditoria seletiva e 6 à calibração ficaram sem leitura: a tabela de transcrições só vai até o ticket 46629421 (atraso de carga).",
+                                           "Escalation 7 a 8 em conversas que ignoraram pedido de atendente (46635904, 46630942).",
+                                           "Escalation 10 em conversa com empréstimo não reconhecido (46634762).",
+                                           "Resolution 8 a 9 com prazo de 80 dias para contestar Pix sem respaldo (46631761, 46635028).",
+                                           "Resolution 9 com \u0027Não\u0027 à confirmação e com a variável de prazo em branco (46631948, 46630957); 6 ou mais aprovadas tiveram CSAT 1."
+                                       ]
+                  },
+    "dimensoes":  {
+                      "effective_vertical":  [
+                                                 {
+                                                     "valor":  "n8n_critico",
+                                                     "n":  26,
+                                                     "pct_volume":  89.7,
+                                                     "bqs":  57.7,
+                                                     "tfc":  11.5,
+                                                     "pct_pediu_humano":  7.7
+                                                 },
+                                                 {
+                                                     "valor":  "assinatura_prime",
+                                                     "n":  1,
+                                                     "pct_volume":  3.4,
+                                                     "bqs":  0.0,
+                                                     "tfc":  0.0,
+                                                     "pct_pediu_humano":  100.0
+                                                 },
+                                                 {
+                                                     "valor":  "emprestimo",
+                                                     "n":  1,
+                                                     "pct_volume":  3.4,
+                                                     "bqs":  100.0,
+                                                     "tfc":  0.0,
+                                                     "pct_pediu_humano":  0.0
+                                                 },
+                                                 {
+                                                     "valor":  "investimentos",
+                                                     "n":  1,
+                                                     "pct_volume":  3.4,
+                                                     "bqs":  100.0,
+                                                     "tfc":  0.0,
+                                                     "pct_pediu_humano":  0.0
+                                                 }
+                                             ],
+                      "product":  [
+                                      {
+                                          "valor":  "perfil-seguranca",
+                                          "n":  8,
+                                          "pct_volume":  27.6,
+                                          "bqs":  62.5,
+                                          "tfc":  12.5,
+                                          "pct_pediu_humano":  12.5
+                                      },
+                                      {
+                                          "valor":  "cartao-recargapay",
+                                          "n":  5,
+                                          "pct_volume":  17.2,
+                                          "bqs":  60.0,
+                                          "tfc":  40.0,
+                                          "pct_pediu_humano":  0.0
+                                      },
+                                      {
+                                          "valor":  "pix",
+                                          "n":  4,
+                                          "pct_volume":  13.8,
+                                          "bqs":  75.0,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  0.0
+                                      },
+                                      {
+                                          "valor":  "global",
+                                          "n":  3,
+                                          "pct_volume":  10.3,
+                                          "bqs":  66.7,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  0.0
+                                      },
+                                      {
+                                          "valor":  "ajuda-login",
+                                          "n":  2,
+                                          "pct_volume":  6.9,
+                                          "bqs":  0.0,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  0.0
+                                      },
+                                      {
+                                          "valor":  "recarga-de-transporte",
+                                          "n":  2,
+                                          "pct_volume":  6.9,
+                                          "bqs":  50.0,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  0.0
+                                      },
+                                      {
+                                          "valor":  "emprestimo",
+                                          "n":  2,
+                                          "pct_volume":  6.9,
+                                          "bqs":  50.0,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  50.0
+                                      },
+                                      {
+                                          "valor":  "seguro-protecao-pix-e-cartoes",
+                                          "n":  1,
+                                          "pct_volume":  3.4,
+                                          "bqs":  0.0,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  100.0
+                                      },
+                                      {
+                                          "valor":  "cashback-e-rendimento",
+                                          "n":  1,
+                                          "pct_volume":  3.4,
+                                          "bqs":  100.0,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  0.0
+                                      },
+                                      {
+                                          "valor":  "contas-e-boleto",
+                                          "n":  1,
+                                          "pct_volume":  3.4,
+                                          "bqs":  100.0,
+                                          "tfc":  0.0,
+                                          "pct_pediu_humano":  0.0
+                                      }
+                                  ],
+                      "topic":  [
+                                    {
+                                        "valor":  "wallet-blocked",
+                                        "n":  11,
+                                        "pct_volume":  37.9,
+                                        "bqs":  81.8,
+                                        "tfc":  9.1,
+                                        "pct_pediu_humano":  9.1
+                                    },
+                                    {
+                                        "valor":  "cliente-nao-logado",
+                                        "n":  2,
+                                        "pct_volume":  6.9,
+                                        "bqs":  0.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "cartao-recargapay",
+                                        "n":  2,
+                                        "pct_volume":  6.9,
+                                        "bqs":  100.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "self-wallet-credit",
+                                        "n":  2,
+                                        "pct_volume":  6.9,
+                                        "bqs":  0.0,
+                                        "tfc":  100.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "por-selfie-reconhecimento-facial",
+                                        "n":  2,
+                                        "pct_volume":  6.9,
+                                        "bqs":  50.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "loan-payment",
+                                        "n":  1,
+                                        "pct_volume":  3.4,
+                                        "bqs":  0.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "overdraft-direct",
+                                        "n":  1,
+                                        "pct_volume":  3.4,
+                                        "bqs":  0.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  100.0
+                                    },
+                                    {
+                                        "valor":  "dúvidas sobre seguro",
+                                        "n":  1,
+                                        "pct_volume":  3.4,
+                                        "bqs":  0.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  100.0
+                                    },
+                                    {
+                                        "valor":  "cashin-boleto",
+                                        "n":  1,
+                                        "pct_volume":  3.4,
+                                        "bqs":  100.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "transport",
+                                        "n":  1,
+                                        "pct_volume":  3.4,
+                                        "bqs":  0.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "nao-consigo-usar-o-saldo-da-minha-carteira",
+                                        "n":  1,
+                                        "pct_volume":  3.4,
+                                        "bqs":  0.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    },
+                                    {
+                                        "valor":  "emprestimo",
+                                        "n":  1,
+                                        "pct_volume":  3.4,
+                                        "bqs":  100.0,
+                                        "tfc":  0.0,
+                                        "pct_pediu_humano":  0.0
+                                    }
+                                ]
+                  },
+    "contencao":  {
+                      "n_classificadas":  29,
+                      "n_elegiveis":  29,
+                      "pct_evitavel":  55.2,
+                      "ic95":  [
+                                   38,
+                                   72
+                               ],
+                      "ce_pct_total":  55.2,
+                      "classes":  {
+                                      "A":  12,
+                                      "B":  4,
+                                      "C":  0,
+                                      "D":  3,
+                                      "R":  8,
+                                      "E":  2
+                                  },
+                      "causas":  [
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "loop_fluxo",
+                                         "causa_rotulo":  "Loop de fluxo (CSAT e CC Error)",
+                                         "n":  5,
+                                         "tickets":  [
+                                                         "46635028",
+                                                         "46631347",
+                                                         "46631124"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "nlu_roteamento",
+                                         "causa_rotulo":  "NLU e roteamento da 1ª mensagem",
+                                         "n":  4,
+                                         "tickets":  [
+                                                         "46628685",
+                                                         "46629630",
+                                                         "46630890"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "prompt_resposta",
+                                         "causa_rotulo":  "Resposta do prompt",
+                                         "n":  3,
+                                         "tickets":  [
+                                                         "46632187",
+                                                         "46632165",
+                                                         "46634324"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "B",
+                                         "causa":  "variavel_hp",
+                                         "causa_rotulo":  "Variável vazia (prazo do Wallet Bloqueado)",
+                                         "n":  4,
+                                         "tickets":  [
+                                                         "46630957",
+                                                         "46633940",
+                                                         "46631948"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "D",
+                                         "causa":  "acao_humana_obrigatoria",
+                                         "causa_rotulo":  "Ação humana obrigatória",
+                                         "n":  3,
+                                         "tickets":  [
+                                                         "46630735",
+                                                         "46634762",
+                                                         "46631797"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "R",
+                                         "causa":  "nenhuma",
+                                         "causa_rotulo":  "Retido provável",
+                                         "n":  8,
+                                         "tickets":  [
+                                                         "46632289",
+                                                         "46631063",
+                                                         "46630540"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "E",
+                                         "causa":  "indeterminada",
+                                         "causa_rotulo":  "Indeterminado (a auditar)",
+                                         "n":  2,
+                                         "tickets":  [
+                                                         "46635904",
+                                                         "46630942"
+                                                     ]
+                                     }
+                                 ],
+                      "por_dono":  {
+                                       "Produto CX":  16,
+                                       "Help Design":  0
+                                   },
+                      "handoff":  {
+                                      "correto":  0,
+                                      "improvisado":  2,
+                                      "tardio":  1
+                                  }
+                  },
+    "pontos_atencao":  [
+                           {
+                               "tipo":  "crit",
+                               "texto":  "Risco regulatório: ameaça de processo com bloqueio judicial sem detecção e com handoff improvisado; outros sinais de risco não detectados (empréstimo não contratado, roubo).",
+                               "tickets":  [
+                                               "46630735",
+                                               "46634762",
+                                               "46631761"
+                                           ]
+                           },
+                           {
+                               "tipo":  "crit",
+                               "texto":  "Pelo menos 4 pedidos explícitos de atendente não foram atendidos (0 transbordos no dia); pesquisa CSAT ignorou texto livre em 12 conversas.",
+                               "tickets":  [
+                                               "46635904",
+                                               "46630942",
+                                               "46628685"
+                                           ]
+                           },
+                           {
+                               "tipo":  "warn",
+                               "texto":  "BQS 2.0 desta rodada não calibrado: nenhuma transcrição disponível (0 auditados). O avaliador tende a superestimar: 6 ou mais aprovadas tiveram CSAT 1.",
+                               "tickets":  [
+                                               "46630957",
+                                               "46633940",
+                                               "46631948"
+                                           ]
+                           },
+                           {
+                               "tipo":  "info",
+                               "texto":  "Sem base de comparação (sem dados em 13/10). Limiares de TFC e pedido de atendente são provisórios (menos de 4 períodos de série)."
+                           }
+                       ],
+    "oportunidades":  [
+                          {
+                              "id":  "OPO-001",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "nlu_roteamento",
+                              "tipo":  "fluxo",
+                              "frente":  "fluxo",
+                              "titulo":  "Fluxos estáticos: checar aderência da 1ª mensagem ao tema pré-selecionado e desambiguar antes de responder",
+                              "titulo_curto":  "Primeira mensagem: desambiguar tema pré-selecionado do fluxo estático",
+                              "vertical_tema":  "Fluxos estáticos / NLU (n8n_critico)",
+                              "problema":  "A primeira mensagem fica presa no tema pré-selecionado do fluxo estático; texto fora do Sim/Não e mensagens curtas recebem escopo ou \u0027Não consegui responder\u0027 repetido, sem transbordo.",
+                              "evidencia":  "Classe A nlu_roteamento: 4 evitáveis; 1ª mensagem presa no tema em 5 conversas e mensagem curta sem transbordo em 6.",
+                              "tickets":  [
+                                              "46628685",
+                                              "46629630",
+                                              "46630890"
+                                          ],
+                              "contatos":  {
+                                               "observado":  4,
+                                               "estimado":  4,
+                                               "pct_total":  13.8
+                                           },
+                              "nota_impacto":  "Classificação de todas as 29 elegíveis (sem extrapolação).",
+                              "antes":  "Cliente escreve \u0027Desbloquear carteira\u0027 ou pede para cancelar um empréstimo feito sem querer e o bot segue no tema pré-selecionado ou responde \u0027Conversa encerrada!\u0027.",
+                              "depois":  "\u0027Sua dúvida é sobre o pagamento que não foi concluído ou sobre outro assunto? Escreva em poucas palavras o que precisa.\u0027 Sinônimos mapeados (ex.: \u0027Desbloquear carteira\u0027 leva ao Wallet Bloqueado); após 2 falhas, transbordo.",
+                              "proposta":  "Checagem de aderência da 1ª mensagem ao tema do fluxo estático; NLU para texto fora do Sim/Não; sinônimos (\u0027desbloquear carteira\u0027, \u0027CPF ruim\u0027); contador de 2 \u0027Não consegui responder\u0027 que oferece transbordo.",
+                              "no":  "Fluxos estáticos de pagamento negado e Wallet Bloqueado (nó a confirmar pelo Produto CX)",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Nós reais por trás dos stages (botmaker_chatbot_flow vazio)",
+                              "como_medir":  "Conversas com 2 ou mais \u0027Não consegui responder\u0027 e abandonos com \u0027Conversa encerrada!\u0027 após pedido válido; classe A nlu_roteamento na próxima rodada."
+                          },
+                          {
+                              "id":  "OPO-002",
+                              "prioridade":  "alta",
+                              "classe":  "B",
+                              "causa":  "variavel_hp",
+                              "tipo":  "variavel",
+                              "frente":  "variavel_hp",
+                              "titulo":  "Wallet Bloqueado: corrigir a variável de prazo em branco, criar fallback sem data e tratar o \u0027Não\u0027",
+                              "titulo_curto":  "Wallet Bloqueado: corrigir variável de prazo em branco e fallback",
+                              "vertical_tema":  "Wallet Bloqueado (wallet-blocked)",
+                              "problema":  "A mensagem do Wallet Bloqueado sai com a data do prazo vazia (\u0027até o final do dia ,\u0027) e, após \u0027Não\u0027 na confirmação, o bot só faz uma oferta passiva.",
+                              "evidencia":  "Classe B variavel_hp: 4 evitáveis; conversas aprovadas pelo avaliador (resolution 9) com CSAT 1.",
+                              "tickets":  [
+                                              "46630957",
+                                              "46633940",
+                                              "46631948"
+                                          ],
+                              "contatos":  {
+                                               "observado":  4,
+                                               "estimado":  4,
+                                               "pct_total":  13.8
+                                           },
+                              "nota_impacto":  "Correção de variável: impacto imediato no tema de maior volume (11 conversas).",
+                              "antes":  "Resposta com o prazo em branco (\u0027até o final do dia ,\u0027); após \u0027Não\u0027, oferta passiva.",
+                              "depois":  "Com data: \u0027A análise da sua carteira tem prazo até *DD/MM*. Quando ela terminar, o desbloqueio acontece automaticamente, sem necessidade de novo contato.\u0027 Sem data: \u0027A análise da sua carteira está em andamento. Quando ela terminar, o desbloqueio acontece automaticamente, sem necessidade de novo contato.\u0027",
+                              "proposta":  "Corrigir a variável de prazo do nó; quando vier nula, usar o texto de fallback sem data; após \u0027Não\u0027, explicar a liberação automática em vez de oferta passiva.",
+                              "no":  "Nó Wallet Bloqueado (nome e origem da variável de prazo a confirmar pelo Produto CX)",
+                              "dono":  "Produto CX",
+                              "prazo":  "Imediato",
+                              "dependencias":  "Nome e origem da variável de prazo",
+                              "como_medir":  "Mensagens do Wallet Bloqueado com data vazia (meta 0); CSAT 1 e BQS 2.0 no tema wallet-blocked."
+                          },
+                          {
+                              "id":  "OPO-004",
+                              "prioridade":  "alta",
+                              "classe":  "D",
+                              "causa":  "acao_humana_obrigatoria",
+                              "tipo":  "handoff",
+                              "frente":  "handoff",
+                              "titulo":  "Regra global de risco: detectar ameaça judicial, contratação não reconhecida e roubo e transferir com tipo, valor e data",
+                              "titulo_curto":  "Gatilhos de risco: transferir ameaça judicial e empréstimo não reconhecido com contexto",
+                              "vertical_tema":  "Risco regulatório (transversal)",
+                              "problema":  "Sinais de risco (ameaça de processo com bloqueio judicial, \u0027não contratei\u0027, estorno de seguro) não foram detectados; handoff improvisado ou tardio.",
+                              "evidencia":  "Classe D: 3 conversas (2 handoffs improvisados, 1 tardio); risco regulatório em 46630735.",
+                              "tickets":  [
+                                              "46630735",
+                                              "46634762",
+                                              "46631797"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não reduz contatos: mede a qualidade do handoff e o risco regulatório.",
+                              "antes":  "Cliente ameaça processo por bloqueio judicial ou diz que não contratou o empréstimo e o bot segue o fluxo padrão, sem transferência estruturada.",
+                              "depois":  "\u0027Seu caso de *[tipo]* no valor de *R$ [valor]*, em *DD/MM*, segue agora para um especialista, com essas informações registradas. Não é necessário repetir os dados.\u0027",
+                              "proposta":  "Gatilhos de risco (processo, judicial, \u0027não contratei\u0027, roubo) com transbordo no 1º pedido e sem CSAT; handoff com tipo, valor e data; desambiguar seguro e Prime+.",
+                              "no":  "Regra global de transbordo (nó a confirmar pelo Produto CX)",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Texto de prazo/protocolo do handoff",
+                              "como_medir":  "Conversas com termos de risco transferidas na mesma mensagem e com tipo, valor e data registrados."
+                          },
+                          {
+                              "id":  "OPO-005",
+                              "prioridade":  "alta",
+                              "classe":  "B",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "politica",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt de Pix: não citar prazo de contestação que não esteja no artigo (80 dias sem respaldo)",
+                              "titulo_curto":  "Prompt de Pix: travar prazo de contestação fora da KB",
+                              "vertical_tema":  "Pix / contestação",
+                              "problema":  "O bot informou um prazo de 80 dias para contestar Pix sem respaldo na Central de Ajuda.",
+                              "evidencia":  "2 conversas aprovadas pelo avaliador (resolution 8 a 9) apesar do prazo sem respaldo.",
+                              "tickets":  [
+                                              "46631761",
+                                              "46635028"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Risco de informação incorreta; sem contatos adicionais além dos já contados.",
+                              "antes":  "Bot afirma que o cliente tem 80 dias para contestar um Pix.",
+                              "depois":  "Sem prazo no material, a resposta não cita prazo; com o prazo oficial confirmado no artigo, cita exatamente o do artigo.",
+                              "proposta":  "Regra no prompt: nunca citar prazo de contestação de Pix que não esteja no artigo vinculado.",
+                              "no":  "Prompt do nó de Pix (a confirmar pelo Produto CX)",
+                              "dono":  "Produto CX",
+                              "prazo":  "Imediato",
+                              "dependencias":  "Prazo oficial de contestação de Pix",
+                              "como_medir":  "Respostas com prazo de contestação fora da KB (meta 0)."
+                          },
+                          {
+                              "id":  "OPO-006",
+                              "prioridade":  "media",
+                              "classe":  "A",
+                              "causa":  "loop_fluxo",
+                              "tipo":  "fluxo",
+                              "frente":  "fluxo",
+                              "titulo":  "Cartão: corrigir ccerror-empty-message e impedir que CC Error encerre a conversa",
+                              "titulo_curto":  "Cartão: CC Error não pode encerrar a conversa",
+                              "vertical_tema":  "Cartão RecargaPay",
+                              "problema":  "CC Error e ccerror-empty-message encerram com \u0027Conversa encerrada!\u0027 pedidos válidos como \u0027quero resgatar o valor\u0027.",
+                              "evidencia":  "Classe A loop_fluxo: 2 evitáveis (2 dos 3 abandonos do dia).",
+                              "tickets":  [
+                                              "46631124",
+                                              "46629952"
+                                          ],
+                              "contatos":  {
+                                               "observado":  2,
+                                               "estimado":  2,
+                                               "pct_total":  6.9
+                                           },
+                              "nota_impacto":  "",
+                              "antes":  "Cliente pede para resgatar o valor e recebe \u0027Conversa encerrada!\u0027.",
+                              "depois":  "\u0027Não recebi sua mensagem completa. Escreva novamente o que precisa sobre o cartão.\u0027 Na 2ª vez, transferir; \u0027resgatar o valor\u0027 vai para o resgate do saldo garantido.",
+                              "proposta":  "Corrigir ccerror-empty-message; CC Error nunca encerra a conversa; rotear \u0027resgatar o valor\u0027 ao Agente CC Produção.",
+                              "no":  "Nós CC Error / ccerror-empty-message; roteamento ao Agente CC Produção",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "—",
+                              "como_medir":  "Conversas encerradas por CC Error após mensagem do cliente (meta 0)."
+                          },
+                          {
+                              "id":  "OPO-007",
+                              "prioridade":  "media",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "fluxo",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt Perfil/Segurança: resposta própria para cliente não logado (sem caminho de menu interno, com recuperação de acesso)",
+                              "titulo_curto":  "Perfil/Segurança: resposta própria para cliente não logado",
+                              "vertical_tema":  "Perfil/Segurança (cliente-nao-logado)",
+                              "problema":  "Cliente não logado recebe passo a passo de quem está logado e link de encerramento.",
+                              "evidencia":  "Classe A prompt_resposta: 2 evitáveis; BQS 2.0 de 0% no tema cliente-nao-logado (amostra pequena).",
+                              "tickets":  [
+                                              "46632187",
+                                              "46632165"
+                                          ],
+                              "contatos":  {
+                                               "observado":  2,
+                                               "estimado":  2,
+                                               "pct_total":  6.9
+                                           },
+                              "nota_impacto":  "",
+                              "antes":  "Bot orienta ir em Perfil \u003e Meus dados a quem não consegue entrar e envia link de encerramento.",
+                              "depois":  "Resposta voltada às formas de recuperação de acesso, sem caminho de menu do app logado; link correto.",
+                              "proposta":  "Regra no prompt de Perfil/Segurança: se o cliente não está logado ou o código não chega, responder com as formas de recuperação de acesso; corrigir o link.",
+                              "no":  "Prompt do nó Perfil/Segurança (a confirmar pelo Produto CX)",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Revisão dos artigos de acesso pela Help Design",
+                              "como_medir":  "BQS 2.0 dos temas cliente-nao-logado e ajuda-login."
+                          },
+                          {
+                              "id":  "OPO-008",
+                              "prioridade":  "media",
+                              "classe":  "A",
+                              "causa":  "politica_produto",
+                              "tipo":  "politica",
+                              "frente":  "politica",
+                              "titulo":  "Regra transversal de pedido de atendente: uma sondagem e transbordo no 2º pedido (risco e CSAT no 1º)",
+                              "titulo_curto":  "Pedido de atendente: sondar uma vez e transferir no 2º pedido",
+                              "vertical_tema":  "Transversal",
+                              "problema":  "Pelo menos 4 pedidos explícitos de atendente não foram atendidos; 0 transbordos no dia.",
+                              "evidencia":  "Escalation é o critério mais baixo (6,38); o avaliador deu 7 a 8 em conversas que ignoraram o pedido.",
+                              "tickets":  [
+                                              "46635904",
+                                              "46630942",
+                                              "46631797"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Sem contatos adicionais: evita CSAT 1 por pedido ignorado.",
+                              "antes":  "Cliente pede atendente duas vezes e o bot repete a orientação ou vai para a pesquisa.",
+                              "depois":  "1º pedido: uma pergunta de sondagem; 2º pedido: transferência. Em caso de risco ou na CSAT, transferência no 1º pedido.",
+                              "proposta":  "Política de transbordo: 1 sondagem e transbordo no 2º pedido; risco e pedido na CSAT transferem no 1º.",
+                              "no":  "Regra global de transbordo (nó a confirmar pelo Produto CX)",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "—",
+                              "como_medir":  "% de pedidos de atendente atendidos até o 2º pedido; critério escalation."
+                          },
+                          {
+                              "id":  "OPO-009",
+                              "prioridade":  "baixa",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "fluxo",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt de Transporte: com recarga há mais de 48h, ir direto ao contato com a central do operador",
+                              "titulo_curto":  "Transporte: regra para recarga há mais de 48h",
+                              "vertical_tema":  "Transporte",
+                              "problema":  "Com o prazo de 48h vencido, o bot não vai direto ao passo de contatar a central do operador.",
+                              "evidencia":  "Classe A prompt_resposta: 1 evitável.",
+                              "tickets":  [
+                                              "46634324"
+                                          ],
+                              "contatos":  {
+                                               "observado":  1,
+                                               "estimado":  1,
+                                               "pct_total":  3.4
+                                           },
+                              "nota_impacto":  "",
+                              "antes":  "Bot repete as orientações de espera mesmo com a recarga há mais de 48h.",
+                              "depois":  "Com mais de 48h, a resposta vai direto ao contato com a central do operador.",
+                              "proposta":  "Regra de 48h vencidas no prompt de Transporte.",
+                              "no":  "Prompt do nó de Transporte (a confirmar pelo Produto CX)",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "—",
+                              "como_medir":  "BQS 2.0 no tema transport."
+                          },
+                          {
+                              "id":  "OPO-010",
+                              "prioridade":  "media",
+                              "classe":  "D",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Central de Ajuda: criar 3 artigos (Pix após roubo do celular, empréstimo não reconhecido, cancelar seguro do cartão)",
+                              "titulo_curto":  "Central de Ajuda: 3 artigos novos de Pix, empréstimo e seguro",
+                              "vertical_tema":  "Pix / Empréstimo / Seguro",
+                              "problema":  "Não há artigo externo para contestação de Pix após roubo, empréstimo não reconhecido e cancelamento do seguro do cartão com reembolso.",
+                              "evidencia":  "13 das 26 conversas de n8n_critico sem artigo (maioria Wallet Bloqueado); 3 temas de risco sem conteúdo.",
+                              "tickets":  [
+                                              "46631761",
+                                              "46634762",
+                                              "46631797"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Sem contatos adicionais; dá respaldo ao bot nos temas de risco.",
+                              "antes":  "Bot responde sem material ou com artigo de outro produto.",
+                              "depois":  "Bot responde com o artigo público correspondente.",
+                              "proposta":  "Criar \u0027Como contestar um Pix que não reconheço depois de ter o celular roubado?\u0027, \u0027Não reconheço um empréstimo contratado na minha conta. O que fazer?\u0027 e \u0027Como cancelar o seguro de proteção do cartão e pedir reembolso?\u0027.",
+                              "no":  "Artigos novos na Central de Ajuda (pendente verificação no Guide)",
+                              "dono":  "Help Design",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Prazo oficial de contestação de Pix; regra e valores de reembolso do seguro; verificação no Guide (Zendesk indisponível nesta rodada)",
+                              "como_medir":  "Uso dos artigos pelo bot nos temas e BQS 2.0 dos temas na próxima rodada."
+                          }
+                      ],
+    "artigos":  [
+                    {
+                        "acao":  "criar",
+                        "tickets":  [
+                                        "46631761",
+                                        "46635028"
+                                    ],
+                        "titulo":  "Como contestar um Pix que não reconheço depois de ter o celular roubado?",
+                        "secao":  "",
+                        "problema":  "Sem artigo; o bot citou prazo de 80 dias sem respaldo. Pendente verificação no Guide.",
+                        "primeira_frase":  "Responder na primeira frase como contestar o Pix não reconhecido após o roubo, com o prazo oficial confirmado pelo produto.",
+                        "conversas":  2,
+                        "prioridade":  "alta"
+                    },
+                    {
+                        "acao":  "criar",
+                        "tickets":  [
+                                        "46634762"
+                                    ],
+                        "titulo":  "Não reconheço um empréstimo contratado na minha conta. O que fazer?",
+                        "secao":  "",
+                        "problema":  "Sem artigo para contratação não reconhecida. Pendente verificação no Guide.",
+                        "primeira_frase":  "Responder na primeira frase o que acontece quando o cliente não reconhece um empréstimo e como o caso é analisado.",
+                        "conversas":  1,
+                        "prioridade":  "media"
+                    },
+                    {
+                        "acao":  "criar",
+                        "tickets":  [
+                                        "46631797"
+                                    ],
+                        "titulo":  "Como cancelar o seguro de proteção do cartão e pedir reembolso?",
+                        "secao":  "",
+                        "problema":  "Sem artigo; o bot confundiu seguro com Prime+. Pendente verificação no Guide.",
+                        "primeira_frase":  "Responder na primeira frase como cancelar o seguro de proteção do cartão e quando há reembolso, com regra e valores confirmados pelo produto.",
+                        "conversas":  1,
+                        "prioridade":  "media"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46632187"
+                                    ],
+                        "titulo":  "Não consigo acessar a minha conta",
+                        "secao":  "",
+                        "problema":  "Não cobre o cliente não logado que não recebe o código.",
+                        "primeira_frase":  "Responder na primeira frase as formas de recuperar o acesso quando o código não chega.",
+                        "conversas":  1,
+                        "prioridade":  "media"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46632165"
+                                    ],
+                        "titulo":  "Problemas para acessar a conta em um novo dispositivo",
+                        "secao":  "",
+                        "problema":  "Orientação pressupõe cliente logado.",
+                        "primeira_frase":  "Responder na primeira frase o que fazer para acessar a conta em um novo dispositivo sem estar logado.",
+                        "conversas":  1,
+                        "prioridade":  "media"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46630331"
+                                    ],
+                        "titulo":  "É seguro investir em CDB no RecargaPay?",
+                        "secao":  "",
+                        "problema":  "A garantia do FGC não aparece na primeira frase.",
+                        "primeira_frase":  "Trazer a garantia do FGC já na primeira frase.",
+                        "conversas":  1,
+                        "prioridade":  "baixa"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46631347"
+                                    ],
+                        "titulo":  "Por qual motivo meu pagamento foi cancelado?",
+                        "secao":  "",
+                        "problema":  "O motivo do cancelamento não aparece de forma direta no início.",
+                        "primeira_frase":  "Responder o motivo do cancelamento já na primeira frase.",
+                        "conversas":  1,
+                        "prioridade":  "baixa"
+                    }
+                ]
 }

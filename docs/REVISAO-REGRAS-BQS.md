@@ -134,3 +134,15 @@ Decisão da Leticia: o cliente pode abandonar a conversa ou pedir um humano a qu
 **Não é falha:** abandono depois de resposta boa; transbordo pedido pelo cliente, inclusive quando ele chega e pede o humano sem fazer pergunta nenhuma. A conduta de um transbordo pedido continua sendo avaliada no BQS (a nota de transbordo cobre se o bot ajudou antes ou transferiu com canal e prazo), mas pedir o humano em si nunca pesa contra o bot.
 
 No `bqs-contencao`: pedido direto de humano sem dúvida informada é classe `D` (causa `pedido_humano_direto`), nunca contato evitável; abandono depois de resposta correta e completa é `R`.
+
+## 12. Pesquisa de satisfação e campo de feedback ficam fora da avaliação (21/10/2026)
+
+Decisão da Leticia: quando o cliente confirma que a dúvida foi resolvida, o bot pede uma nota de 1 a 5 e abre um campo de texto livre ("O que você espera no nosso atendimento?") que **só coleta feedback e não executa ação**. Portanto o bot não entender, responder "Não consegui responder" ou encerrar depois desse texto **não é falha**.
+
+- Tudo a partir do convite à pesquisa é pós-atendimento e **não entra** em nenhuma nota (`understanding`, `efficiency`, `escalation`, `resolution`), no TFC, nos sinalizados nem nos contatos evitáveis.
+- Pedido de atendente ou dúvida nova digitados nesse campo, ou depois de "Conversa encerrada!", não contam como pedido ignorado.
+- Não se propõe "ler o texto livre da CSAT" nem "reabrir atendimento" a partir dela; o texto serve só como evidência do motivo da nota (voz do cliente).
+- Continua sendo falha o que ocorreu **antes** do convite (pedido de atendente ignorado, "Não" à confirmação, loop, resposta errada).
+- Agentes ajustados: `bqs-auditor`, `bqs-contencao`, `chatbot-cx-botmaker`, `chatbot-oportunidades`, `chatbot-proposta-ajustes`, `chatbot-relatorio-cx` e os orquestradores.
+- Efeito na calibração de 20/10 dos Casos Críticos (semana 12–18/10): 2 dos 6 aprovados revertidos (46609016 e 46608677) tinham sido reprovados só por fatos do pós-pesquisa; recalculado, são 4 de 14 revertidos (28,6%) e o BQS sobe de 38,1% para 47,6%.
+- Limitação: a calibração mede só falsos aprovados. Como o avaliador automático (n8n, não alterado) pode ter reprovado conversas por causa do pós-pesquisa, o BQS pode estar subestimado nas conversas não auditadas; uma amostra de reprovados para medir falsos reprovados é um passo possível.

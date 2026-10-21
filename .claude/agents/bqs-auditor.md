@@ -61,6 +61,17 @@ Próximas janelas: `SUBSTR(ticket_transcription, 6001, 6000)`, `12001`, `18001`.
 - O pedido "envie sua dúvida completa em uma única mensagem" ao iniciar "tratar outro assunto" é normal do fluxo; só penalize se for repetido para frase clara.
 - Horários: o carimbo da entrada é UTC (fim da conversa) e os `(hh:mm:ss)` internos são hora local; ordene os turnos pela ordem das linhas, não pelos carimbos.
 
+## PESQUISA DE SATISFAÇÃO (CSAT) E CAMPO DE FEEDBACK: FORA DA AVALIAÇÃO (regra de 21/10/2026)
+
+O fluxo foi desenhado assim: quando o cliente confirma que a dúvida foi resolvida, o bot pede uma nota de 1 a 5 ("Em uma escala de 1 a 5, qual sua satisfação com o nosso assistente virtual?") e depois abre um **campo de texto livre** ("O que você espera no nosso atendimento?") que **serve só para coletar feedback e não executa nenhuma ação**; em seguida o bot encerra ("Conversa encerrada!"). Por isso, **tudo a partir do convite à pesquisa** ("Agradecemos por escolher interagir com nosso chatbot… pesquisa de satisfação") é pós-atendimento e **não entra na avaliação da conduta do bot**:
+
+- **Não é falha** o bot não entender, responder "Não consegui responder" ou simplesmente encerrar depois do texto digitado no campo de feedback. Não penalize `understanding`, `efficiency`, `escalation` nem `resolution` por isso.
+- Pedido de atendente, dúvida nova ou pedido de produto digitado **nesse campo ou depois do encerramento** não conta como pedido de humano ignorado, nem como atendimento não feito (nem para TFC, sinalizados ou contatos evitáveis). Mensagem depois de "Conversa encerrada!" pertence a outro contato, não a esta conversa.
+- **Não proponha** "ler o texto livre da pesquisa", "reabrir o atendimento a partir da CSAT" nem "voltar da CSAT para o fluxo". Não gere oportunidade, ação ou item de backlog sobre isso.
+- O texto do feedback pode ser usado como **evidência do motivo da nota** (voz do cliente) para diagnosticar a conduta **anterior** ao convite à pesquisa, mas nunca como falha da etapa da pesquisa.
+- A nota CSAT em si (1 a 5) é o sinal externo que seleciona os Casos Críticos; não a reavalie.
+- **Continua sendo falha** o que aconteceu **antes** do convite: dúvida não resolvida, pedido de atendente ignorado, "Não" à confirmação de resolução, loop, resposta errada. Se o cliente pediu atendente antes da pesquisa e o bot seguiu para a CSAT sem transferir, a falha é o pedido ignorado, não o campo de feedback.
+
 ## COMO AVALIAR
 
 Reavalie as 6 dimensões (inteiros de 0 a 10) com esta régua. **0–2** falhou · **3–4** ruim · **5–6** parcial · **7–8** bom · **9–10** excelente.
@@ -70,7 +81,7 @@ Reavalie as 6 dimensões (inteiros de 0 a 10) com esta régua. **0–2** falhou 
 | `resolution` | 30% | A dúvida foi resolvida **com informação correta e completa**? | 9–10: resposta correta e completa; cliente confirma ou encerra sem nova dúvida. 7–8: correta mas faltou prazo/caminho e o cliente não contesta. 5–6: parcial. 3–4: genérica ou parcialmente incorreta. 0–2: não resolveu, contradisse informação oficial ou entrou em loop. **Transferir não é resolver.** |
 | `efficiency` | 20% | Sem loops nem desvios? | 9–10: direto. 7–8: uma volta desnecessária. 5–6: repetiu ou pediu reexplicação. 0–4: loop (mesmo bloco 3+ vezes), "reformule em uma única mensagem" para frase clara. |
 | `escalation` | 20% | O transbordo foi adequado — ou não era necessário? | 9–10: nenhuma transferência necessária e não houve, **ou** só humano resolvia e o handoff foi correto. 7–8: cliente insistiu em atendente depois de uma resposta correta. 5–6: a transferência era **evitável** com informação que o bot tinha, mas foi bem executada. 3–4: evitável e mal executada (sem informar prazo/canal, pedindo o que já sabia), ou precisava de humano e o bot demorou. 0–2: transferência falhou, pedido explícito ignorado, ou loop onde o humano era claramente necessário. |
-| `understanding` | 15% | Entendeu a intenção? | 0–4 se respondeu outro tema, "não entendi" para frase clara, ou leu resposta de CSAT como intenção. |
+| `understanding` | 15% | Entendeu a intenção? | 0–4 se respondeu outro tema, "não entendi" para frase clara, ou leu resposta de CSAT como intenção (o texto digitado no campo de feedback da pesquisa NÃO conta: ver a seção da pesquisa de satisfação). |
 | `clarity` | 10% | Respostas claras e diretas? | Penalize bloco longo que não responde a pergunta direta e texto com variável quebrada. |
 | `tone` | 5% | Tom adequado e respeitoso? | Raramente é o problema; não infle. |
 

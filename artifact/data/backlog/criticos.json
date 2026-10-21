@@ -2,25 +2,25 @@
     {
         "id":  "CR-001",
         "fluxo":  "criticos",
-        "titulo":  "Fluxo de encerramento e CSAT: não encerrar com pergunta aberta e retomar intenção nova",
+        "titulo":  "Pesquisa CSAT: ler o texto livre e reabrir o atendimento em nova intenção, problema reaberto ou pedido de atendente",
         "frente":  "fluxo",
         "causa":  "loop_fluxo",
         "classe":  "A",
         "dono":  "Produto CX",
         "prioridade":  "alta",
-        "problema":  "Após a CSAT ou por inatividade, o bot responde \u0027Conversa encerrada!\u0027 ou \u0027Não consegui responder\u0027 a uma intenção nova ou ainda ativa do cliente.",
-        "proposta":  "Bloquear encerramento automático com pergunta aberta (inatividade só conta após mensagem do bot); na CSAT, texto livre que não seja nota volta para CX_CA - Validacao_Conteudo; transbordo executado na 2ª \u0027Não consegui responder\u0027; \u0027PIS\u0027 com desambiguação e \u0027limite/crédito\u0027 para o fluxo de limite.",
-        "no":  "CX_CA - Validacao_Conteudo (confirmado); nós de encerramento/CSAT a confirmar pelo Produto CX",
-        "antes":  "Cliente escreve uma dúvida nova após a CSAT e o bot responde \u0027Conversa encerrada!\u0027 ou \u0027Não consegui responder\u0027 e encerra.",
-        "depois":  "Texto livre que não seja nota volta para a validação de conteúdo; na 2ª falha: \u0027Não foi possível responder a essa dúvida por aqui. A conversa será transferida para o atendimento com o assunto já registrado.\u0027",
-        "como_medir":  "Conversas que terminam em \u0027Conversa encerrada!\u0027/\u0027Não consegui responder\u0027 após mensagem do cliente; recontato em 24h (baseline 31.3%).",
-        "dependencias":  "Regra de inatividade do Botmaker",
+        "problema":  "A pesquisa CSAT ignora pedido de atendente, nova intenção ou problema reaberto escritos em texto livre.",
+        "proposta":  "NLU no texto livre da pesquisa CSAT; nova intenção sai da pesquisa e reabre o atendimento.",
+        "no":  "Nós de CSAT/encerramento (a confirmar pelo Produto CX); CX_CA - Validacao_Conteudo",
+        "antes":  "Cliente escreve \u0027cancelar minha conta\u0027 ou uma nova dúvida de empréstimo na pesquisa e o bot repete a confirmação.",
+        "depois":  "Texto livre que não é nota sai da pesquisa e volta para a validação de conteúdo com a nova intenção; pedido de atendente segue a regra de transbordo.",
+        "como_medir":  "Conversas com texto livre na CSAT seguidas de nova resposta do bot; recontato em 24h (baseline 21,4%).",
+        "dependencias":  "—",
         "criada_em":  "2026-10-19",
-        "ultima_vez":  "2026-10-19",
+        "ultima_vez":  "2026-10-20",
         "origem":  "rotina",
-        "status":  "aberta",
-        "status_em":  null,
-        "nota":  "",
+        "status":  "cancelada",
+        "status_em":  "2026-10-21",
+        "nota":  "Cancelada por decisÃ£o da Leticia: o campo de texto livre depois da nota CSAT foi desenhado sÃ³ para coletar feedback e nÃ£o executa aÃ§Ã£o; o bot nÃ£o entender ou nÃ£o agir sobre esse texto nÃ£o Ã© falha. Regra incorporada aos agentes em 21/10/2026.",
         "reapareceu_em":  [
 
                           ],
@@ -34,6 +34,17 @@
                                                 "46628438",
                                                 "46628953",
                                                 "46627611"
+                                            ]
+                            },
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  3,
+                                "tickets":  [
+                                                "46635028",
+                                                "46631347",
+                                                "46631761"
                                             ]
                             }
                         ]
@@ -80,21 +91,21 @@
     {
         "id":  "CR-003",
         "fluxo":  "criticos",
-        "titulo":  "Regra global de transbordo: gatilho jurídico com transferência imediata, sem CSAT",
+        "titulo":  "Regra global de risco: detectar ameaça judicial, contratação não reconhecida e roubo e transferir com tipo, valor e data",
         "frente":  "politica",
         "causa":  "acao_humana_obrigatoria",
         "classe":  "D",
         "dono":  "Produto CX",
         "prioridade":  "alta",
-        "problema":  "Cliente sinalizou ação jurídica e o bot não transferiu de imediato (risco regulatório).",
-        "proposta":  "Gatilho global para Procon, advogado, justiça, Reclame Aqui, processar; \u0027processo\u0027 só quando acompanhado de \u0027contra\u0027, \u0027judicial\u0027 ou \u0027entrar com\u0027. Transbordo imediato, sem CSAT.",
-        "no":  "nó a confirmar pelo Produto CX",
-        "antes":  "Bot segue o fluxo estático e oferece CSAT após menção a processo.",
-        "depois":  "Transbordo imediato com o assunto registrado, sem CSAT.",
-        "como_medir":  "Conversas com termos jurídicos e transbordo na mesma mensagem.",
-        "dependencias":  "—",
+        "problema":  "Sinais de risco (ameaça de processo com bloqueio judicial, \u0027não contratei\u0027, estorno de seguro) não foram detectados; handoff improvisado ou tardio.",
+        "proposta":  "Gatilhos de risco (processo, judicial, \u0027não contratei\u0027, roubo) com transbordo no 1º pedido e sem CSAT; handoff com tipo, valor e data; desambiguar seguro e Prime+.",
+        "no":  "Regra global de transbordo (nó a confirmar pelo Produto CX)",
+        "antes":  "Cliente ameaça processo por bloqueio judicial ou diz que não contratou o empréstimo e o bot segue o fluxo padrão, sem transferência estruturada.",
+        "depois":  "\u0027Seu caso de *[tipo]* no valor de *R$ [valor]*, em *DD/MM*, segue agora para um especialista, com essas informações registradas. Não é necessário repetir os dados.\u0027",
+        "como_medir":  "Conversas com termos de risco transferidas na mesma mensagem e com tipo, valor e data registrados.",
+        "dependencias":  "Texto de prazo/protocolo do handoff",
         "criada_em":  "2026-10-19",
-        "ultima_vez":  "2026-10-19",
+        "ultima_vez":  "2026-10-20",
         "origem":  "rotina",
         "status":  "aberta",
         "status_em":  null,
@@ -111,27 +122,38 @@
                                 "tickets":  [
                                                 "46626567"
                                             ]
+                            },
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46630735",
+                                                "46634762",
+                                                "46631797"
+                                            ]
                             }
                         ]
     },
     {
         "id":  "CR-004",
         "fluxo":  "criticos",
-        "titulo":  "Fluxo Pix negado: explicar no 1º pedido de atendente e transferir no 2º",
+        "titulo":  "Regra transversal de pedido de atendente: uma sondagem e transbordo no 2º pedido (risco e CSAT no 1º)",
         "frente":  "politica",
         "causa":  "politica_produto",
         "classe":  "A",
         "dono":  "Produto CX",
         "prioridade":  "media",
-        "problema":  "Pedido explícito de atendente ignorado até a CSAT em Pix negado; transferência tardia.",
-        "proposta":  "Regra de pedido de atendente no fluxo Pix negado: 1º pedido explica e sonda; 2º pedido transfere.",
-        "no":  "nó a confirmar pelo Produto CX",
-        "antes":  "Cliente pede atendente e o bot repete a orientação até a CSAT.",
-        "depois":  "1º pedido: o atendimento não libera Pix recusado por verificação automática; alternativas em Área Pix \u003e Meus limites Pix; sonda a dúvida. 2º pedido: transfere.",
-        "como_medir":  "% de pedidos de atendente atendidos até o 2º pedido no tema Pix.",
+        "problema":  "Pelo menos 4 pedidos explícitos de atendente não foram atendidos; 0 transbordos no dia.",
+        "proposta":  "Política de transbordo: 1 sondagem e transbordo no 2º pedido; risco e pedido na CSAT transferem no 1º.",
+        "no":  "Regra global de transbordo (nó a confirmar pelo Produto CX)",
+        "antes":  "Cliente pede atendente duas vezes e o bot repete a orientação ou vai para a pesquisa.",
+        "depois":  "1º pedido: uma pergunta de sondagem; 2º pedido: transferência. Em caso de risco ou na CSAT, transferência no 1º pedido.",
+        "como_medir":  "% de pedidos de atendente atendidos até o 2º pedido; critério escalation.",
         "dependencias":  "—",
         "criada_em":  "2026-10-19",
-        "ultima_vez":  "2026-10-19",
+        "ultima_vez":  "2026-10-20",
         "origem":  "rotina",
         "status":  "aberta",
         "status_em":  null,
@@ -148,6 +170,17 @@
                                 "tickets":  [
                                                 "46628593",
                                                 "46625909"
+                                            ]
+                            },
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46635904",
+                                                "46630942",
+                                                "46631797"
                                             ]
                             }
                         ]
@@ -231,21 +264,21 @@
     {
         "id":  "CR-007",
         "fluxo":  "criticos",
-        "titulo":  "Fluxos estáticos (Transporte/URBS, CC Error): detectar troca de intenção no texto livre",
+        "titulo":  "Fluxos estáticos: checar aderência da 1ª mensagem ao tema pré-selecionado e desambiguar antes de responder",
         "frente":  "fluxo",
         "causa":  "nlu_roteamento",
         "classe":  "B",
         "dono":  "Produto CX",
-        "prioridade":  "media",
-        "problema":  "Fluxos estáticos prendem o cliente e ignoram quando ele muda de assunto.",
-        "proposta":  "Detecção de intenção nos nós de texto livre de Transporte/URBS e CC Error; ramo \u0027\u003e24h\u0027 no Transporte com transbordo.",
-        "no":  "nó a confirmar pelo Produto CX",
-        "antes":  "Cliente muda de assunto e o bot repete as opções do fluxo estático.",
-        "depois":  "Nova intenção detectada e roteada; no Transporte, ramo \u0027\u003e24h\u0027 com transbordo.",
-        "como_medir":  "Abandono e loop nos fluxos estáticos de Transporte e CC Error.",
-        "dependencias":  "—",
+        "prioridade":  "alta",
+        "problema":  "A primeira mensagem fica presa no tema pré-selecionado do fluxo estático; texto fora do Sim/Não e mensagens curtas recebem escopo ou \u0027Não consegui responder\u0027 repetido, sem transbordo.",
+        "proposta":  "Checagem de aderência da 1ª mensagem ao tema do fluxo estático; NLU para texto fora do Sim/Não; sinônimos (\u0027desbloquear carteira\u0027, \u0027CPF ruim\u0027); contador de 2 \u0027Não consegui responder\u0027 que oferece transbordo.",
+        "no":  "Fluxos estáticos de pagamento negado e Wallet Bloqueado (nó a confirmar pelo Produto CX)",
+        "antes":  "Cliente escreve \u0027Desbloquear carteira\u0027 ou pede para cancelar um empréstimo feito sem querer e o bot segue no tema pré-selecionado ou responde \u0027Conversa encerrada!\u0027.",
+        "depois":  "\u0027Sua dúvida é sobre o pagamento que não foi concluído ou sobre outro assunto? Escreva em poucas palavras o que precisa.\u0027 Sinônimos mapeados (ex.: \u0027Desbloquear carteira\u0027 leva ao Wallet Bloqueado); após 2 falhas, transbordo.",
+        "como_medir":  "Conversas com 2 ou mais \u0027Não consegui responder\u0027 e abandonos com \u0027Conversa encerrada!\u0027 após pedido válido; classe A nlu_roteamento na próxima rodada.",
+        "dependencias":  "Nós reais por trás dos stages (botmaker_chatbot_flow vazio)",
         "criada_em":  "2026-10-19",
-        "ultima_vez":  "2026-10-19",
+        "ultima_vez":  "2026-10-20",
         "origem":  "rotina",
         "status":  "aberta",
         "status_em":  null,
@@ -262,6 +295,17 @@
                                 "tickets":  [
                                                 "46629622",
                                                 "46625849"
+                                            ]
+                            },
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  4,
+                                "tickets":  [
+                                                "46628685",
+                                                "46629630",
+                                                "46630890"
                                             ]
                             }
                         ]
@@ -451,6 +495,235 @@
                                 "tickets":  [
                                                 "46627269",
                                                 "46626714"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-013",
+        "fluxo":  "criticos",
+        "titulo":  "Wallet Bloqueado: corrigir a variável de prazo em branco, criar fallback sem data e tratar o \u0027Não\u0027",
+        "frente":  "variavel_hp",
+        "causa":  "variavel_hp",
+        "classe":  "B",
+        "dono":  "Produto CX",
+        "prioridade":  "alta",
+        "problema":  "A mensagem do Wallet Bloqueado sai com a data do prazo vazia (\u0027até o final do dia ,\u0027) e, após \u0027Não\u0027 na confirmação, o bot só faz uma oferta passiva.",
+        "proposta":  "Corrigir a variável de prazo do nó; quando vier nula, usar o texto de fallback sem data; após \u0027Não\u0027, explicar a liberação automática em vez de oferta passiva.",
+        "no":  "Nó Wallet Bloqueado (nome e origem da variável de prazo a confirmar pelo Produto CX)",
+        "antes":  "Resposta com o prazo em branco (\u0027até o final do dia ,\u0027); após \u0027Não\u0027, oferta passiva.",
+        "depois":  "Com data: \u0027A análise da sua carteira tem prazo até *DD/MM*. Quando ela terminar, o desbloqueio acontece automaticamente, sem necessidade de novo contato.\u0027 Sem data: \u0027A análise da sua carteira está em andamento. Quando ela terminar, o desbloqueio acontece automaticamente, sem necessidade de novo contato.\u0027",
+        "como_medir":  "Mensagens do Wallet Bloqueado com data vazia (meta 0); CSAT 1 e BQS 2.0 no tema wallet-blocked.",
+        "dependencias":  "Nome e origem da variável de prazo",
+        "criada_em":  "2026-10-20",
+        "ultima_vez":  "2026-10-20",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  4,
+                                "tickets":  [
+                                                "46630957",
+                                                "46633940",
+                                                "46631948"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-014",
+        "fluxo":  "criticos",
+        "titulo":  "Prompt de Pix: não citar prazo de contestação que não esteja no artigo (80 dias sem respaldo)",
+        "frente":  "prompt",
+        "causa":  "prompt_resposta",
+        "classe":  "B",
+        "dono":  "Produto CX",
+        "prioridade":  "alta",
+        "problema":  "O bot informou um prazo de 80 dias para contestar Pix sem respaldo na Central de Ajuda.",
+        "proposta":  "Regra no prompt: nunca citar prazo de contestação de Pix que não esteja no artigo vinculado.",
+        "no":  "Prompt do nó de Pix (a confirmar pelo Produto CX)",
+        "antes":  "Bot afirma que o cliente tem 80 dias para contestar um Pix.",
+        "depois":  "Sem prazo no material, a resposta não cita prazo; com o prazo oficial confirmado no artigo, cita exatamente o do artigo.",
+        "como_medir":  "Respostas com prazo de contestação fora da KB (meta 0).",
+        "dependencias":  "Prazo oficial de contestação de Pix",
+        "criada_em":  "2026-10-20",
+        "ultima_vez":  "2026-10-20",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46631761",
+                                                "46635028"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-015",
+        "fluxo":  "criticos",
+        "titulo":  "Cartão: corrigir ccerror-empty-message e impedir que CC Error encerre a conversa",
+        "frente":  "fluxo",
+        "causa":  "loop_fluxo",
+        "classe":  "A",
+        "dono":  "Produto CX",
+        "prioridade":  "media",
+        "problema":  "CC Error e ccerror-empty-message encerram com \u0027Conversa encerrada!\u0027 pedidos válidos como \u0027quero resgatar o valor\u0027.",
+        "proposta":  "Corrigir ccerror-empty-message; CC Error nunca encerra a conversa; rotear \u0027resgatar o valor\u0027 ao Agente CC Produção.",
+        "no":  "Nós CC Error / ccerror-empty-message; roteamento ao Agente CC Produção",
+        "antes":  "Cliente pede para resgatar o valor e recebe \u0027Conversa encerrada!\u0027.",
+        "depois":  "\u0027Não recebi sua mensagem completa. Escreva novamente o que precisa sobre o cartão.\u0027 Na 2ª vez, transferir; \u0027resgatar o valor\u0027 vai para o resgate do saldo garantido.",
+        "como_medir":  "Conversas encerradas por CC Error após mensagem do cliente (meta 0).",
+        "dependencias":  "—",
+        "criada_em":  "2026-10-20",
+        "ultima_vez":  "2026-10-20",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  2,
+                                "tickets":  [
+                                                "46631124",
+                                                "46629952"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-016",
+        "fluxo":  "criticos",
+        "titulo":  "Prompt Perfil/Segurança: resposta própria para cliente não logado (sem caminho de menu interno, com recuperação de acesso)",
+        "frente":  "prompt",
+        "causa":  "prompt_resposta",
+        "classe":  "A",
+        "dono":  "Produto CX",
+        "prioridade":  "media",
+        "problema":  "Cliente não logado recebe passo a passo de quem está logado e link de encerramento.",
+        "proposta":  "Regra no prompt de Perfil/Segurança: se o cliente não está logado ou o código não chega, responder com as formas de recuperação de acesso; corrigir o link.",
+        "no":  "Prompt do nó Perfil/Segurança (a confirmar pelo Produto CX)",
+        "antes":  "Bot orienta ir em Perfil \u003e Meus dados a quem não consegue entrar e envia link de encerramento.",
+        "depois":  "Resposta voltada às formas de recuperação de acesso, sem caminho de menu do app logado; link correto.",
+        "como_medir":  "BQS 2.0 dos temas cliente-nao-logado e ajuda-login.",
+        "dependencias":  "Revisão dos artigos de acesso pela Help Design",
+        "criada_em":  "2026-10-20",
+        "ultima_vez":  "2026-10-20",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  2,
+                                "tickets":  [
+                                                "46632187",
+                                                "46632165"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-017",
+        "fluxo":  "criticos",
+        "titulo":  "Prompt de Transporte: com recarga há mais de 48h, ir direto ao contato com a central do operador",
+        "frente":  "prompt",
+        "causa":  "prompt_resposta",
+        "classe":  "A",
+        "dono":  "Produto CX",
+        "prioridade":  "baixa",
+        "problema":  "Com o prazo de 48h vencido, o bot não vai direto ao passo de contatar a central do operador.",
+        "proposta":  "Regra de 48h vencidas no prompt de Transporte.",
+        "no":  "Prompt do nó de Transporte (a confirmar pelo Produto CX)",
+        "antes":  "Bot repete as orientações de espera mesmo com a recarga há mais de 48h.",
+        "depois":  "Com mais de 48h, a resposta vai direto ao contato com a central do operador.",
+        "como_medir":  "BQS 2.0 no tema transport.",
+        "dependencias":  "—",
+        "criada_em":  "2026-10-20",
+        "ultima_vez":  "2026-10-20",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  1,
+                                "tickets":  [
+                                                "46634324"
+                                            ]
+                            }
+                        ]
+    },
+    {
+        "id":  "CR-018",
+        "fluxo":  "criticos",
+        "titulo":  "Central de Ajuda: criar 3 artigos (Pix após roubo do celular, empréstimo não reconhecido, cancelar seguro do cartão)",
+        "frente":  "artigo",
+        "causa":  "artigo",
+        "classe":  "D",
+        "dono":  "Help Design",
+        "prioridade":  "media",
+        "problema":  "Não há artigo externo para contestação de Pix após roubo, empréstimo não reconhecido e cancelamento do seguro do cartão com reembolso.",
+        "proposta":  "Criar \u0027Como contestar um Pix que não reconheço depois de ter o celular roubado?\u0027, \u0027Não reconheço um empréstimo contratado na minha conta. O que fazer?\u0027 e \u0027Como cancelar o seguro de proteção do cartão e pedir reembolso?\u0027.",
+        "no":  "Artigos novos na Central de Ajuda (pendente verificação no Guide)",
+        "antes":  "Bot responde sem material ou com artigo de outro produto.",
+        "depois":  "Bot responde com o artigo público correspondente.",
+        "como_medir":  "Uso dos artigos pelo bot nos temas e BQS 2.0 dos temas na próxima rodada.",
+        "dependencias":  "Prazo oficial de contestação de Pix; regra e valores de reembolso do seguro; verificação no Guide (Zendesk indisponível nesta rodada)",
+        "criada_em":  "2026-10-20",
+        "ultima_vez":  "2026-10-20",
+        "origem":  "rotina",
+        "status":  "aberta",
+        "status_em":  null,
+        "nota":  "",
+        "reapareceu_em":  [
+
+                          ],
+        "ocorrencias":  [
+                            {
+                                "fim":  "2026-10-20",
+                                "periodo_label":  "20/10/2026",
+                                "rotina":  "criticos-diario",
+                                "contatos_estimados":  0,
+                                "tickets":  [
+                                                "46631761",
+                                                "46634762",
+                                                "46631797"
                                             ]
                             }
                         ]

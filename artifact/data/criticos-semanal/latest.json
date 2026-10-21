@@ -1,36 +1,84 @@
 {
-  "schema": "bqs-run/1",
-  "chave": "criticos-semanal",
-  "rotina": "Casos críticos (semanal)",
-  "meta": {
-    "origem": "teste",
-    "nota": "BQS 2.0 calibrado por auditoria (teste): o avaliador aprovou 66,7% e a auditoria leu 14 dos 14 aprovados da semana e reverteu 6 (43%). Só métricas reais do Databricks e auditoria (20/10/2026). A classificação de contatos evitáveis e as oportunidades ainda não rodaram para esta rotina."
-  },
-  "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
-  "gerado_em": "2026-10-20T11:55:00-03:00",
-  "cobertura": {
-    "baixa": true,
-    "comparacao_indisponivel": true,
-    "texto": "22 conversas em 2 dos 7 dias; em agosto eram de 150 a 196 por semana. Não leia como melhora."
-  },
-  "metricas": {
-    "n_total": 22,
-    "n_avaliaveis": 21,
-    "n_ok": 14,
-    "bqs": 38.1,
-    "bqs_avaliador": 66.7,
-    "calibracao": { "calibrado": true, "n_amostra": 14, "n_revertidos": 6, "taxa_falso_aprovado": 42.9, "faixa": [38.1, 38.1] },
-    "bqs_anterior": null,
-    "pct_recontato_24h": 38.5,
-    "sinalizados": { "transbordo_sem_pedido": { "n": 0, "pct": 0.0, "tickets": [] } },
-    "tfc": 4.5,
-    "pct_pediu_humano": 18.2,
-    "pct_transbordo": 4.5,
-    "labels": { "excelente": 10, "bom": 4, "regular": 3, "ruim": 1, "critico": 3 },
-    "retention": { "resolutiva": 20, "abandono": 1, "transbordo": 1, "loop": 0 },
-    "criterios": { "understanding": 6.95, "resolution": 6.64, "clarity": 7.23, "tone": 7.32, "efficiency": 6.59, "escalation": 6.86 }
-  },
-  "pontos_atencao": [
-    { "tipo": "warn", "texto": "20 das 22 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. O padrão mais recorrente a investigar é a resposta que encerra sem resolver. Exemplos com resolução 0 ou 1:", "tickets": [46609212, 46611706, 46604540] }
-  ]
+    "schema":  "bqs-run/1",
+    "chave":  "criticos-semanal",
+    "rotina":  "Casos críticos (semanal)",
+    "meta":  {
+                 "origem":  "teste",
+                 "nota":  "BQS 2.0 calibrado por auditoria (teste): o avaliador aprovou 66,7% e a auditoria leu 14 dos 14 aprovados da semana e reverteu 4 (29%), jÃ¡ sem considerar o que aconteceu depois do convite Ã  pesquisa de satisfaÃ§Ã£o. SÃ³ mÃ©tricas reais do Databricks e auditoria (20/10/2026). A classificaÃ§Ã£o de contatos evitÃ¡veis e as oportunidades ainda nÃ£o rodaram para esta rotina."
+             },
+    "periodo":  {
+                    "tipo":  "semanal",
+                    "inicio":  "2026-10-12",
+                    "fim":  "2026-10-18",
+                    "label":  "12/10 a 18/10/2026"
+                },
+    "gerado_em":  "2026-10-20T11:55:00-03:00",
+    "cobertura":  {
+                      "baixa":  true,
+                      "comparacao_indisponivel":  true,
+                      "texto":  "22 conversas em 2 dos 7 dias; em agosto eram de 150 a 196 por semana. Não leia como melhora."
+                  },
+    "metricas":  {
+                     "n_total":  22,
+                     "n_avaliaveis":  21,
+                     "n_ok":  14,
+                     "bqs":  47.6,
+                     "bqs_avaliador":  66.7,
+                     "calibracao":  {
+                                        "calibrado":  true,
+                                        "n_amostra":  14,
+                                        "n_revertidos":  4,
+                                        "taxa_falso_aprovado":  28.6,
+                                        "faixa":  [
+                                                      47.6,
+                                                      47.6
+                                                  ]
+                                    },
+                     "bqs_anterior":  null,
+                     "pct_recontato_24h":  38.5,
+                     "sinalizados":  {
+                                         "transbordo_sem_pedido":  {
+                                                                       "n":  0,
+                                                                       "pct":  0.0,
+                                                                       "tickets":  [
+
+                                                                                   ]
+                                                                   }
+                                     },
+                     "tfc":  4.5,
+                     "pct_pediu_humano":  18.2,
+                     "pct_transbordo":  4.5,
+                     "labels":  {
+                                    "excelente":  10,
+                                    "bom":  4,
+                                    "regular":  3,
+                                    "ruim":  1,
+                                    "critico":  3
+                                },
+                     "retention":  {
+                                       "resolutiva":  20,
+                                       "abandono":  1,
+                                       "transbordo":  1,
+                                       "loop":  0
+                                   },
+                     "criterios":  {
+                                       "understanding":  6.95,
+                                       "resolution":  6.64,
+                                       "clarity":  7.23,
+                                       "tone":  7.32,
+                                       "efficiency":  6.59,
+                                       "escalation":  6.86
+                                   }
+                 },
+    "pontos_atencao":  [
+                           {
+                               "tipo":  "warn",
+                               "texto":  "20 das 22 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. O padrão mais recorrente a investigar é a resposta que encerra sem resolver. Exemplos com resolução 0 ou 1:",
+                               "tickets":  [
+                                               46609212,
+                                               46611706,
+                                               46604540
+                                           ]
+                           }
+                       ]
 }

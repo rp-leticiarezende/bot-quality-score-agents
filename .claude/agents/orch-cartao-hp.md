@@ -39,6 +39,17 @@ Postura obrigatória de todo o pipeline: **criteriosa**. Transbordo bem executad
 
 ---
 
+## PESQUISA DE SATISFAÇÃO (CSAT) E CAMPO DE FEEDBACK: FORA DA AVALIAÇÃO (regra de 21/10/2026)
+
+O fluxo foi desenhado assim: quando o cliente confirma que a dúvida foi resolvida, o bot pede uma nota de 1 a 5 ("Em uma escala de 1 a 5, qual sua satisfação com o nosso assistente virtual?") e depois abre um **campo de texto livre** ("O que você espera no nosso atendimento?") que **serve só para coletar feedback e não executa nenhuma ação**; em seguida o bot encerra ("Conversa encerrada!"). Por isso, **tudo a partir do convite à pesquisa** ("Agradecemos por escolher interagir com nosso chatbot… pesquisa de satisfação") é pós-atendimento e **não entra na avaliação da conduta do bot**:
+
+- **Não é falha** o bot não entender, responder "Não consegui responder" ou simplesmente encerrar depois do texto digitado no campo de feedback. Não penalize `understanding`, `efficiency`, `escalation` nem `resolution` por isso.
+- Pedido de atendente, dúvida nova ou pedido de produto digitado **nesse campo ou depois do encerramento** não conta como pedido de humano ignorado, nem como atendimento não feito (nem para TFC, sinalizados ou contatos evitáveis). Mensagem depois de "Conversa encerrada!" pertence a outro contato, não a esta conversa.
+- **Não proponha** "ler o texto livre da pesquisa", "reabrir o atendimento a partir da CSAT" nem "voltar da CSAT para o fluxo". Não gere oportunidade, ação ou item de backlog sobre isso.
+- O texto do feedback pode ser usado como **evidência do motivo da nota** (voz do cliente) para diagnosticar a conduta **anterior** ao convite à pesquisa, mas nunca como falha da etapa da pesquisa.
+- A nota CSAT em si (1 a 5) é o sinal externo que seleciona os Casos Críticos; não a reavalie.
+- **Continua sendo falha** o que aconteceu **antes** do convite: dúvida não resolvida, pedido de atendente ignorado, "Não" à confirmação de resolução, loop, resposta errada. Se o cliente pediu atendente antes da pesquisa e o bot seguiu para a CSAT sem transferir, a falha é o pedido ignorado, não o campo de feedback.
+
 ## DEFINIÇÕES CANÔNICAS (não altere, não reinterprete)
 
 ```
