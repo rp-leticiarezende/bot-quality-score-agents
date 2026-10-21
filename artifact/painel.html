@@ -385,15 +385,7 @@ function visao(){
     if(linhasSp.length)h+='<div class="panel scroll"><h3>Tickets para analisar ('+linhasSp.length+')</h3><table><thead><tr><th>Rotina</th><th>Ticket</th><th>Tema</th><th>Vertical</th><th>Desfecho</th><th>Avaliador</th></tr></thead><tbody>'+linhasSp.map(function(r){var it=r.it;return '<tr><td>'+esc(r.f.nome)+'</td><td><code>'+esc(it.ticket_id)+'</code></td><td>'+esc(it.tema||"—")+'</td><td>'+esc(it.vertical||"—")+'</td><td>'+esc(DESF[it.desfecho]||it.desfecho||"—")+'</td><td>'+(it.aprovada_avaliador?chip("Aprovada","good"):chip("Reprovada","warn"))+'</td></tr>'}).join("")+'</tbody></table></div>';
   }else h+=empty("Sem dados ainda","A tabela aparece quando uma rotina publicar o indicador de contatos que entraram sem artigo.");
   h+='</section>';
-  // auditoria
-  h+='<section class="block"><h2>Quanto o avaliador automático erra</h2><p class="sub">O auditor lê a transcrição de casos duvidosos (amostra seletiva) e de uma amostra aleatória das aprovações (calibração). A nota revisada e a taxa de aprovações revertidas entram no BQS 2.0.</p>';
-  var au=FLUXOS.map(function(f){var d=fluxoDados(f);return d&&g(d,"auditoria.auditados")!=null?{f:f,a:d.auditoria}:null}).filter(Boolean);
-  if(au.length){
-    h+='<div class="panel scroll"><table><thead><tr><th>Rotina</th><th class="n">Auditados</th><th class="n">Notas revisadas</th><th class="n">Aprovado → reprovado</th><th class="n">Reprovado → aprovado</th></tr></thead><tbody>'+au.map(function(x){return '<tr><td>'+esc(x.f.nome)+'</td><td class="n">'+int(x.a.auditados)+'</td><td class="n">'+int(x.a.revisados)+'</td><td class="n">'+int(x.a.aprovado_para_reprovado)+'</td><td class="n">'+int(x.a.reprovado_para_aprovado)+'</td></tr>'}).join("")+'</tbody></table></div>';
-    var dv=[];au.forEach(function(x){arr(x.a.divergencias).forEach(function(t){dv.push(t)})});
-    if(dv.length)h+='<div class="panel"><h3>Divergências observadas</h3><ul class="plain">'+dv.slice(0,5).map(function(t){return '<li><span class="dot warn"></span><span>'+esc(t)+'</span></li>'}).join("")+'</ul></div>';
-  }else h+=empty("Sem auditoria ainda","Os tickets marcados para auditoria são lidos na transcrição a cada rodada.");
-  main(h+'</section>');
+  main(h);
 }
 /* ---------- linha do tempo ---------- */
 var CORES={"cartao-hp":"var(--cD)","aleatorio":"var(--cA)","criticos-semanal":"var(--cR)","criticos-diario":"var(--cC)","cartao-hp-mensal":"var(--cD)","aleatorio-mensal":"var(--cA)","criticos-mensal":"var(--cR)"};
