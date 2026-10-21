@@ -4,7 +4,7 @@
     "rotina":  "Casos críticos (semanal)",
     "meta":  {
                  "origem":  "teste",
-                 "nota":  "BQS 2.0 calibrado por auditoria (teste): o avaliador aprovou 66,7% e a auditoria leu 14 dos 14 aprovados da semana e reverteu 4 (29%), jÃ¡ sem considerar o que aconteceu depois do convite Ã  pesquisa de satisfaÃ§Ã£o. SÃ³ mÃ©tricas reais do Databricks e auditoria (20/10/2026). A classificaÃ§Ã£o de contatos evitÃ¡veis e as oportunidades ainda nÃ£o rodaram para esta rotina."
+                 "nota":  "BQS 2.0 calibrado por auditoria nos dois sentidos (teste): o avaliador aprovou 66,7%; a auditoria leu os 14 aprovados da semana e reverteu 4, e leu os 6 reprovados sÃ³ pela nota e aprovou 3 (parte da transcriÃ§Ã£o legÃ­vel comeÃ§a sÃ³ no convite Ã  pesquisa de satisfaÃ§Ã£o, entÃ£o esses 3 tÃªm confianÃ§a baixa). O que veio depois do convite Ã  pesquisa nÃ£o conta. SÃ³ mÃ©tricas reais do Databricks e auditoria (21/10/2026). A classificaÃ§Ã£o de contatos evitÃ¡veis e as oportunidades ainda nÃ£o rodaram para esta rotina."
              },
     "periodo":  {
                     "tipo":  "semanal",
@@ -22,7 +22,7 @@
                      "n_total":  22,
                      "n_avaliaveis":  21,
                      "n_ok":  14,
-                     "bqs":  47.6,
+                     "bqs":  61.9,
                      "bqs_avaliador":  66.7,
                      "calibracao":  {
                                         "calibrado":  true,
@@ -30,9 +30,13 @@
                                         "n_revertidos":  4,
                                         "taxa_falso_aprovado":  28.6,
                                         "faixa":  [
-                                                      47.6,
-                                                      47.6
-                                                  ]
+                                                      61.9,
+                                                      61.9
+                                                  ],
+                                        "calibrado_reprovados":  true,
+                                        "n_amostra_reprovados":  6,
+                                        "n_revertidos_reprovados":  3,
+                                        "taxa_falso_reprovado":  50
                                     },
                      "bqs_anterior":  null,
                      "pct_recontato_24h":  38.5,
