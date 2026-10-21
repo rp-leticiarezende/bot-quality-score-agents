@@ -276,6 +276,32 @@ Guarde como `sinalizados_transbordo` (até 12 `ticket_id`; use os 3 primeiros co
 
 ---
 
+### 3.5 — Entraram sem artigo da Central (tag `chat-default-instead-form`)
+
+A tag `chat-default-instead-form` é gravada quando o cliente abre o chat **sem passar por nenhum artigo da Central de Ajuda**: é uma **porta não mapeada** (tela do app ou MCT sem artigo associado), e sem o artigo o bot não reconhece bem o assunto. Ela vem dentro de `ticket_tags`. É um **indicador de acompanhamento, fora da conta do BQS**: serve para análise manual e, no futuro, para um agente investigar esses casos.
+
+```sql
+[BASE]
+SELECT COUNT(*) AS n_total_periodo,
+       SUM(CASE WHEN ticket_tags LIKE '%chat-default-instead-form%' THEN 1 ELSE 0 END) AS n_sem_porta,
+       ROUND(100.0 * SUM(CASE WHEN ticket_tags LIKE '%chat-default-instead-form%' THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_sem_porta,
+       ROUND(100.0 * SUM(CASE WHEN ticket_tags LIKE '%chat-default-instead-form%' AND nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END)
+             / NULLIF(SUM(CASE WHEN ticket_tags LIKE '%chat-default-instead-form%' AND nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS pct_aprovadas_avaliador
+FROM base WHERE periodo = 'atual'
+```
+
+```sql
+[BASE]
+SELECT ticket_id, topic, effective_vertical, retention_type,
+       CASE WHEN nota_ok = true AND desfecho_ok = true THEN true ELSE false END AS aprovada_avaliador
+FROM base
+WHERE periodo = 'atual' AND ticket_tags LIKE '%chat-default-instead-form%'
+ORDER BY received_timestamp DESC, ticket_id
+LIMIT 25
+```
+
+Guarde como `sem_porta`. Vai para `metricas.sem_artigo_porta` do JSON do painel (contrato em "Contrato de dados"). Não gere oportunidade, alerta nem ação a partir disso: a tabela é só para análise manual. As quebras por tema desta tabela usam o `topic` do avaliador, que pode estar vazio para essas conversas.
+
 ## PASSO 4 — PACOTES DE DADOS (consultas determinísticas)
 
 Todas as consultas começam com `[BASE]`. Formate cada resultado como texto estruturado (uma linha por conversa, campos nomeados), com o `diagnostics` legível (categoria — descrição — ação sugerida).

@@ -69,7 +69,57 @@
                                        "tone":  8.08,
                                        "efficiency":  6.54,
                                        "escalation":  9.77
-                                   }
+                                   },
+                     "sem_artigo_porta":  {
+                                              "tag":  "chat-default-instead-form",
+                                              "n":  6,
+                                              "pct":  11.5,
+                                              "pct_aprovadas_avaliador":  66.7,
+                                              "itens":  [
+                                                            {
+                                                                "ticket_id":  46611663,
+                                                                "tema":  "seguro-protecao-pix",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46610527,
+                                                                "tema":  "dúvidas-sobre-seguro",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609833,
+                                                                "tema":  "seguro",
+                                                                "vertical":  "estorno_seg",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609824,
+                                                                "tema":  "seguro-prestamista",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46608443,
+                                                                "tema":  "empréstimo",
+                                                                "vertical":  "emprestimo",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46608013,
+                                                                "tema":  "seguro",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  false
+                                                            }
+                                                        ]
+                                          }
                  },
     "pontos_atencao":  [
                            {

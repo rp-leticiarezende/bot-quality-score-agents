@@ -1,3 +1,24 @@
 [
-  {"inicio":"2026-10-12","fim":"2026-10-18","periodo_label":"12/10 a 18/10/2026","bqs":43.2,"tfc":30.4,"ce_pct_total":50.8,"n_total":398,"n_avaliaveis":388,"calibracao_amostra":25,"calibracao_revertidos":8,"n_sinalizados":32,"cobertura_baixa":true,"prompt_version":"v1","pct_recontato_24h":12.2}
+    {
+        "value":  [
+                      {
+                          "inicio":  "2026-10-12",
+                          "fim":  "2026-10-18",
+                          "periodo_label":  "12/10 a 18/10/2026",
+                          "bqs":  43.2,
+                          "tfc":  30.4,
+                          "ce_pct_total":  50.8,
+                          "n_total":  398,
+                          "n_avaliaveis":  388,
+                          "calibracao_amostra":  25,
+                          "calibracao_revertidos":  8,
+                          "n_sinalizados":  32,
+                          "cobertura_baixa":  true,
+                          "prompt_version":  "v1",
+                          "pct_recontato_24h":  12.2,
+                          "n_sem_porta":  19
+                      }
+                  ],
+        "Count":  1
+    }
 ]

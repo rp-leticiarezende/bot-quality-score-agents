@@ -77,7 +77,148 @@
                      "qualidade_dado":  {
                                             "n_sem_boas_vindas":  21,
                                             "pct_sem_boas_vindas":  5.3
-                                        }
+                                        },
+                     "sem_artigo_porta":  {
+                                              "tag":  "chat-default-instead-form",
+                                              "n":  19,
+                                              "pct":  4.8,
+                                              "pct_aprovadas_avaliador":  38.9,
+                                              "itens":  [
+                                                            {
+                                                                "ticket_id":  46609835,
+                                                                "tema":  "empréstimo debitado do cartão do titular",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609493,
+                                                                "tema":  "problemas-com-o-uso-do-cartao",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609276,
+                                                                "tema":  "cartao-recargapay",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46610432,
+                                                                "tema":  "tap-to-pay",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46608244,
+                                                                "tema":  "bloquear-desbloquear-ou-cancelar-cartao",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609834,
+                                                                "tema":  "reembolso",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607846,
+                                                                "tema":  "cobranca",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607782,
+                                                                "tema":  "meios-de-pagamento",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "resolutiva",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609722,
+                                                                "tema":  "cartao_credito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "resolutiva",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607081,
+                                                                "tema":  "contestacao-de-compra",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607006,
+                                                                "tema":  "cartão de crédito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46606571,
+                                                                "tema":  "cartao_credito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46606264,
+                                                                "tema":  "anuidade",
+                                                                "vertical":  "cc_anuidade",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46605295,
+                                                                "tema":  "cartao-credito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604899,
+                                                                "tema":  "empréstimo",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607478,
+                                                                "tema":  "cartão de crédito da recargapay",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604834,
+                                                                "tema":  "seguro-prestamista",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604797,
+                                                                "tema":  "fatura",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604614,
+                                                                "tema":  "cobranca-fatura-cartao-cancelado",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            }
+                                                        ]
+                                          }
                  },
     "auditoria":  {
                       "auditados":  9,

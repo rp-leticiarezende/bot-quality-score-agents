@@ -1,37 +1,143 @@
 {
-  "schema": "bqs-run/1",
-  "chave": "aleatorio",
-  "rotina": "Aleatório (semanal)",
-  "meta": {
-    "origem": "teste",
-    "nota": "BQS 2.0 calibrado por auditoria (teste): o avaliador aprovou 76,9% e a auditoria de 15 aprovados sorteados na semana reverteu 13 (87%). Só métricas reais do Databricks (20/10/2026). A classificação de contatos evitáveis e as oportunidades ainda não rodaram para esta rotina."
-  },
-  "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
-  "gerado_em": "2026-10-20T11:55:00-03:00",
-  "cobertura": {
-    "baixa": true,
-    "comparacao_indisponivel": true,
-    "texto": "dados em 2 dos 7 dias da semana; sem registros de 11/09 a 14/10; a comparação com a semana anterior não existe."
-  },
-  "metricas": {
-    "n_total": 52,
-    "n_avaliaveis": 52,
-    "n_ok": 40,
-    "bqs": 10.3,
-    "bqs_avaliador": 76.9,
-    "calibracao": { "calibrado": true, "n_amostra": 15, "n_revertidos": 13, "taxa_falso_aprovado": 86.7, "faixa": [5.6, 22.1] },
-    "bqs_anterior": null,
-    "pct_recontato_24h": 12.8,
-    "sinalizados": { "transbordo_sem_pedido": { "n": 2, "pct": 3.8, "tickets": [46608599, 46608013] } },
-    "tfc": 3.8,
-    "pct_pediu_humano": 96.2,
-    "pct_transbordo": 100,
-    "labels": { "excelente": 19, "bom": 23, "regular": 2, "ruim": 8, "critico": 0 },
-    "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 52, "loop": 0 },
-    "criterios": { "understanding": 7.15, "resolution": 6.88, "clarity": 7.04, "tone": 8.08, "efficiency": 6.54, "escalation": 9.77 }
-  },
-  "pontos_atencao": [
-    { "tipo": "warn", "texto": "2 transbordos sem pedido do cliente (3,8% das conversas) reprovam o BQS 2.0 e foram sinalizados para análise. Exemplos:", "tickets": [46608599, 46608013] },
-    { "tipo": "info", "texto": "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot. Exemplos de transbordos com resolução baixa: os contatos evitáveis são o número principal desta rotina.", "tickets": [46607730, 46608607, 46609156] }
-  ]
+    "schema":  "bqs-run/1",
+    "chave":  "aleatorio",
+    "rotina":  "Aleatório (semanal)",
+    "meta":  {
+                 "origem":  "teste",
+                 "nota":  "BQS 2.0 calibrado por auditoria (teste): o avaliador aprovou 76,9% e a auditoria de 15 aprovados sorteados na semana reverteu 13 (87%). Só métricas reais do Databricks (20/10/2026). A classificação de contatos evitáveis e as oportunidades ainda não rodaram para esta rotina."
+             },
+    "periodo":  {
+                    "tipo":  "semanal",
+                    "inicio":  "2026-10-12",
+                    "fim":  "2026-10-18",
+                    "label":  "12/10 a 18/10/2026"
+                },
+    "gerado_em":  "2026-10-20T11:55:00-03:00",
+    "cobertura":  {
+                      "baixa":  true,
+                      "comparacao_indisponivel":  true,
+                      "texto":  "dados em 2 dos 7 dias da semana; sem registros de 11/09 a 14/10; a comparação com a semana anterior não existe."
+                  },
+    "metricas":  {
+                     "n_total":  52,
+                     "n_avaliaveis":  52,
+                     "n_ok":  40,
+                     "bqs":  10.3,
+                     "bqs_avaliador":  76.9,
+                     "calibracao":  {
+                                        "calibrado":  true,
+                                        "n_amostra":  15,
+                                        "n_revertidos":  13,
+                                        "taxa_falso_aprovado":  86.7,
+                                        "faixa":  [
+                                                      5.6,
+                                                      22.1
+                                                  ]
+                                    },
+                     "bqs_anterior":  null,
+                     "pct_recontato_24h":  12.8,
+                     "sinalizados":  {
+                                         "transbordo_sem_pedido":  {
+                                                                       "n":  2,
+                                                                       "pct":  3.8,
+                                                                       "tickets":  [
+                                                                                       46608599,
+                                                                                       46608013
+                                                                                   ]
+                                                                   }
+                                     },
+                     "tfc":  3.8,
+                     "pct_pediu_humano":  96.2,
+                     "pct_transbordo":  100,
+                     "labels":  {
+                                    "excelente":  19,
+                                    "bom":  23,
+                                    "regular":  2,
+                                    "ruim":  8,
+                                    "critico":  0
+                                },
+                     "retention":  {
+                                       "resolutiva":  0,
+                                       "abandono":  0,
+                                       "transbordo":  52,
+                                       "loop":  0
+                                   },
+                     "criterios":  {
+                                       "understanding":  7.15,
+                                       "resolution":  6.88,
+                                       "clarity":  7.04,
+                                       "tone":  8.08,
+                                       "efficiency":  6.54,
+                                       "escalation":  9.77
+                                   },
+                     "sem_artigo_porta":  {
+                                              "tag":  "chat-default-instead-form",
+                                              "n":  6,
+                                              "pct":  11.5,
+                                              "pct_aprovadas_avaliador":  66.7,
+                                              "itens":  [
+                                                            {
+                                                                "ticket_id":  46611663,
+                                                                "tema":  "seguro-protecao-pix",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46610527,
+                                                                "tema":  "dúvidas-sobre-seguro",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609833,
+                                                                "tema":  "seguro",
+                                                                "vertical":  "estorno_seg",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609824,
+                                                                "tema":  "seguro-prestamista",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46608443,
+                                                                "tema":  "empréstimo",
+                                                                "vertical":  "emprestimo",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46608013,
+                                                                "tema":  "seguro",
+                                                                "vertical":  "n8n_aleatorio",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  false
+                                                            }
+                                                        ]
+                                          }
+                 },
+    "pontos_atencao":  [
+                           {
+                               "tipo":  "warn",
+                               "texto":  "2 transbordos sem pedido do cliente (3,8% das conversas) reprovam o BQS 2.0 e foram sinalizados para análise. Exemplos:",
+                               "tickets":  [
+                                               46608599,
+                                               46608013
+                                           ]
+                           },
+                           {
+                               "tipo":  "info",
+                               "texto":  "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot. Exemplos de transbordos com resolução baixa: os contatos evitáveis são o número principal desta rotina.",
+                               "tickets":  [
+                                               46607730,
+                                               46608607,
+                                               46609156
+                                           ]
+                           }
+                       ]
 }

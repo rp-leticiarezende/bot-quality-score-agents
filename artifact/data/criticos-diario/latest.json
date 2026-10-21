@@ -71,7 +71,22 @@
 
                                                                                    ]
                                                                    }
-                                     }
+                                     },
+                     "sem_artigo_porta":  {
+                                              "tag":  "chat-default-instead-form",
+                                              "n":  1,
+                                              "pct":  3.4,
+                                              "pct_aprovadas_avaliador":  0,
+                                              "itens":  [
+                                                            {
+                                                                "ticket_id":  46631797,
+                                                                "tema":  "dúvidas sobre seguro",
+                                                                "vertical":  "assinatura_prime",
+                                                                "desfecho":  "resolutiva",
+                                                                "aprovada_avaliador":  false
+                                                            }
+                                                        ]
+                                          }
                  },
     "auditoria":  {
                       "auditados":  0,

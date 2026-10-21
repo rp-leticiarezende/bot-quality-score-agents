@@ -1,535 +1,1423 @@
 {
-  "schema": "bqs-run/1",
-  "chave": "cartao-hp",
-  "rotina": "Agente de Cartão de Crédito (semanal)",
-  "meta": {
-    "origem": "teste",
-    "nota": "Rodada de teste do BQS 2.0 (validação do formato, do painel e da leitura dos dados pelos agentes). BQS calibrado por auditoria: o avaliador aprovou 64,4% e a auditoria de 25 aprovados sorteados reverteu 8 (32%). Contenção medida em amostra de 60 das 276 conversas elegíveis. Os BQS por agente e por tema abaixo ainda mostram a nota do avaliador. Números ainda não oficiais."
-  },
-  "periodo": { "tipo": "semanal", "inicio": "2026-10-12", "fim": "2026-10-18", "label": "12/10 a 18/10/2026" },
-  "gerado_em": "2026-10-20T15:15:00-03:00",
-  "cobertura": {
-    "baixa": true,
-    "comparacao_indisponivel": true,
-    "texto": "Dados em 2 dos 7 dias da semana (15 e 16/10); semana de 05/10 a 11/10 sem registros e sem dados de 11/09 a 14/10 por hiato do BQS; sem base de comparação. Ingestão em dia (última em 20/10 04:51)."
-  },
-  "metricas": {
-    "n_total": 398,
-    "n_avaliaveis": 388,
-    "n_ok": 250,
-    "bqs": 43.2,
-    "bqs_avaliador": 64.4,
-    "calibracao": { "calibrado": true, "n_amostra": 25, "n_revertidos": 8, "taxa_falso_aprovado": 32.0, "faixa": [32.1, 51.6] },
-    "bqs_anterior": null,
-    "ultimo_ponto_anterior": null,
-    "prompt_version": "v1",
-    "tfc": 30.4,
-    "pct_pediu_humano": 25.4,
-    "pct_transbordo": 32.7,
-    "n_transbordo_nota_ok": 115,
-    "labels": { "excelente": 183, "bom": 98, "regular": 49, "ruim": 41, "critico": 17 },
-    "retention": { "resolutiva": 125, "abandono": 130, "transbordo": 130, "loop": 9 },
-    "criterios": { "understanding": 7.66, "resolution": 6.77, "clarity": 7.37, "tone": 8.24, "efficiency": 6.81, "escalation": 7.79 },
-    "pct_recontato_24h": 12.2,
-    "sinalizados": { "transbordo_sem_pedido": { "n": 32, "pct": 8.0, "tickets": ["46607623", "46610432", "46611276"] } },
-    "qualidade_dado": { "n_sem_boas_vindas": 21, "pct_sem_boas_vindas": 5.3 }
-  },
-  "auditoria": {
-    "auditados": 9,
-    "revisados": 8,
-    "aprovado_para_reprovado": 4,
-    "reprovado_para_aprovado": 0,
-    "divergencias": [
-      "O avaliador automático premiou o transbordo executado sem checar a resposta anterior: resolução 9-10 e transbordo 10 em respostas que não resolveram ou estavam erradas (tickets 46611210, 46610566, 46610959).",
-      "Transferência anunciada e nunca conectada recebeu nota 9 de transbordo (ticket 46605356).",
-      "Handoff tardio depois de loop longo recebeu nota 5 de transbordo quando só o humano resolvia (ticket 46607478)."
-    ]
-  },
-  "dimensoes": {
-    "effective_vertical": [
-      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 63.5, "tfc": 30.4, "pct_pediu_humano": 27.4 },
-      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 69.2, "tfc": 30.4, "pct_pediu_humano": 15.9 }
-    ],
-    "topic": [
-      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 73.0, "tfc": 24.9, "pct_pediu_humano": null },
-      { "valor": "pix", "n": 17, "pct_volume": null, "bqs": 47.1, "tfc": 41.2, "pct_pediu_humano": null },
-      { "valor": "recargapay-cards", "n": 15, "pct_volume": null, "bqs": 53.3, "tfc": 26.7, "pct_pediu_humano": null },
-      { "valor": "pix-payment", "n": 8, "pct_volume": null, "bqs": 62.5, "tfc": 37.5, "pct_pediu_humano": null },
-      { "valor": "por-que-recebi-uma-fatura", "n": 8, "pct_volume": null, "bqs": 37.5, "tfc": 50.0, "pct_pediu_humano": null },
-      { "valor": "investimentos", "n": 6, "pct_volume": null, "bqs": 33.3, "tfc": 66.7, "pct_pediu_humano": null },
-      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": null, "bqs": 33.3, "tfc": 66.7, "pct_pediu_humano": null },
-      { "valor": "fatura", "n": 5, "pct_volume": null, "bqs": 60.0, "tfc": 40.0, "pct_pediu_humano": null },
-      { "valor": "cashback-e-rendimento", "n": 4, "pct_volume": null, "bqs": null, "tfc": 25.0, "pct_pediu_humano": null },
-      { "valor": "roubaram-meu-cartao", "n": 4, "pct_volume": null, "bqs": null, "tfc": 50.0, "pct_pediu_humano": null },
-      { "valor": "wallet-blocked", "n": 4, "pct_volume": null, "bqs": null, "tfc": 25.0, "pct_pediu_humano": null },
-      { "valor": "chargeback-recovery", "n": 3, "pct_volume": null, "bqs": null, "tfc": null, "pct_pediu_humano": null }
-    ]
-  },
-  "contencao": {
-    "n_classificadas": 60,
-    "n_elegiveis": 276,
-    "pct_evitavel": 78.3,
-    "ic95": [66, 87],
-    "ce_pct_total": 54.3,
-    "classes": { "A": 43, "B": 2, "C": 2, "D": 8, "R": 5, "E": 0 },
-    "causas": [
-      { "classe": "A", "causa": "prompt_resposta", "causa_rotulo": "Resposta do prompt (incompleta, genérica ou contraditória ao artigo)", "n": 18, "tickets": ["46605017", "46604988", "46607227"] },
-      { "classe": "A", "causa": "nlu_roteamento", "causa_rotulo": "Entendimento e roteamento (frase clara tratada como 'Não entendi' ou tema trocado)", "n": 11, "tickets": ["46610868", "46609275", "46609389"] },
-      { "classe": "A", "causa": "loop_fluxo", "causa_rotulo": "Loop do fluxo (repetição de passo a passo ou de pedido de reformulação)", "n": 8, "tickets": ["46606986", "46607050", "46606431"] },
-      { "classe": "A", "causa": "politica_produto", "causa_rotulo": "Política: sem sondagem após o 'Não' na confirmação", "n": 5, "tickets": ["46609030", "46607711", "46611090"] },
-      { "classe": "A", "causa": "integracao_acao", "causa_rotulo": "Integração: falha técnica de consulta", "n": 1, "tickets": ["46605878"] },
-      { "classe": "B", "causa": "variavel_hp", "causa_rotulo": "Variável HP quebrada ou mal formatada", "n": 2, "tickets": ["46608351", "46611052"] },
-      { "classe": "C", "causa": "integracao_acao", "causa_rotulo": "Capacidade ausente: consulta que o bot não faz", "n": 2, "tickets": ["46608785", "46607846"] },
-      { "classe": "D", "causa": "acao_humana_obrigatoria", "causa_rotulo": "Só o humano resolve (qualidade do handoff do bot)", "n": 8, "tickets": ["46606593", "46611425", "46604601"] },
-      { "classe": "R", "causa": "nenhuma", "causa_rotulo": "Resolvida sem falha concreta do bot", "n": 5, "tickets": ["46607859", "46605126", "46609707"] }
-    ],
-    "por_dono": { "Produto CX": 47, "Help Design": 0 },
-    "handoff": { "correto": 2, "improvisado": 3, "tardio": 3 }
-  },
-  "pontos_atencao": [
-    { "tipo": "warn", "texto": "32 transbordos sem pedido do cliente (8,0%): possíveis erros do bot, sinalizados para análise.", "tickets": ["46607623", "46610432", "46611276"] },
-    { "tipo": "warn", "texto": "Maior bloco de contatos evitáveis: resposta do prompt (classe A), 18 de 47 evitáveis na amostra, ≈83 contatos estimados no período, dono Produto CX. Evitáveis: 78,3% das classificadas (IC 66–87%).", "tickets": ["46605017", "46604988", "46607227"] },
-    { "tipo": "warn", "texto": "TFC 30,4%, abaixo do limiar provisório de 40%. 25,4% dos clientes pediram atendente (limiar provisório de 20%): pedir atendente não é falha do bot, mas mostra demanda por humano que o bot pode tentar reter. Agente CC Produção (n=329) com BQS por agente de 63,5% pela nota do avaliador (ainda sem calibração por recorte)." },
-    { "tipo": "info", "texto": "Auditoria: 9 tickets lidos, 8 notas revisadas, 4 aprovado→reprovado. O avaliador automático tende a premiar o transbordo mesmo quando a resposta anterior falhou." },
-    { "tipo": "info", "texto": "Cobertura baixa (dados em 2 dos 7 dias: 15 e 16/10) e sem base de comparação: ler como ordem de grandeza. BQS 2.0 de 63,4% com histórico recomeçando em 20/10/2026." }
-  ],
-  "oportunidades": [
-    {
-      "id": "OPO-001", "prioridade": "alta", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Prompt do Agente CC Produção: na contestação de compra, abrir com o caminho único (Início > Cartão > Histórico > Reportar um problema) e os prazos de 180/120 dias e estorno em até 2 faturas",
-      "vertical_tema": "Agente CC Produção / Contestação de compra não reconhecida",
-      "problema": "O bot dá caminhos diferentes, omite prazos ou onde anexar documentos e repete o passo a passo; o cliente abandona ou pede atendente.",
-      "evidencia": "6 conversas observadas na amostra. Fluxo: caminhos divergentes e sem fallback. HP: recomendação de contestação. KB: artigo 'Não reconheço uma compra na fatura do meu cartão de crédito' com 12 de 23 conversas com problema.",
-      "tickets": ["46604988", "46607306", "46607880"],
-      "contatos": { "observado": 6, "estimado": 28, "pct_total": 7.0 },
-      "nota_impacto": "Estimativa pela amostra (60 de 276 elegíveis); ordem de grandeza.",
-      "antes": "Dois caminhos diferentes para contestar; prazos omitidos; passo a passo repetido quando o cliente só perguntou onde anexar documentos; encerra após o 'Não'.",
-      "depois": "A contestação é feita em Início, Cartão, Histórico: escolher a compra e Reportar um problema. Prazo de até *180 dias*, análise em até *120 dias* e estorno, se aprovado, em até *2 faturas*. Documentos anexados dentro de Reportar um problema, depois do motivo.",
-      "proposta": "Inserir no prompt um bloco 'Contestação de compra não reconhecida': (a) caminho único na 1ª resposta; (b) os três prazos sempre juntos; (c) sobre anexos, responder só onde anexar; (d) nunca citar outro caminho nem repetir o já enviado; (e) se hasChargeback for true, informar chargebackStatus (campo a confirmar com dados); (f) compra em processamento não pode ser contestada [texto a validar]; (g) após o 'Não' seguir a OPO-003. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção (bloco Cartao Recargapay IA); artigo de base 'Não reconheço uma compra na fatura do meu cartão de crédito. O que faço?'",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Confirmação do time de dados (hasChargeback, chargebackStatus); decisão sobre as regras 5 e 12 (caminho como fato); Help Design resolve a marcação '[VALIDAR]' do artigo.",
-      "como_medir": "Conversas do tema com dois caminhos diferentes (deve ir a zero); pedidos de atendente e transbordos no tema; retenção resolutiva no tema."
-    },
-    {
-      "id": "OPO-002", "prioridade": "alta", "classe": "A", "causa": "nlu_roteamento", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Roteamento/NLU do Agente CC Produção: tratar frase curta ou follow-up ('Fatura do cartão', 'Que vencimento', 'Quero o saldo') como continuação do tema e, após 2 'Não entendi', oferecer opções ou transferir",
-      "vertical_tema": "Agente CC Produção / Frases curtas e follow-ups tratados como 'Não entendi'",
-      "problema": "Frases claras recebem 'Não entendi sua dúvida' ou pedido de reformulação, às vezes repetido, até o cliente abandonar.",
-      "evidencia": "6 observadas (5 de roteamento e 1 de loop). Fluxo: padrão com 14 conversas no pacote. HP: recomendação de follow-ups.",
-      "tickets": ["46610868", "46609389", "46606748"],
-      "contatos": { "observado": 6, "estimado": 28, "pct_total": 7.0 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza. A regra de 2 'Não entendi' toca o transbordo e depende de validação.",
-      "antes": "'Que vencimento' tratado como mensagem nova com pedido de reformulação; 'Fatura do cartão' recebeu pedido de reformulação; 'Quero o saldo' reabriu clarificação genérica.",
-      "depois": "'O vencimento da sua fatura é em *03/11*.' / 'O limite garantido funciona como cartão de crédito, não como pré-pago.' / envio direto do link de resgate, sem reabrir a clarificação.",
-      "proposta": "Inserir bloco 'Continuidade do tema': mensagem de até 4 palavras logo após uma resposta é continuação do tema; 'Que vencimento' responde billDueDate; 'Fatura do cartão' como 1ª frase vira a dúvida 'por que recebi uma fatura'; 'Quero o saldo' envia o link de resgate; 'Quero cancelar esse pagamento' responde com o artigo 'Posso cancelar um pagamento?'; nunca pedir 'detalhe em uma única mensagem' para frase clara. Roteamento: após 2 'Não entendi', enviar opções do tema ou transferir com motivo.",
-      "no": "Agente CC Produção (regra de continuidade); Condição Transbordo 2; mensagem de opções: nó a confirmar pelo Produto CX",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Time de dados (campos mascarados como statementAmount).",
-      "como_medir": "% de conversas com 'Não entendi' ou reformulação para frase de até 4 palavras; conversas com 2 ou mais 'Não entendi'; abandono após 'Não entendi'."
-    },
-    {
-      "id": "OPO-003", "prioridade": "alta", "classe": "A", "causa": "politica_produto", "tipo": "politica", "frente": "politica",
-      "titulo": "Regra de fluxo do Agente CC Produção: após 'Não' em 'Consegui responder sua dúvida?', fazer 1 pergunta de sondagem com 2 a 3 opções do tema antes de transferir",
-      "vertical_tema": "Agente CC Produção / Resposta ao 'Não' na confirmação de resolução",
-      "problema": "O 'Não' não gera sondagem: o bot repete o passo a passo ou oferece humano, e o contato vira atendimento sem necessidade.",
-      "evidencia": "5 observadas na amostra. Fluxo: padrão com 12 conversas no pacote; a nota alta dos transbordos desta lista não prova que o fluxo esteja bom.",
-      "tickets": ["46609030", "46607711", "46611090"],
-      "contatos": { "observado": 5, "estimado": 23, "pct_total": 5.8 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "Após o 'Não' na contestação, transferiu sem sondar; na dúvida de fatura, entregou valor e vencimento sem responder o 'por quê' e transferiu.",
-      "depois": "'O que ainda ficou em aberto: o prazo, o valor ou o caminho no app?' e só após novo 'Não' transferir, com o motivo registrado.",
-      "proposta": "No 1º 'Não' em cada tema, enviar UMA pergunta fechada com 2 a 3 opções do tema (contestação: prazo, documentos ou status; cartão físico: status da entrega, prazo ou desbloqueio; fatura: valor, compras ou vencimento; cancelamento: motivo ou fatura aberta); no 2º 'Não', ou a qualquer momento se o cliente pedir atendente, transferir. Pedido explícito de atendente nunca é sondado.",
-      "no": "Nó da confirmação de resolução e da resposta ao 'Não': nó a confirmar pelo Produto CX; decisão de transferir em Condição Transbordo 2",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Definição dos botões por tema pelo Produto CX.",
-      "como_medir": "% de 'Não' seguido de transbordo imediato (deve cair); pedidos de atendente no tema; resolutiva após a sondagem; tempo até a transferência quando o cliente pede humano (não pode aumentar)."
-    },
-    {
-      "id": "OPO-004", "prioridade": "alta", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Prompt do Agente CC Produção: em 'paguei e o limite não voltou', usar o status da fatura e dizer o prazo do artigo (1 dia útil) uma única vez",
-      "vertical_tema": "Agente CC Produção / 'Paguei a fatura e o limite não voltou'",
-      "problema": "O bot repete prazos genéricos ('poucos minutos', '3 dias úteis'), lista todas as formas de pagamento e ignora que o payload já mostra a fatura paga.",
-      "evidencia": "4 observadas. Fluxo: padrão com 19 conversas no pacote. KB: artigo 'Paguei a fatura e o limite ainda não voltou' com 8 de 11 conversas com problema. HP: status da fatura disponível e não usado.",
-      "tickets": ["46610281", "46611567", "46605017"],
-      "contatos": { "observado": 4, "estimado": 18, "pct_total": 4.5 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "Supôs pagamento por boleto e citou 'poucos minutos' e '3 dias úteis'; misturou vencimento futuro com pagamento já feito; repetiu a mesma resposta a quem via atraso no app.",
-      "depois": "O limite é liberado em até *1 dia útil* após o pagamento por Pix ou saldo da carteira, e a fatura já consta como paga. Pagando com saldo garantido, o limite não é restabelecido.",
-      "proposta": "Bloco 'Pagamento da fatura e limite': usar billStatus, billOverdueDays e billDueDate para dizer se a fatura consta como paga; informar o prazo do artigo uma única vez; não listar todas as formas de pagamento; não citar prazos genéricos nem supor boleto; fatura Aberta com valor R$ 0,00: dizer que não há valor em aberto e que o limite volta em até 1 dia útil. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção; artigo 'Paguei a fatura e o limite ainda não voltou. E agora?'",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Payload não traz forma de pagamento nem horário de compensação (ver OPO-012); confirmar campos com o time de dados.",
-      "como_medir": "Pedidos de atendente no tema; respostas com prazo diferente de 1 dia útil; resolutiva no tema."
-    },
-    {
-      "id": "OPO-005", "prioridade": "alta", "classe": "A", "causa": "loop_fluxo", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Prompts do Agente CC Produção e do Agente CC Anuidade: reconhecer 'quero cancelar' na 1ª vez, explicar o impedimento com accountStatus/statementStatus e fazer a retenção da anuidade uma única vez",
-      "vertical_tema": "Agente CC Produção e Agente CC Anuidade / Cancelar cartão e 'não consigo cancelar'",
-      "problema": "O bot repete o passo a passo de cancelamento e a retenção quando o cliente já disse que não consegue cancelar.",
-      "evidencia": "4 observadas. Fluxo: padrões de repetição de retenção e passo a passo. HP: accountStatus e statementStatus disponíveis e não usados. Relacionado em classe D: 46604601.",
-      "tickets": ["46606986", "46608069", "46611275"],
-      "contatos": { "observado": 4, "estimado": 18, "pct_total": 4.5 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "Após 'não consigo cancelar' repetiu o passo a passo; repetiu retenção; não reconheceu 'quero cancelar meu cartão' na 1ª ocorrência nem usou o motivo (anuidade) já dito.",
-      "depois": "Seu cartão está cancelado por inatividade e há uma fatura fechada de *R$ 9,90* com vencimento em *${billDueDate}*; o pagamento é feito em Cartão RecargaPay, Minha Fatura. Retenção uma única vez: cancelar o cartão não interrompe a anuidade; qualquer compra reinicia o prazo de 6 meses sem uso.",
-      "proposta": "Bloco 'Cancelamento do cartão': reconhecer 'quero cancelar' na 1ª ocorrência usando o motivo já dito; retenção UMA vez; em 'não consigo cancelar' ler accountStatus e statementStatus e informar valor e vencimento da fatura; nunca repetir o passo a passo; erro do app sem impedimento no payload: transferir; nunca prometer transferência que o fluxo não executa. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção; Agente CC Anuidade (etapa de retenção); Condição Anuidade; artigo de base 'Como cancelo meu cartão físico?'",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Passo a passo de 'Encerrar relacionamento com cartão' não existe como conteúdo externo (OPO-025); campos de payload a confirmar com dados.",
-      "como_medir": "Loops no Agente CC Anuidade e no tema cancelamento; pedidos de atendente no tema; conversas com 3 ou mais pedidos de cancelamento."
-    },
-    {
-      "id": "OPO-006", "prioridade": "alta", "classe": "A", "causa": "nlu_roteamento", "tipo": "cross-domain", "frente": "fluxo",
-      "titulo": "Roteamento do Agente CC Produção: confirmar a origem antes de trocar de tema (Pix pago com o cartão, Pix com produto defeituoso, cobrança em outro cartão) e levar 'cobrança indevida' no cartão ao caminho de contestação",
-      "vertical_tema": "Agente CC Produção / Mistura de temas (Pix, cobrança em outro cartão) e contestação de compra",
-      "problema": "Uma palavra solta muda o tema; o bot inverte pagador e recebedor, culpa o banco sem perguntar o cartão ou responde sobre reembolso de seguro em vez de contestação.",
-      "evidencia": "4 observadas. Fluxo: padrão com 14 conversas no pacote.",
-      "tickets": ["46609834", "46608985", "46606271"],
-      "contatos": { "observado": 4, "estimado": 18, "pct_total": 4.5 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "Tratou Pix enviado em duplicidade invertendo pagador e recebedor; respondeu 'Não entendi' ao pedido de contestar Pix por produto com defeito; repetiu a pergunta de categoria.",
-      "depois": "'A cobrança foi no cartão RecargaPay ou em outro cartão?' e, para cartão RecargaPay, o caminho de contestação; Pix por produto com defeito: 'Disputa por produto com defeito não é fraude nem MED. A devolução é tratada com o vendedor.'",
-      "proposta": "Bloco 'Desambiguação de temas vizinhos': perguntar uma vez a origem da cobrança antes de culpar o banco; cartão RecargaPay segue a contestação (OPO-001); Pix em duplicidade não se cancela e, se pago com o cartão, é lançamento da fatura; Pix por produto com defeito é disputa comercial; nunca inverter pagador e recebedor. Colar as 14 regras de guardrail.",
-      "no": "Condição Desambiguação CC 2; Mensagem de texto 2; Agente CC Produção",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Confirmar o nome da variável de desambiguação (agcc_desambiguacao e cc_desambiguacao divergem entre os documentos).",
-      "como_medir": "Conversas com troca indevida de tema (Pix e cartão); 'Não entendi' no tema contestação; transbordos nessas conversas."
-    },
-    {
-      "id": "OPO-007", "prioridade": "alta", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Prompt do Agente CC Produção: na 1ª resposta fixar a modalidade do cartão (pré-aprovado Standard ou limite garantido), dizer que o limite concedido é R$ 0 e que só o limite garantido conta, e informar 'sem cartão ativo' com o próximo passo",
-      "vertical_tema": "Agente CC Produção / Limite concedido R$ 0, pré-aprovado Standard e limite garantido, cliente sem cartão ativo",
-      "problema": "O bot trata Standard como limite garantido (com resgate e CDI), repete a explicação de soma de limites e, sem cartão ativo, só pede para escolher físico, virtual ou outro.",
-      "evidencia": "4 observadas (3 de prompt e 1 de loop). Fluxo: modalidade alterna na mesma conversa. KB: ajuste de prompt. HP: campos de modalidade disponíveis e não usados.",
-      "tickets": ["46605721", "46608672", "46609138"],
-      "contatos": { "observado": 4, "estimado": 18, "pct_total": 4.5 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "Tratou o Standard como limite garantido com rendimento de CDI e resgate; repetiu a soma de limites; pediu para escolher físico, virtual ou outro em vez de dizer que não há cartão ativo.",
-      "depois": "O limite concedido do seu cartão é *R$ 0,00*; o único limite disponível é o garantido, que você adiciona. Os *R$ 100* são apenas o teto do Standard. Pré-aprovado: oferta automática que não pode ser solicitada; a alternativa é o limite garantido.",
-      "proposta": "Bloco 'Modalidade do cartão e limite': identificar a modalidade na 1ª resposta e não alterná-la; Standard pré-aprovado não tem resgate nem CDI; limite concedido R$ 0,00: dizer que o único limite é o garantido; hasActiveCard falso: dizer 'você não possui cartão ativo' e o próximo passo; 'Vou tentar' é intenção de compra. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção; fonte: Tabela Tipos Cartão e artigo de limite garantido",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Time de dados (campos de modalidade); Help Design decidir sobre publicar o artigo de pré-aprovado, hoje em rascunho.",
-      "como_medir": "Conversas com alternância de modalidade; pedidos de atendente em limite; 'Não' após explicação de limite."
-    },
-    {
-      "id": "OPO-008", "prioridade": "alta", "classe": "A", "causa": "loop_fluxo", "tipo": "politica", "frente": "politica",
-      "titulo": "Análise do Agente CC Produção: 32 transbordos sem pedido do cliente (8,0%) — separar erro do bot (interpretação errada, loop) de transbordo legítimo e corrigir o gatilho que transfere sem pedido",
-      "vertical_tema": "Agente CC Produção / Transbordos sem pedido do cliente",
-      "problema": "32 conversas foram transferidas sem o cliente pedir atendente; na amostra, os 2 casos classificados terminaram em transferência após loop ou interpretação errada, o que contraria a política do cartão.",
-      "evidencia": "SQL: 32 de 398 (8,0%). Amostra de contenção: 2 observados. Fluxo: parte vem de falha de interpretação anterior ao pedido de atendente. Prioridade alta pelo universo SQL (8,0% do total), não pelo estimado da amostra.",
-      "tickets": ["46607623", "46610432", "46611276"],
-      "contatos": { "observado": 2, "estimado": 9, "pct_total": 2.3 },
-      "nota_impacto": "Estimado pela amostra: 9 (2,3%). O universo sinalizado pelo SQL é de 32 contatos (8,0%), ainda não classificados como evitáveis: é o teto do que esta análise pode recuperar.",
-      "antes": "Acertou Tap to Pay no 1º turno e, após 'foi no cartão do meu esposo', tratou como empréstimo, repetiu o bloco de resgate 5 vezes e transferiu só após cerca de 20 minutos e aceite do cliente; em outra conversa transferiu sem pedido em dúvida de entrega do cartão.",
-      "depois": "'A venda do Tap to Pay pode ter ido como limite do Cartão Empreendedor, que aparece em Cartão RP, Meu limite, Resgatar.' Sem cartão ativo, transferir logo com o caso resumido.",
-      "proposta": "1) Análise (Produto CX, até 1 sprint): ler os 32 tickets e registrar o gatilho que gerou varTransbordo, a última resposta do bot antes da transferência, se houve pedido de atendente e a classificação (interpretação, loop, política, handoff legítimo). 2) Após a análise e sob validação: o bot só transfere sem pedido em tema de classe D, com o handoff da OPO-014; nos demais usa a sondagem da OPO-003. 3) Tap to Pay: manter o tema já definido pelo cliente e confirmar a origem antes de mudar de assunto.",
-      "no": "Condição Transbordo 2 e o ponto que define varTransbordo: nó a confirmar pelo Produto CX",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Acesso às transcrições dos 32 tickets.",
-      "como_medir": "% de transbordos sem pedido do cliente (hoje 8,0%, 32 de 398), semana a semana; parte desses casos com loop ou 'Não entendi' antes da transferência."
-    },
-    {
-      "id": "OPO-009", "prioridade": "alta", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Prompt do Agente CC Produção: ao cliente dizer que perdeu ou teve o cartão roubado, abrir com o bloqueio de todos os cartões (formulário de perda/roubo) e como pedir novo cartão, nunca só o bloqueio do físico",
-      "vertical_tema": "Agente CC Produção / Perda e roubo do cartão (segurança)",
-      "problema": "O bot orientou o bloqueio manual só do físico e disse que os virtuais seguem ativos, o oposto do formulário que bloqueia todos.",
-      "evidencia": "1 observada na amostra; fora dela, 46605060 e 46605913. KB: artigo 'Roubaram meu cartão RecargaPay, e agora?' com 8 de 9 conversas com problema (kb_score médio 5,4). Prioridade alta por risco de fraude, não pelo volume.",
-      "tickets": ["46605567", "46605060", "46605913"],
-      "contatos": { "observado": 1, "estimado": 5, "pct_total": 1.3 },
-      "nota_impacto": "Alta por risco de fraude e segurança, não pelo volume. TFC do tema de 66,7% na amostra pequena (n=6).",
-      "antes": "Orientou o bloqueio manual do cartão físico e disse que os virtuais continuam ativos.",
-      "depois": "Bloqueie agora pelo formulário de perda ou roubo, que bloqueia todos os cartões, físicos e virtuais. Depois, solicite um novo cartão na opção de cartões.",
-      "proposta": "Bloco 'Perda ou roubo do cartão (prioridade máxima)': ao ouvir perdi, roubaram ou furtaram, abrir a resposta com o formulário de perda/roubo (URL idêntica à do artigo); em seguida, como pedir novo cartão; nunca dizer que os virtuais continuam ativos após o formulário; compras feitas depois do roubo seguem a OPO-001; não explicar limite garantido nem anuidade neste tema. Oferta imediata de atendente quando o cliente não achar o caminho. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção; artigo 'Roubaram meu cartão RecargaPay, e agora?'",
-      "dono": "Produto CX", "prazo": "Imediato",
-      "dependencias": "Confirmar o caminho de bloqueio direto no app antes de citar.",
-      "como_medir": "Conversas do tema em que o bot não oferece o bloqueio na 1ª resposta (deve ir a zero); transbordos e loops no tema."
-    },
-    {
-      "id": "OPO-010", "prioridade": "media", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Prompt do Agente CC Produção: dizer que faturas antigas não ficam mais no app e devem ser buscadas no e-mail de cobrança",
-      "vertical_tema": "Agente CC Produção / Faturas antigas",
-      "problema": "O bot contradiz o artigo correto e indica um caminho que não existe (deslizar a tela em Minha fatura).",
-      "evidencia": "2 observadas; fora da amostra, 46604925. KB: o artigo está correto, o ajuste é no prompt.",
-      "tickets": ["46607531", "46609296", "46604925"],
-      "contatos": { "observado": 2, "estimado": 9, "pct_total": 2.3 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "Indicou deslizar a tela em Minha fatura para ver meses anteriores.",
-      "depois": "As faturas anteriores ficam nos e-mails de cobrança. Após o 'Não', sondar antes de transferir.",
-      "proposta": "Acrescentar ao prompt: faturas antigas não ficam mais no app e devem ser consultadas nos e-mails de cobrança; nunca indicar navegar pelos meses anteriores. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção; artigo 'Como acessar as faturas antigas do cartão?'",
-      "dono": "Produto CX", "prazo": "Imediato",
-      "dependencias": "Confirmar a expressão 'enviados no fechamento' antes de usar.",
-      "como_medir": "Respostas com 'deslizar' ou meses anteriores no tema; 'Não' após resposta de fatura antiga."
-    },
-    {
-      "id": "OPO-011", "prioridade": "media", "classe": "B", "causa": "variavel_hp", "tipo": "variavel", "frente": "variavel_hp",
-      "titulo": "Agente CC Produção (limitInvested mostrado cru) e template de anuidade do Gold: formatar variável como moeda e tratar payload vazio ou zerado com frase explicativa",
-      "vertical_tema": "Agente CC Produção e Agente CC Anuidade / Variável ou template quebrado",
-      "problema": "O cliente vê nome de variável interna com asterisco e frase quebrada.",
-      "evidencia": "2 observadas; relacionado 46605723. Fluxo e HP: variáveis quebradas em 4 conversas.",
-      "tickets": ["46608351", "46611052", "46605723"],
-      "contatos": { "observado": 2, "estimado": 9, "pct_total": 2.3 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "'limitInvested R$ 100,30*' (nome cru e asterisco); 'Seu limite disponível agora é de o mesmo valor da anuidade.'",
-      "depois": "Valor formatado em R$ sem nome de campo; 'Seu limite disponível agora é *${valor}*'; orientar 'Encerrar relacionamento com cartão' quando há dois virtuais.",
-      "proposta": "(1) Mapear limitInvested e collateralBalance como moeda formatada; (2) valor nulo ou zerado: frase 'você ainda não tem limite garantido adicionado' (confirmar se zero é real ou falha de carga); (3) corrigir a oração do template da anuidade; (4) incluir carência e multa de resgate antecipado do artigo do CDB quando perguntarem de resgate, sem inventar valores. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção (resposta com limitInvested e collateralBalance); template do Agente CC Anuidade para Gold: nó a confirmar pelo Produto CX",
-      "dono": "Produto CX", "prazo": "Imediato",
-      "dependencias": "Time de dados (zero real ou falha de carga; campos mascarados).",
-      "como_medir": "Ocorrências de nome de variável ou asterisco na resposta (deve ir a zero); conversas com todos os limites R$ 0,00 sem explicação."
-    },
-    {
-      "id": "OPO-012", "prioridade": "media", "classe": "C", "causa": "integracao_acao", "tipo": "capacidade", "frente": "capacidade",
-      "titulo": "Payload/consulta do Agente CC Produção: especificar campos novos (lançamentos recentes com origem, valor do limite exibível, forma de pagamento e horário de compensação da fatura), todos a confirmar com Engenharia",
-      "vertical_tema": "Agente CC Produção / Capacidade nova de consulta",
-      "problema": "O bot não consegue dizer a origem de uma cobrança pequena, o valor do limite quando o campo é mascarado nem se o pagamento da fatura já foi compensado.",
-      "evidencia": "2 observadas na classe C (lançamento de R$ 5,80; valor do limite não exibido). HP: campos ausentes no payload; todos 'a confirmar'.",
-      "tickets": ["46607846", "46608785", "46610281"],
-      "contatos": { "observado": 2, "estimado": 9, "pct_total": 2.3 },
-      "nota_impacto": "Estimativa pela amostra; roadmap sem prazo.",
-      "antes": "O bot não consegue dizer a origem do débito nem se o pagamento foi compensado.",
-      "depois": "Com a consulta, diz a origem do lançamento ou leva ao caminho de contestação; sem ela, informa em 1 frase onde ver o valor no app.",
-      "proposta": "Especificar: (1) lançamentos recentes com origem e valor; (2) valor do limite exibível, definindo quando o bot pode exibi-lo; (3) forma de pagamento e horário de compensação da última fatura. Todos os campos a confirmar com dados e Engenharia (dentro do Produto CX).",
-      "no": "Payload do Agente CC Produção (seção creditCardAccount); campos novos: a confirmar",
-      "dono": "Produto CX", "prazo": "Backlog",
-      "dependencias": "Engenharia e dados; revisão de privacidade dos campos mascarados.",
-      "como_medir": "Contatos nos temas 'cobrança que não reconheço' e 'paguei e o limite não voltou'; conversas em que o bot diz que não consegue consultar."
-    },
-    {
-      "id": "OPO-013", "prioridade": "media", "classe": "A", "causa": "nlu_roteamento", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Agente CC Produção: manter a intenção 'compra não aprovada' e apontar a causa provável pelo payload; desambiguar o 'Não' à oferta de cancelamento antes de iniciar o cancelamento",
-      "vertical_tema": "Agente CC Produção / 'Compra não aprovada' e 'Não' ambíguo",
-      "problema": "O bot reabre menu e responde sobre cartão virtual; um 'Não' a uma sugestão é lido como desejo de cancelar.",
-      "evidencia": "2 observadas, ambas auditadas. HP: recomendação sobre compra recusada.",
-      "tickets": ["46611210", "46608009", "46608178"],
-      "contatos": { "observado": 2, "estimado": 9, "pct_total": 2.3 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "Reabriu o menu e respondeu sobre cartão virtual; após 'Não' iniciou o cancelamento.",
-      "depois": "'A compra não foi aprovada porque o limite disponível era menor que o valor; o valor recusado não é cobrado' (só se o payload mostrar o limite); 'Você quer cancelar o cartão?' antes de qualquer passo de cancelamento.",
-      "proposta": "Acrescentar ao prompt: compra recusada não é cobrada e o valor volta ao saldo ou limite; apontar uma causa provável pelo payload (limite, status do cartão, accountStatus, atraso); 'Não' a uma sugestão do bot: perguntar o que o cliente quer antes de assumir cancelamento. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção; artigo 'Compra recusada no Cartão RecargaPay. O que fazer?'",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Confirmar campos com o time de dados; Help Design resolver as marcações '[VALIDAR]' do artigo.",
-      "como_medir": "Pedidos de atendente em compra recusada; cancelamentos iniciados após 'Não'."
-    },
-    {
-      "id": "OPO-014", "prioridade": "media", "classe": "D", "causa": "acao_humana_obrigatoria", "tipo": "handoff", "frente": "handoff",
-      "titulo": "Handoff do Agente CC Produção: antes de transferir, coletar cartão (final), motivo e valor, informar canal e prazo e encerrar numa única mensagem, sem repetir pedidos",
-      "vertical_tema": "Agente CC Produção / Handoff improvisado ou tardio (cancelar físico, débito automático de empréstimo, desconto no saldo, cobrança em dobro)",
-      "problema": "Casos em que só o humano resolve foram transferidos tarde (loop de cerca de 15 repetições) ou de forma improvisada, sem dizer o que acontece a seguir.",
-      "evidencia": "4 conversas de classe D com handoff ruim; outras 3 estão na OPO-015; handoff correto em 2 de 8 (46591281, 46609802).",
-      "tickets": ["46604601", "46607478", "46609569"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Classe D não é evitável: ganho em qualidade do handoff. 4 conversas afetadas na amostra, ≈18 (4,5%) no período seguem com humano.",
-      "antes": "Cliente repetiu a dúvida cerca de 15 vezes antes de o bot oferecer atendente; cancelar débito automático pedido 3 vezes sem encaminhamento; cancelar físico sem dizer o que acontece a seguir.",
-      "depois": "'O cancelamento do cartão físico é feito pelo atendimento. Ele não interrompe a anuidade e pode afetar benefícios em aberto; vou encaminhar com o final do cartão e o motivo.'",
-      "proposta": "Regra comum de handoff: (1) reconhecer o caso sem repetir orientação; (2) dizer o que acontece a seguir e em quanto tempo; (3) usar o que o payload já sabe; (4) encerrar sem gancho. Por caso: cancelar físico, desconto no saldo, débito automático do empréstimo e cobrança em dobro com cashback divergente. Escopo: só o que o bot coleta e informa.",
-      "no": "Mensagem de transferência: nó a confirmar pelo Produto CX",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Definição do canal e do prazo a informar (não constam nos arquivos).",
-      "como_medir": "% dos handoffs de classe D classificados como 'correto' (hoje 2 de 8); turnos até a transferência em casos D."
-    },
-    {
-      "id": "OPO-015", "prioridade": "media", "classe": "D", "causa": "integracao_acao", "tipo": "integracao", "frente": "capacidade",
-      "titulo": "Fluxo de transferência do Agente CC Produção: corrigir transferência anunciada que não conecta, seleção de canal 'ligação' que volta ao menu e erro 'volume alto' na consulta de fatura (escalar à Engenharia dentro do Produto CX)",
-      "vertical_tema": "Agente CC Produção / Transferência anunciada e não concluída; erro de consulta de fatura",
-      "problema": "O bot diz 'vou te transferir' e a conversa fecha por inatividade; o cliente escolhe ligação e o bot volta a pedir o canal; a consulta de fatura falha com 'volume alto' e a conversa é abandonada.",
-      "evidencia": "46605356 (auditado: transferência nunca conectada), 46606593, 46605878; relacionados 46606431, 46609732, 46607377. Fluxo: bugs técnicos, fora do BQS.",
-      "tickets": ["46605356", "46606593", "46605878"],
-      "contatos": { "observado": 1, "estimado": 5, "pct_total": 1.3 },
-      "nota_impacto": "1 evitável observada (46605878, classe A); as outras 2 são de classe D com handoff que falha.",
-      "antes": "'Vou te transferir' e a conversa fechou por inatividade sem conexão; após escolher 'Receber uma ligação' o bot voltou a pedir o canal; 'Tente novamente em alguns segundos, estou com volume alto' e abandono.",
-      "depois": "Nova tentativa automática ou resposta de fallback para o erro de consulta; confirmar a conexão da transferência e dar o prazo; ao cliente que perguntou 'paguei', responder o prazo de 1 dia útil.",
-      "proposta": "Escalar como bug técnico com os tickets de exemplo e relacionados: transferência anunciada sem conexão, canal 'ligação' que volta ao menu e erro de consulta de fatura sem fallback.",
-      "no": "Nó de transferência e nó de consulta de fatura: nó a confirmar pelo Produto CX",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Logs da Engenharia.",
-      "como_medir": "Conversas com transferência anunciada e sem conexão; erros de consulta de fatura por semana."
-    },
-    {
-      "id": "OPO-016", "prioridade": "media", "classe": "A", "causa": "prompt_resposta", "tipo": "cross-domain", "frente": "prompt",
-      "titulo": "Prompt do Agente CC Produção: responder só com o que consta no artigo e não citar valores, prazos ou regras ausentes (cashback de 0,5%, carência de 6 meses e multa de 50% no resgate, limite mínimo de R$ 200 para o físico)",
-      "vertical_tema": "Agente CC Produção / Informação inventada ou fora do artigo",
-      "problema": "O bot cita regra sem respaldo no artigo; risco de promessa indevida ao cliente.",
-      "evidencia": "1 observada na amostra (46610566, auditado). Fora da amostra: 46606181, 46604987, 46608756, 46609926, 46611494. Prioridade média por julgamento.",
-      "tickets": ["46610566", "46606181", "46608756"],
-      "contatos": { "observado": 1, "estimado": 5, "pct_total": 1.3 },
-      "nota_impacto": "Estimativa pela amostra; demais tickets não foram classificados.",
-      "antes": "Informou cashback de 0,5%; inventou carência de 6 meses e multa de 50%; tratou o bloqueio do resgate como dívida.",
-      "depois": "'O cashback do cartão volta como limite, em até 1 dia útil após o vencimento, e somente se a fatura for quitada integralmente até a data.' Resgate do limite garantido pelo link do artigo, inclusive com o cartão encerrado.",
-      "proposta": "Acrescentar ao prompt: nunca citar percentual, carência, multa, valor mínimo ou prazo que não conste no artigo fornecido; se não constar, dizer que a informação não está disponível. Colar as 14 regras de guardrail.",
-      "no": "Agente CC Produção; artigos 'Como funciona o cashback do cartão de crédito?' e 'Como faço o resgate do saldo não utilizado do meu cartão?'",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "—",
-      "como_medir": "Respostas com percentual, carência ou multa ausentes do artigo (amostragem semanal); kb_score do artigo de cashback."
-    },
-    {
-      "id": "OPO-017", "prioridade": "media", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigo 'Ainda não recebi meu cartão de crédito físico. E agora?': incluir o caso 'status Entregue, mas o cartão não chegou' (o que verificar, como pedir nova via, uso do cartão virtual enquanto isso)",
-      "vertical_tema": "Central de Ajuda / Cartão físico 'Entregue' mas não recebido",
-      "problema": "O artigo só orienta status e previsão; o bot repete 'Chegou!' sem tratar a divergência e o cliente abandona ou pede atendente.",
-      "evidencia": "46606857, 46606223, 46607227 (classe A, contado aqui). KB: artigo com 12 de 23 conversas com problema. HP: deliveryStatus disponível.",
-      "tickets": ["46606857", "46606223", "46607227"],
-      "contatos": { "observado": 1, "estimado": 5, "pct_total": 1.3 },
-      "nota_impacto": "Estimativa pela amostra; ordem de grandeza.",
-      "antes": "O bot repetiu o status 'Chegou!' sem reconhecer a divergência e afirmou que a taxa de emissão não é reembolsável, sem respaldo.",
-      "depois": "Se o status está como Entregue e o cartão não chegou, [passo a confirmar com Produto: como pedir nova via]; enquanto isso, o cartão virtual e o uso por aproximação na carteira digital continuam disponíveis.",
-      "proposta": "Incluir no artigo: por que o status pode constar 'Entregue'; o que verificar (status e previsão em Início > Cartão RP > Acompanhar entrega do cartão); como pedir nova via [a confirmar]; se a taxa de emissão de R$ 20 é devolvida [a confirmar]. Frases curtas, sem passo a passo numerado.",
-      "no": "Artigo 'Ainda não recebi meu cartão de crédito físico. E agora?' (seção a confirmar no Guide)",
-      "dono": "Help Design", "prazo": "Imediato",
-      "dependencias": "Produto confirma nova via e taxa antes de publicar.",
-      "como_medir": "Abandono e transbordo no tema cartão não recebido; respostas do bot com o caso 'Entregue'."
-    },
-    {
-      "id": "OPO-018", "prioridade": "baixa", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigo 'Como troco a forma de pagamento do meu seguro?': acrescentar como cancelar o seguro e as regras de reembolso confirmadas por Produto/Jurídico",
-      "vertical_tema": "Central de Ajuda / Seguro Proteção Pix e Cartões (cancelamento e reembolso)",
-      "problema": "Artigo com kb_score médio de 3,5; o bot citou regras de reembolso que o artigo não traz.",
-      "evidencia": "4 conversas no output de KB. Não classificadas na amostra de contenção.",
-      "tickets": ["46605789", "46604834", "46607846"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (observado 0 na amostra).",
-      "antes": "O bot afirmou regras de reembolso sem respaldo e entrou em ciclo sem cancelar o seguro.",
-      "depois": "Para cancelar o Seguro Proteção Pix e Cartões, [caminho no app a confirmar]; a cobrança de R$ 5,99 é debitada automaticamente do saldo da carteira ou do cartão cadastrado.",
-      "proposta": "Acrescentar como cancelar o seguro; não publicar regras de reembolso sem confirmação de Produto/Jurídico; considerar artigo separado para cancelamento e reembolso.",
-      "no": "Artigo 'Como troco a forma de pagamento do meu seguro?' (localizar no Guide pelo título)",
-      "dono": "Help Design", "prazo": "Sprint",
-      "dependencias": "Confirmação de Produto/Jurídico sobre o reembolso.",
-      "como_medir": "kb_score do artigo (3,5); respostas do bot sobre reembolso de seguro."
-    },
-    {
-      "id": "OPO-019", "prioridade": "baixa", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigo 'Minha transação está em processamento ou com o status \"Autorizada\". O que faço?': incluir 'por que não consigo contestar agora' e o retorno ao limite em até 10 dias úteis",
-      "vertical_tema": "Central de Ajuda / Transação em processamento ou 'Autorizada'",
-      "problema": "Artigo com mais problema na vertical (13 de 16 conversas); o bot respondeu contestação de compra não reconhecida a quem queria o prazo de estorno.",
-      "evidencia": "46607327, 46608573, 46607304. KB: kb_score médio 6,8.",
-      "tickets": ["46607327", "46608573", "46607304"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (observado 0 na amostra).",
-      "antes": "Respondeu contestação de compra não reconhecida a quem perguntava o prazo de estorno de compra cancelada.",
-      "depois": "Enquanto a compra estiver em processamento ou Autorizada, não é possível contestá-la; se ela for cancelada pelo estabelecimento, o valor volta ao seu limite em até 10 dias úteis.",
-      "proposta": "Incluir o caso 'não consigo contestar porque a compra está em processamento' e o prazo de retorno ao limite; incluir o que fazer se o limite não voltar após 10 dias úteis [a confirmar].",
-      "no": "Artigo 'Minha transação está em processamento ou com o status \"Autorizada\". O que faço?'",
-      "dono": "Help Design", "prazo": "Sprint",
-      "dependencias": "Confirmar com Produto o que fazer após 10 dias úteis.",
-      "como_medir": "kb_score do artigo; respostas do bot com prazo errado."
-    },
-    {
-      "id": "OPO-020", "prioridade": "baixa", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigos 'Como resgato meu dinheiro investido no CDB?', 'Preciso ter um cartão RecargaPay para receber Rendimento' e 'Quanto passa a render o meu saldo de limite garantido do Cartão de Crédito?': esclarecer ativação mínima, cartão cancelado com conta ativa e bloqueio por pendência financeira",
-      "vertical_tema": "Central de Ajuda / Rendimento e resgate do limite garantido",
-      "problema": "O bot repete passo a passo inviável a quem não tem cartão ou conclui que não há rendimento.",
-      "evidencia": "46605444, 46607862, 46610566. KB: kb_score 4 nos exemplos.",
-      "tickets": ["46605444", "46607862", "46610566"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (observado 0 na amostra; 46610566 está na OPO-016).",
-      "antes": "O bot concluiu que não há rendimento para cartão cancelado com conta ativa e tratou bloqueio do resgate como dívida.",
-      "depois": "Basta ter ativado o cartão RecargaPay ao menos uma vez para liberar o rendimento; [regra para cartão cancelado com conta ativa a confirmar com Produto].",
-      "proposta": "Esclarecer a ativação mínima, o caso de cartão cancelado com conta ativa e que o resgate fica bloqueado enquanto houver pendência financeira [a confirmar]; incluir a regra vigente desde 11/06/2026 [a confirmar].",
-      "no": "Artigos de CDB e rendimento do limite garantido (localizar no Guide pelo título)",
-      "dono": "Help Design", "prazo": "Sprint",
-      "dependencias": "Confirmação de Produto sobre as condições e a regra de 11/06/2026.",
-      "como_medir": "kb_score dos artigos; respostas do bot sobre rendimento sem cartão."
-    },
-    {
-      "id": "OPO-021", "prioridade": "baixa", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigo novo 'Meu cartão aparece como cancelado por inatividade. O que acontece com a fatura e com a carteira digital?'",
-      "vertical_tema": "Central de Ajuda / Cartão cancelado por inatividade",
-      "problema": "Não há artigo; o bot oscila entre dívida e inatividade.",
-      "evidencia": "46606431, 46604614, 46607081. Existência no Guide não verificada em modo curadoria.",
-      "tickets": ["46606431", "46604614", "46607081"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (46606431 está contado na OPO-005).",
-      "antes": "Oscilou entre dívida e inatividade e prometeu transferência que não concluiu.",
-      "depois": "Cartão cancelado por inatividade não pode ser reativado e [se a fatura em aberto continua devida: a confirmar com Produto]; é por isso que ele deixa de funcionar na carteira digital.",
-      "proposta": "Criar artigo que responda: por que foi cancelado, fatura pendente, como pedir novo cartão e como contestar compra. Verificar no Guide se já existe artigo equivalente.",
-      "no": "Artigo novo (seção Cartão de Crédito > Cancelamento e anuidade, inferida; confirmar)",
-      "dono": "Help Design", "prazo": "Sprint",
-      "dependencias": "Confirmação de Produto sobre a fatura em aberto.",
-      "como_medir": "Conversas do tema com loop ou promessa de transferência."
-    },
-    {
-      "id": "OPO-022", "prioridade": "baixa", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigo novo 'Um valor foi descontado do meu saldo e eu não reconheço. O que pode ter acontecido?'",
-      "vertical_tema": "Central de Ajuda / Valor descontado do saldo da carteira",
-      "problema": "Nenhum artigo cobre o tema; o bot reciclou explicações em loop.",
-      "evidencia": "46607478 (auditado, classe D: handoff tardio), 46609722, 46607384, 46610384, 46610391. Existência no Guide não verificada.",
-      "tickets": ["46607478", "46609722", "46607384"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (observado 0 na amostra).",
-      "antes": "O bot reciclou explicações genéricas por cerca de 15 repetições sem localizar o desconto.",
-      "depois": "Se um valor saiu do seu saldo da carteira, o motivo mais comum é [causa a confirmar com Produto], e você confere o detalhe em [caminho no app a confirmar].",
-      "proposta": "Criar artigo que cubra quais lançamentos debitam o saldo, onde ver o extrato e quando contestar. Verificar no Guide se existe artigo equivalente.",
-      "no": "Artigo novo (seção Cartão de Crédito > Pagamentos e saldo, inferida; confirmar)",
-      "dono": "Help Design", "prazo": "Sprint",
-      "dependencias": "Causa e caminho a confirmar com Produto.",
-      "como_medir": "Loops no tema."
-    },
-    {
-      "id": "OPO-023", "prioridade": "baixa", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigo novo 'Fui cobrado por um empréstimo que não reconheço. O que fazer?' (confirmar se é do time de Empréstimo)",
-      "vertical_tema": "Central de Ajuda / Cobrança de empréstimo que o cliente não reconhece",
-      "problema": "O bot trata cobrança de empréstimo como compra do cartão e entra em loop.",
-      "evidencia": "46609835, 46604772, 46607623. Existência no Guide não verificada; já existe artigo sobre cancelar o débito automático do empréstimo, que cobre só o débito.",
-      "tickets": ["46609835", "46604772", "46607623"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (46609569, relacionado, está na OPO-014).",
-      "antes": "Aplicou o artigo de compra não reconhecida a cobrança de empréstimo em cartão de terceiro.",
-      "depois": "Se você não reconhece uma cobrança de empréstimo, não a conteste como compra do cartão: [caminho correto a confirmar com Produto/Empréstimo].",
-      "proposta": "Criar artigo que separe cobrança de empréstimo de compra do cartão, explique como contestar e trate o caso de cartão de terceiro.",
-      "no": "Artigo novo (seção Empréstimo > Cobranças, inferida; confirmar o dono)",
-      "dono": "Help Design", "prazo": "Backlog",
-      "dependencias": "Confirmar se é responsabilidade do time de Empréstimo.",
-      "como_medir": "Conversas com cobrança de empréstimo tratada como contestação de compra."
-    },
-    {
-      "id": "OPO-024", "prioridade": "baixa", "classe": "A", "causa": "loop_fluxo", "tipo": "fluxo", "frente": "fluxo",
-      "titulo": "Fluxo do Agente CC Produção: reconhecer agradecimento, 'Ok' e 'Não' após o fechamento ou depois do CSAT com despedida curta, sem nova busca nem 'Não consegui responder'",
-      "vertical_tema": "Agente CC Produção / Encerramento e pós-pesquisa de satisfação",
-      "problema": "O fim da conversa é lido como nova intenção.",
-      "evidencia": "46607377, 46605603, 46609599 (6 conversas no pacote do fluxo).",
-      "tickets": ["46607377", "46605603", "46609599"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (observado 0 na amostra); ganho de qualidade rápido.",
-      "antes": "Respondeu 'Não consegui responder à sua pergunta' a um agradecimento após o CSAT.",
-      "depois": "'Obrigado pelo contato!' e encerrar.",
-      "proposta": "'Obrigada' e 'Ok' após o fechamento e a resposta à nota 0 a 5 do CSAT não são intenção nova: responder com despedida curta e encerrar.",
-      "no": "Nó a confirmar pelo Produto CX",
-      "dono": "Produto CX", "prazo": "Sprint",
-      "dependencias": "Nenhuma.",
-      "como_medir": "Conversas com mensagem de erro ou nova busca após o CSAT."
-    },
-    {
-      "id": "OPO-025", "prioridade": "baixa", "classe": "B", "causa": "artigo", "tipo": "artigo", "frente": "artigo",
-      "titulo": "Artigo novo 'Como encerrar o relacionamento com o cartão para parar a cobrança da anuidade'",
-      "vertical_tema": "Central de Ajuda / Encerrar relacionamento com cartão",
-      "problema": "Não há conteúdo externo que diga como parar a anuidade; o bot só orienta cancelar cada cartão.",
-      "evidencia": "46611052, 46591281, 46606986. O artigo de cancelar o físico termina em 'conforme detalhado abaixo' sem conteúdo.",
-      "tickets": ["46611052", "46591281", "46606986"],
-      "contatos": { "observado": 0, "estimado": 0, "pct_total": 0.0 },
-      "nota_impacto": "Não calculável (46611052 está na OPO-011 e 46606986 na OPO-005). O playbook de cartão marca a lacuna como alta; aqui baixa pela regra de volume.",
-      "antes": "O bot orientou cancelar cada cartão virtual, sem dizer como encerrar o relacionamento e parar a anuidade.",
-      "depois": "Cancelar o cartão não interrompe a anuidade; para encerrar a cobrança é preciso cancelar todos os cartões, inclusive os virtuais, e escolher Encerrar relacionamento com cartão.",
-      "proposta": "Criar artigo com o caminho no app [a confirmar], a irreversibilidade do encerramento e a perda de benefícios em aberto (a validar com Produto).",
-      "no": "Artigo novo (título a confirmar pelo Help Design)",
-      "dono": "Help Design", "prazo": "Sprint",
-      "dependencias": "Validação de Produto.",
-      "como_medir": "Pedidos de cancelamento repetidos por anuidade; 'não consigo cancelar' (OPO-005)."
-    }
-  ],
-  "artigos": [
-    { "acao": "criar", "tickets": ["46607478", "46609722", "46607384"], "titulo": "Um valor foi descontado do meu saldo e eu não reconheço. O que pode ter acontecido?", "secao": "Cartão de Crédito > Pagamentos e saldo (inferida; confirmar)", "problema": "Nenhum artigo cobre o tema; o bot reciclou explicações em loop. Existência no Guide não verificada.", "primeira_frase": "Se um valor saiu do seu saldo da carteira, o motivo mais comum é [causa a confirmar com Produto], e você confere o detalhe em [caminho no app a confirmar].", "conversas": 5, "prioridade": "alta" },
-    { "acao": "criar", "tickets": ["46606431", "46604614", "46607081"], "titulo": "Meu cartão aparece como cancelado por inatividade. O que acontece com a fatura e com a carteira digital?", "secao": "Cartão de Crédito > Cancelamento e anuidade (inferida; confirmar)", "problema": "Não há artigo; o bot oscila entre dívida e inatividade. Existência no Guide não verificada.", "primeira_frase": "Cartão cancelado por inatividade não pode ser reativado e [se a fatura em aberto continua devida: a confirmar com Produto]; é por isso que ele deixa de funcionar na carteira digital.", "conversas": 3, "prioridade": "media" },
-    { "acao": "criar", "tickets": ["46609835", "46604772", "46607623"], "titulo": "Fui cobrado por um empréstimo que não reconheço. O que fazer?", "secao": "Empréstimo > Cobranças (inferida; confirmar o dono)", "problema": "O bot trata cobrança de empréstimo como compra do cartão. Existência no Guide não verificada.", "primeira_frase": "Se você não reconhece uma cobrança de empréstimo, não a conteste como compra do cartão: [caminho correto a confirmar com Produto/Empréstimo].", "conversas": 3, "prioridade": "baixa" },
-    { "acao": "atualizar", "tickets": ["46605789", "46604834", "46607846"], "titulo": "Como troco a forma de pagamento do meu seguro?", "secao": "Seguro Proteção Pix e Cartões", "problema": "O artigo trata só da forma de pagamento (kb_score médio 3,5); faltam cancelamento e as regras de reembolso que o bot citou sem respaldo.", "primeira_frase": "Para cancelar o Seguro Proteção Pix e Cartões, [caminho no app a confirmar]; a cobrança de R$ 5,99 é debitada automaticamente do saldo da carteira ou do cartão cadastrado.", "conversas": 4, "prioridade": "alta" },
-    { "acao": "atualizar", "tickets": ["46606857", "46606223"], "titulo": "Ainda não recebi meu cartão de crédito físico. E agora?", "secao": "Cartão físico", "problema": "Não trata o caso 'status Entregue, mas o cartão não chegou' nem a taxa de emissão.", "primeira_frase": "Se o status está como Entregue e o cartão não chegou, [passo a confirmar com Produto: como pedir nova via]; enquanto isso você pode usar o cartão virtual.", "conversas": 2, "prioridade": "alta" },
-    { "acao": "atualizar", "tickets": ["46605444", "46607862"], "titulo": "Preciso ter um cartão RecargaPay para receber Rendimento", "secao": "Rendimento", "problema": "Não esclarece que basta ativar o cartão ao menos uma vez nem o caso de cartão cancelado com conta ativa (kb_score 4 nos exemplos).", "primeira_frase": "Basta ter ativado o cartão RecargaPay ao menos uma vez para liberar o rendimento; [regra para cartão cancelado com conta ativa a confirmar com Produto].", "conversas": 2, "prioridade": "alta" },
-    { "acao": "atualizar", "tickets": ["46605444", "46607862"], "titulo": "Quanto passa a render o meu saldo de limite garantido do Cartão de Crédito?", "secao": "Rendimento", "problema": "Mesmo problema do artigo de rendimento: condições de ativação e cartão cancelado não esclarecidas.", "primeira_frase": "Basta ter ativado o cartão RecargaPay ao menos uma vez para liberar o rendimento; [condições a confirmar com Produto].", "conversas": 2, "prioridade": "alta" },
-    { "acao": "atualizar", "tickets": ["46607327", "46608573", "46607304"], "titulo": "Minha transação está em processamento ou com o status \"Autorizada\". O que faço?", "secao": "Transações", "problema": "Artigo mais problemático da vertical (13 de 16 conversas): falta explicar por que não é possível contestar agora e o retorno ao limite em até 10 dias úteis.", "primeira_frase": "Enquanto a compra estiver em processamento ou Autorizada, não é possível contestá-la; se ela for cancelada pelo estabelecimento, o valor volta ao seu limite em até 10 dias úteis.", "conversas": 3, "prioridade": "media" },
-    { "acao": "atualizar", "tickets": ["46608190", "46609830"], "titulo": "Posso cancelar um pagamento?", "secao": "Pagamentos", "problema": "Não cobre compra estornada cuja parcela continua na fatura nem o pagamento de fatura já liquidado.", "primeira_frase": "Depois que o pagamento é liquidado ele não pode ser cancelado, e a devolução depende da emissora; se a compra foi estornada, o lançamento continua visível na fatura, mas o valor já voltou ao seu limite.", "conversas": 2, "prioridade": "media" },
-    { "acao": "atualizar", "tickets": ["46610566"], "titulo": "Como resgato meu dinheiro investido no CDB?", "secao": "Investimentos / CDB", "problema": "Não cobre o resgate do limite garantido, a regra vigente desde 11/06/2026 nem o bloqueio por pendência financeira.", "primeira_frase": "Você pode resgatar o valor do limite garantido [condições a confirmar com Produto, conforme a regra vigente desde 11/06/2026], e o resgate fica bloqueado enquanto houver pendência financeira.", "conversas": 1, "prioridade": "baixa" }
-  ]
+    "schema":  "bqs-run/1",
+    "chave":  "cartao-hp",
+    "rotina":  "Agente de Cartão de Crédito (semanal)",
+    "meta":  {
+                 "origem":  "teste",
+                 "nota":  "Rodada de teste do BQS 2.0 (validação do formato, do painel e da leitura dos dados pelos agentes). BQS calibrado por auditoria: o avaliador aprovou 64,4% e a auditoria de 25 aprovados sorteados reverteu 8 (32%). Contenção medida em amostra de 60 das 276 conversas elegíveis. Os BQS por agente e por tema abaixo ainda mostram a nota do avaliador. Números ainda não oficiais."
+             },
+    "periodo":  {
+                    "tipo":  "semanal",
+                    "inicio":  "2026-10-12",
+                    "fim":  "2026-10-18",
+                    "label":  "12/10 a 18/10/2026"
+                },
+    "gerado_em":  "2026-10-20T15:15:00-03:00",
+    "cobertura":  {
+                      "baixa":  true,
+                      "comparacao_indisponivel":  true,
+                      "texto":  "Dados em 2 dos 7 dias da semana (15 e 16/10); semana de 05/10 a 11/10 sem registros e sem dados de 11/09 a 14/10 por hiato do BQS; sem base de comparação. Ingestão em dia (última em 20/10 04:51)."
+                  },
+    "metricas":  {
+                     "n_total":  398,
+                     "n_avaliaveis":  388,
+                     "n_ok":  250,
+                     "bqs":  43.2,
+                     "bqs_avaliador":  64.4,
+                     "calibracao":  {
+                                        "calibrado":  true,
+                                        "n_amostra":  25,
+                                        "n_revertidos":  8,
+                                        "taxa_falso_aprovado":  32.0,
+                                        "faixa":  [
+                                                      32.1,
+                                                      51.6
+                                                  ]
+                                    },
+                     "bqs_anterior":  null,
+                     "ultimo_ponto_anterior":  null,
+                     "prompt_version":  "v1",
+                     "tfc":  30.4,
+                     "pct_pediu_humano":  25.4,
+                     "pct_transbordo":  32.7,
+                     "n_transbordo_nota_ok":  115,
+                     "labels":  {
+                                    "excelente":  183,
+                                    "bom":  98,
+                                    "regular":  49,
+                                    "ruim":  41,
+                                    "critico":  17
+                                },
+                     "retention":  {
+                                       "resolutiva":  125,
+                                       "abandono":  130,
+                                       "transbordo":  130,
+                                       "loop":  9
+                                   },
+                     "criterios":  {
+                                       "understanding":  7.66,
+                                       "resolution":  6.77,
+                                       "clarity":  7.37,
+                                       "tone":  8.24,
+                                       "efficiency":  6.81,
+                                       "escalation":  7.79
+                                   },
+                     "pct_recontato_24h":  12.2,
+                     "sinalizados":  {
+                                         "transbordo_sem_pedido":  {
+                                                                       "n":  32,
+                                                                       "pct":  8.0,
+                                                                       "tickets":  [
+                                                                                       "46607623",
+                                                                                       "46610432",
+                                                                                       "46611276"
+                                                                                   ]
+                                                                   }
+                                     },
+                     "qualidade_dado":  {
+                                            "n_sem_boas_vindas":  21,
+                                            "pct_sem_boas_vindas":  5.3
+                                        },
+                     "sem_artigo_porta":  {
+                                              "tag":  "chat-default-instead-form",
+                                              "n":  19,
+                                              "pct":  4.8,
+                                              "pct_aprovadas_avaliador":  38.9,
+                                              "itens":  [
+                                                            {
+                                                                "ticket_id":  46609835,
+                                                                "tema":  "empréstimo debitado do cartão do titular",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609493,
+                                                                "tema":  "problemas-com-o-uso-do-cartao",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609276,
+                                                                "tema":  "cartao-recargapay",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46610432,
+                                                                "tema":  "tap-to-pay",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46608244,
+                                                                "tema":  "bloquear-desbloquear-ou-cancelar-cartao",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609834,
+                                                                "tema":  "reembolso",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "transbordo",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607846,
+                                                                "tema":  "cobranca",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607782,
+                                                                "tema":  "meios-de-pagamento",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "resolutiva",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46609722,
+                                                                "tema":  "cartao_credito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "resolutiva",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607081,
+                                                                "tema":  "contestacao-de-compra",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607006,
+                                                                "tema":  "cartão de crédito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46606571,
+                                                                "tema":  "cartao_credito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46606264,
+                                                                "tema":  "anuidade",
+                                                                "vertical":  "cc_anuidade",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46605295,
+                                                                "tema":  "cartao-credito",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604899,
+                                                                "tema":  "empréstimo",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46607478,
+                                                                "tema":  "cartão de crédito da recargapay",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "loop",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604834,
+                                                                "tema":  "seguro-prestamista",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604797,
+                                                                "tema":  "fatura",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  true
+                                                            },
+                                                            {
+                                                                "ticket_id":  46604614,
+                                                                "tema":  "cobranca-fatura-cartao-cancelado",
+                                                                "vertical":  "cartao_credito",
+                                                                "desfecho":  "abandono",
+                                                                "aprovada_avaliador":  false
+                                                            }
+                                                        ]
+                                          }
+                 },
+    "auditoria":  {
+                      "auditados":  9,
+                      "revisados":  8,
+                      "aprovado_para_reprovado":  4,
+                      "reprovado_para_aprovado":  0,
+                      "divergencias":  [
+                                           "O avaliador automático premiou o transbordo executado sem checar a resposta anterior: resolução 9-10 e transbordo 10 em respostas que não resolveram ou estavam erradas (tickets 46611210, 46610566, 46610959).",
+                                           "Transferência anunciada e nunca conectada recebeu nota 9 de transbordo (ticket 46605356).",
+                                           "Handoff tardio depois de loop longo recebeu nota 5 de transbordo quando só o humano resolvia (ticket 46607478)."
+                                       ]
+                  },
+    "dimensoes":  {
+                      "effective_vertical":  [
+                                                 {
+                                                     "valor":  "cartao_credito",
+                                                     "rotulo":  "Agente CC Produção",
+                                                     "n":  329,
+                                                     "pct_volume":  82.7,
+                                                     "bqs":  63.5,
+                                                     "tfc":  30.4,
+                                                     "pct_pediu_humano":  27.4
+                                                 },
+                                                 {
+                                                     "valor":  "cc_anuidade",
+                                                     "rotulo":  "Agente CC Anuidade",
+                                                     "n":  69,
+                                                     "pct_volume":  17.3,
+                                                     "bqs":  69.2,
+                                                     "tfc":  30.4,
+                                                     "pct_pediu_humano":  15.9
+                                                 }
+                                             ],
+                      "topic":  [
+                                    {
+                                        "valor":  "cartao-recargapay",
+                                        "n":  249,
+                                        "pct_volume":  62.6,
+                                        "bqs":  73.0,
+                                        "tfc":  24.9,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "pix",
+                                        "n":  17,
+                                        "pct_volume":  null,
+                                        "bqs":  47.1,
+                                        "tfc":  41.2,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "recargapay-cards",
+                                        "n":  15,
+                                        "pct_volume":  null,
+                                        "bqs":  53.3,
+                                        "tfc":  26.7,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "pix-payment",
+                                        "n":  8,
+                                        "pct_volume":  null,
+                                        "bqs":  62.5,
+                                        "tfc":  37.5,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "por-que-recebi-uma-fatura",
+                                        "n":  8,
+                                        "pct_volume":  null,
+                                        "bqs":  37.5,
+                                        "tfc":  50.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "investimentos",
+                                        "n":  6,
+                                        "pct_volume":  null,
+                                        "bqs":  33.3,
+                                        "tfc":  66.7,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "roubaram-meu-cartão",
+                                        "n":  6,
+                                        "pct_volume":  null,
+                                        "bqs":  33.3,
+                                        "tfc":  66.7,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "fatura",
+                                        "n":  5,
+                                        "pct_volume":  null,
+                                        "bqs":  60.0,
+                                        "tfc":  40.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "cashback-e-rendimento",
+                                        "n":  4,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  25.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "roubaram-meu-cartao",
+                                        "n":  4,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  50.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "wallet-blocked",
+                                        "n":  4,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  25.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "chargeback-recovery",
+                                        "n":  3,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  null,
+                                        "pct_pediu_humano":  null
+                                    }
+                                ]
+                  },
+    "contencao":  {
+                      "n_classificadas":  60,
+                      "n_elegiveis":  276,
+                      "pct_evitavel":  78.3,
+                      "ic95":  [
+                                   66,
+                                   87
+                               ],
+                      "ce_pct_total":  54.3,
+                      "classes":  {
+                                      "A":  43,
+                                      "B":  2,
+                                      "C":  2,
+                                      "D":  8,
+                                      "R":  5,
+                                      "E":  0
+                                  },
+                      "causas":  [
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "prompt_resposta",
+                                         "causa_rotulo":  "Resposta do prompt (incompleta, genérica ou contraditória ao artigo)",
+                                         "n":  18,
+                                         "tickets":  [
+                                                         "46605017",
+                                                         "46604988",
+                                                         "46607227"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "nlu_roteamento",
+                                         "causa_rotulo":  "Entendimento e roteamento (frase clara tratada como \u0027Não entendi\u0027 ou tema trocado)",
+                                         "n":  11,
+                                         "tickets":  [
+                                                         "46610868",
+                                                         "46609275",
+                                                         "46609389"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "loop_fluxo",
+                                         "causa_rotulo":  "Loop do fluxo (repetição de passo a passo ou de pedido de reformulação)",
+                                         "n":  8,
+                                         "tickets":  [
+                                                         "46606986",
+                                                         "46607050",
+                                                         "46606431"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "politica_produto",
+                                         "causa_rotulo":  "Política: sem sondagem após o \u0027Não\u0027 na confirmação",
+                                         "n":  5,
+                                         "tickets":  [
+                                                         "46609030",
+                                                         "46607711",
+                                                         "46611090"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "integracao_acao",
+                                         "causa_rotulo":  "Integração: falha técnica de consulta",
+                                         "n":  1,
+                                         "tickets":  [
+                                                         "46605878"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "B",
+                                         "causa":  "variavel_hp",
+                                         "causa_rotulo":  "Variável HP quebrada ou mal formatada",
+                                         "n":  2,
+                                         "tickets":  [
+                                                         "46608351",
+                                                         "46611052"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "C",
+                                         "causa":  "integracao_acao",
+                                         "causa_rotulo":  "Capacidade ausente: consulta que o bot não faz",
+                                         "n":  2,
+                                         "tickets":  [
+                                                         "46608785",
+                                                         "46607846"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "D",
+                                         "causa":  "acao_humana_obrigatoria",
+                                         "causa_rotulo":  "Só o humano resolve (qualidade do handoff do bot)",
+                                         "n":  8,
+                                         "tickets":  [
+                                                         "46606593",
+                                                         "46611425",
+                                                         "46604601"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "R",
+                                         "causa":  "nenhuma",
+                                         "causa_rotulo":  "Resolvida sem falha concreta do bot",
+                                         "n":  5,
+                                         "tickets":  [
+                                                         "46607859",
+                                                         "46605126",
+                                                         "46609707"
+                                                     ]
+                                     }
+                                 ],
+                      "por_dono":  {
+                                       "Produto CX":  47,
+                                       "Help Design":  0
+                                   },
+                      "handoff":  {
+                                      "correto":  2,
+                                      "improvisado":  3,
+                                      "tardio":  3
+                                  }
+                  },
+    "pontos_atencao":  [
+                           {
+                               "tipo":  "warn",
+                               "texto":  "32 transbordos sem pedido do cliente (8,0%): possíveis erros do bot, sinalizados para análise.",
+                               "tickets":  [
+                                               "46607623",
+                                               "46610432",
+                                               "46611276"
+                                           ]
+                           },
+                           {
+                               "tipo":  "warn",
+                               "texto":  "Maior bloco de contatos evitáveis: resposta do prompt (classe A), 18 de 47 evitáveis na amostra, ≈83 contatos estimados no período, dono Produto CX. Evitáveis: 78,3% das classificadas (IC 66–87%).",
+                               "tickets":  [
+                                               "46605017",
+                                               "46604988",
+                                               "46607227"
+                                           ]
+                           },
+                           {
+                               "tipo":  "warn",
+                               "texto":  "TFC 30,4%, abaixo do limiar provisório de 40%. 25,4% dos clientes pediram atendente (limiar provisório de 20%): pedir atendente não é falha do bot, mas mostra demanda por humano que o bot pode tentar reter. Agente CC Produção (n=329) com BQS por agente de 63,5% pela nota do avaliador (ainda sem calibração por recorte)."
+                           },
+                           {
+                               "tipo":  "info",
+                               "texto":  "Auditoria: 9 tickets lidos, 8 notas revisadas, 4 aprovado→reprovado. O avaliador automático tende a premiar o transbordo mesmo quando a resposta anterior falhou."
+                           },
+                           {
+                               "tipo":  "info",
+                               "texto":  "Cobertura baixa (dados em 2 dos 7 dias: 15 e 16/10) e sem base de comparação: ler como ordem de grandeza. BQS 2.0 de 63,4% com histórico recomeçando em 20/10/2026."
+                           }
+                       ],
+    "oportunidades":  [
+                          {
+                              "id":  "OPO-001",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt do Agente CC Produção: na contestação de compra, abrir com o caminho único (Início \u003e Cartão \u003e Histórico \u003e Reportar um problema) e os prazos de 180/120 dias e estorno em até 2 faturas",
+                              "vertical_tema":  "Agente CC Produção / Contestação de compra não reconhecida",
+                              "problema":  "O bot dá caminhos diferentes, omite prazos ou onde anexar documentos e repete o passo a passo; o cliente abandona ou pede atendente.",
+                              "evidencia":  "6 conversas observadas na amostra. Fluxo: caminhos divergentes e sem fallback. HP: recomendação de contestação. KB: artigo \u0027Não reconheço uma compra na fatura do meu cartão de crédito\u0027 com 12 de 23 conversas com problema.",
+                              "tickets":  [
+                                              "46604988",
+                                              "46607306",
+                                              "46607880"
+                                          ],
+                              "contatos":  {
+                                               "observado":  6,
+                                               "estimado":  28,
+                                               "pct_total":  7.0
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra (60 de 276 elegíveis); ordem de grandeza.",
+                              "antes":  "Dois caminhos diferentes para contestar; prazos omitidos; passo a passo repetido quando o cliente só perguntou onde anexar documentos; encerra após o \u0027Não\u0027.",
+                              "depois":  "A contestação é feita em Início, Cartão, Histórico: escolher a compra e Reportar um problema. Prazo de até *180 dias*, análise em até *120 dias* e estorno, se aprovado, em até *2 faturas*. Documentos anexados dentro de Reportar um problema, depois do motivo.",
+                              "proposta":  "Inserir no prompt um bloco \u0027Contestação de compra não reconhecida\u0027: (a) caminho único na 1ª resposta; (b) os três prazos sempre juntos; (c) sobre anexos, responder só onde anexar; (d) nunca citar outro caminho nem repetir o já enviado; (e) se hasChargeback for true, informar chargebackStatus (campo a confirmar com dados); (f) compra em processamento não pode ser contestada [texto a validar]; (g) após o \u0027Não\u0027 seguir a OPO-003. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção (bloco Cartao Recargapay IA); artigo de base \u0027Não reconheço uma compra na fatura do meu cartão de crédito. O que faço?\u0027",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Confirmação do time de dados (hasChargeback, chargebackStatus); decisão sobre as regras 5 e 12 (caminho como fato); Help Design resolve a marcação \u0027[VALIDAR]\u0027 do artigo.",
+                              "como_medir":  "Conversas do tema com dois caminhos diferentes (deve ir a zero); pedidos de atendente e transbordos no tema; retenção resolutiva no tema."
+                          },
+                          {
+                              "id":  "OPO-002",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "nlu_roteamento",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Roteamento/NLU do Agente CC Produção: tratar frase curta ou follow-up (\u0027Fatura do cartão\u0027, \u0027Que vencimento\u0027, \u0027Quero o saldo\u0027) como continuação do tema e, após 2 \u0027Não entendi\u0027, oferecer opções ou transferir",
+                              "vertical_tema":  "Agente CC Produção / Frases curtas e follow-ups tratados como \u0027Não entendi\u0027",
+                              "problema":  "Frases claras recebem \u0027Não entendi sua dúvida\u0027 ou pedido de reformulação, às vezes repetido, até o cliente abandonar.",
+                              "evidencia":  "6 observadas (5 de roteamento e 1 de loop). Fluxo: padrão com 14 conversas no pacote. HP: recomendação de follow-ups.",
+                              "tickets":  [
+                                              "46610868",
+                                              "46609389",
+                                              "46606748"
+                                          ],
+                              "contatos":  {
+                                               "observado":  6,
+                                               "estimado":  28,
+                                               "pct_total":  7.0
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza. A regra de 2 \u0027Não entendi\u0027 toca o transbordo e depende de validação.",
+                              "antes":  "\u0027Que vencimento\u0027 tratado como mensagem nova com pedido de reformulação; \u0027Fatura do cartão\u0027 recebeu pedido de reformulação; \u0027Quero o saldo\u0027 reabriu clarificação genérica.",
+                              "depois":  "\u0027O vencimento da sua fatura é em *03/11*.\u0027 / \u0027O limite garantido funciona como cartão de crédito, não como pré-pago.\u0027 / envio direto do link de resgate, sem reabrir a clarificação.",
+                              "proposta":  "Inserir bloco \u0027Continuidade do tema\u0027: mensagem de até 4 palavras logo após uma resposta é continuação do tema; \u0027Que vencimento\u0027 responde billDueDate; \u0027Fatura do cartão\u0027 como 1ª frase vira a dúvida \u0027por que recebi uma fatura\u0027; \u0027Quero o saldo\u0027 envia o link de resgate; \u0027Quero cancelar esse pagamento\u0027 responde com o artigo \u0027Posso cancelar um pagamento?\u0027; nunca pedir \u0027detalhe em uma única mensagem\u0027 para frase clara. Roteamento: após 2 \u0027Não entendi\u0027, enviar opções do tema ou transferir com motivo.",
+                              "no":  "Agente CC Produção (regra de continuidade); Condição Transbordo 2; mensagem de opções: nó a confirmar pelo Produto CX",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Time de dados (campos mascarados como statementAmount).",
+                              "como_medir":  "% de conversas com \u0027Não entendi\u0027 ou reformulação para frase de até 4 palavras; conversas com 2 ou mais \u0027Não entendi\u0027; abandono após \u0027Não entendi\u0027."
+                          },
+                          {
+                              "id":  "OPO-003",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "politica_produto",
+                              "tipo":  "politica",
+                              "frente":  "politica",
+                              "titulo":  "Regra de fluxo do Agente CC Produção: após \u0027Não\u0027 em \u0027Consegui responder sua dúvida?\u0027, fazer 1 pergunta de sondagem com 2 a 3 opções do tema antes de transferir",
+                              "vertical_tema":  "Agente CC Produção / Resposta ao \u0027Não\u0027 na confirmação de resolução",
+                              "problema":  "O \u0027Não\u0027 não gera sondagem: o bot repete o passo a passo ou oferece humano, e o contato vira atendimento sem necessidade.",
+                              "evidencia":  "5 observadas na amostra. Fluxo: padrão com 12 conversas no pacote; a nota alta dos transbordos desta lista não prova que o fluxo esteja bom.",
+                              "tickets":  [
+                                              "46609030",
+                                              "46607711",
+                                              "46611090"
+                                          ],
+                              "contatos":  {
+                                               "observado":  5,
+                                               "estimado":  23,
+                                               "pct_total":  5.8
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "Após o \u0027Não\u0027 na contestação, transferiu sem sondar; na dúvida de fatura, entregou valor e vencimento sem responder o \u0027por quê\u0027 e transferiu.",
+                              "depois":  "\u0027O que ainda ficou em aberto: o prazo, o valor ou o caminho no app?\u0027 e só após novo \u0027Não\u0027 transferir, com o motivo registrado.",
+                              "proposta":  "No 1º \u0027Não\u0027 em cada tema, enviar UMA pergunta fechada com 2 a 3 opções do tema (contestação: prazo, documentos ou status; cartão físico: status da entrega, prazo ou desbloqueio; fatura: valor, compras ou vencimento; cancelamento: motivo ou fatura aberta); no 2º \u0027Não\u0027, ou a qualquer momento se o cliente pedir atendente, transferir. Pedido explícito de atendente nunca é sondado.",
+                              "no":  "Nó da confirmação de resolução e da resposta ao \u0027Não\u0027: nó a confirmar pelo Produto CX; decisão de transferir em Condição Transbordo 2",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Definição dos botões por tema pelo Produto CX.",
+                              "como_medir":  "% de \u0027Não\u0027 seguido de transbordo imediato (deve cair); pedidos de atendente no tema; resolutiva após a sondagem; tempo até a transferência quando o cliente pede humano (não pode aumentar)."
+                          },
+                          {
+                              "id":  "OPO-004",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt do Agente CC Produção: em \u0027paguei e o limite não voltou\u0027, usar o status da fatura e dizer o prazo do artigo (1 dia útil) uma única vez",
+                              "vertical_tema":  "Agente CC Produção / \u0027Paguei a fatura e o limite não voltou\u0027",
+                              "problema":  "O bot repete prazos genéricos (\u0027poucos minutos\u0027, \u00273 dias úteis\u0027), lista todas as formas de pagamento e ignora que o payload já mostra a fatura paga.",
+                              "evidencia":  "4 observadas. Fluxo: padrão com 19 conversas no pacote. KB: artigo \u0027Paguei a fatura e o limite ainda não voltou\u0027 com 8 de 11 conversas com problema. HP: status da fatura disponível e não usado.",
+                              "tickets":  [
+                                              "46610281",
+                                              "46611567",
+                                              "46605017"
+                                          ],
+                              "contatos":  {
+                                               "observado":  4,
+                                               "estimado":  18,
+                                               "pct_total":  4.5
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "Supôs pagamento por boleto e citou \u0027poucos minutos\u0027 e \u00273 dias úteis\u0027; misturou vencimento futuro com pagamento já feito; repetiu a mesma resposta a quem via atraso no app.",
+                              "depois":  "O limite é liberado em até *1 dia útil* após o pagamento por Pix ou saldo da carteira, e a fatura já consta como paga. Pagando com saldo garantido, o limite não é restabelecido.",
+                              "proposta":  "Bloco \u0027Pagamento da fatura e limite\u0027: usar billStatus, billOverdueDays e billDueDate para dizer se a fatura consta como paga; informar o prazo do artigo uma única vez; não listar todas as formas de pagamento; não citar prazos genéricos nem supor boleto; fatura Aberta com valor R$ 0,00: dizer que não há valor em aberto e que o limite volta em até 1 dia útil. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção; artigo \u0027Paguei a fatura e o limite ainda não voltou. E agora?\u0027",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Payload não traz forma de pagamento nem horário de compensação (ver OPO-012); confirmar campos com o time de dados.",
+                              "como_medir":  "Pedidos de atendente no tema; respostas com prazo diferente de 1 dia útil; resolutiva no tema."
+                          },
+                          {
+                              "id":  "OPO-005",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "loop_fluxo",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Prompts do Agente CC Produção e do Agente CC Anuidade: reconhecer \u0027quero cancelar\u0027 na 1ª vez, explicar o impedimento com accountStatus/statementStatus e fazer a retenção da anuidade uma única vez",
+                              "vertical_tema":  "Agente CC Produção e Agente CC Anuidade / Cancelar cartão e \u0027não consigo cancelar\u0027",
+                              "problema":  "O bot repete o passo a passo de cancelamento e a retenção quando o cliente já disse que não consegue cancelar.",
+                              "evidencia":  "4 observadas. Fluxo: padrões de repetição de retenção e passo a passo. HP: accountStatus e statementStatus disponíveis e não usados. Relacionado em classe D: 46604601.",
+                              "tickets":  [
+                                              "46606986",
+                                              "46608069",
+                                              "46611275"
+                                          ],
+                              "contatos":  {
+                                               "observado":  4,
+                                               "estimado":  18,
+                                               "pct_total":  4.5
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "Após \u0027não consigo cancelar\u0027 repetiu o passo a passo; repetiu retenção; não reconheceu \u0027quero cancelar meu cartão\u0027 na 1ª ocorrência nem usou o motivo (anuidade) já dito.",
+                              "depois":  "Seu cartão está cancelado por inatividade e há uma fatura fechada de *R$ 9,90* com vencimento em *${billDueDate}*; o pagamento é feito em Cartão RecargaPay, Minha Fatura. Retenção uma única vez: cancelar o cartão não interrompe a anuidade; qualquer compra reinicia o prazo de 6 meses sem uso.",
+                              "proposta":  "Bloco \u0027Cancelamento do cartão\u0027: reconhecer \u0027quero cancelar\u0027 na 1ª ocorrência usando o motivo já dito; retenção UMA vez; em \u0027não consigo cancelar\u0027 ler accountStatus e statementStatus e informar valor e vencimento da fatura; nunca repetir o passo a passo; erro do app sem impedimento no payload: transferir; nunca prometer transferência que o fluxo não executa. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção; Agente CC Anuidade (etapa de retenção); Condição Anuidade; artigo de base \u0027Como cancelo meu cartão físico?\u0027",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Passo a passo de \u0027Encerrar relacionamento com cartão\u0027 não existe como conteúdo externo (OPO-025); campos de payload a confirmar com dados.",
+                              "como_medir":  "Loops no Agente CC Anuidade e no tema cancelamento; pedidos de atendente no tema; conversas com 3 ou mais pedidos de cancelamento."
+                          },
+                          {
+                              "id":  "OPO-006",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "nlu_roteamento",
+                              "tipo":  "cross-domain",
+                              "frente":  "fluxo",
+                              "titulo":  "Roteamento do Agente CC Produção: confirmar a origem antes de trocar de tema (Pix pago com o cartão, Pix com produto defeituoso, cobrança em outro cartão) e levar \u0027cobrança indevida\u0027 no cartão ao caminho de contestação",
+                              "vertical_tema":  "Agente CC Produção / Mistura de temas (Pix, cobrança em outro cartão) e contestação de compra",
+                              "problema":  "Uma palavra solta muda o tema; o bot inverte pagador e recebedor, culpa o banco sem perguntar o cartão ou responde sobre reembolso de seguro em vez de contestação.",
+                              "evidencia":  "4 observadas. Fluxo: padrão com 14 conversas no pacote.",
+                              "tickets":  [
+                                              "46609834",
+                                              "46608985",
+                                              "46606271"
+                                          ],
+                              "contatos":  {
+                                               "observado":  4,
+                                               "estimado":  18,
+                                               "pct_total":  4.5
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "Tratou Pix enviado em duplicidade invertendo pagador e recebedor; respondeu \u0027Não entendi\u0027 ao pedido de contestar Pix por produto com defeito; repetiu a pergunta de categoria.",
+                              "depois":  "\u0027A cobrança foi no cartão RecargaPay ou em outro cartão?\u0027 e, para cartão RecargaPay, o caminho de contestação; Pix por produto com defeito: \u0027Disputa por produto com defeito não é fraude nem MED. A devolução é tratada com o vendedor.\u0027",
+                              "proposta":  "Bloco \u0027Desambiguação de temas vizinhos\u0027: perguntar uma vez a origem da cobrança antes de culpar o banco; cartão RecargaPay segue a contestação (OPO-001); Pix em duplicidade não se cancela e, se pago com o cartão, é lançamento da fatura; Pix por produto com defeito é disputa comercial; nunca inverter pagador e recebedor. Colar as 14 regras de guardrail.",
+                              "no":  "Condição Desambiguação CC 2; Mensagem de texto 2; Agente CC Produção",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Confirmar o nome da variável de desambiguação (agcc_desambiguacao e cc_desambiguacao divergem entre os documentos).",
+                              "como_medir":  "Conversas com troca indevida de tema (Pix e cartão); \u0027Não entendi\u0027 no tema contestação; transbordos nessas conversas."
+                          },
+                          {
+                              "id":  "OPO-007",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt do Agente CC Produção: na 1ª resposta fixar a modalidade do cartão (pré-aprovado Standard ou limite garantido), dizer que o limite concedido é R$ 0 e que só o limite garantido conta, e informar \u0027sem cartão ativo\u0027 com o próximo passo",
+                              "vertical_tema":  "Agente CC Produção / Limite concedido R$ 0, pré-aprovado Standard e limite garantido, cliente sem cartão ativo",
+                              "problema":  "O bot trata Standard como limite garantido (com resgate e CDI), repete a explicação de soma de limites e, sem cartão ativo, só pede para escolher físico, virtual ou outro.",
+                              "evidencia":  "4 observadas (3 de prompt e 1 de loop). Fluxo: modalidade alterna na mesma conversa. KB: ajuste de prompt. HP: campos de modalidade disponíveis e não usados.",
+                              "tickets":  [
+                                              "46605721",
+                                              "46608672",
+                                              "46609138"
+                                          ],
+                              "contatos":  {
+                                               "observado":  4,
+                                               "estimado":  18,
+                                               "pct_total":  4.5
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "Tratou o Standard como limite garantido com rendimento de CDI e resgate; repetiu a soma de limites; pediu para escolher físico, virtual ou outro em vez de dizer que não há cartão ativo.",
+                              "depois":  "O limite concedido do seu cartão é *R$ 0,00*; o único limite disponível é o garantido, que você adiciona. Os *R$ 100* são apenas o teto do Standard. Pré-aprovado: oferta automática que não pode ser solicitada; a alternativa é o limite garantido.",
+                              "proposta":  "Bloco \u0027Modalidade do cartão e limite\u0027: identificar a modalidade na 1ª resposta e não alterná-la; Standard pré-aprovado não tem resgate nem CDI; limite concedido R$ 0,00: dizer que o único limite é o garantido; hasActiveCard falso: dizer \u0027você não possui cartão ativo\u0027 e o próximo passo; \u0027Vou tentar\u0027 é intenção de compra. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção; fonte: Tabela Tipos Cartão e artigo de limite garantido",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Time de dados (campos de modalidade); Help Design decidir sobre publicar o artigo de pré-aprovado, hoje em rascunho.",
+                              "como_medir":  "Conversas com alternância de modalidade; pedidos de atendente em limite; \u0027Não\u0027 após explicação de limite."
+                          },
+                          {
+                              "id":  "OPO-008",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "loop_fluxo",
+                              "tipo":  "politica",
+                              "frente":  "politica",
+                              "titulo":  "Análise do Agente CC Produção: 32 transbordos sem pedido do cliente (8,0%) — separar erro do bot (interpretação errada, loop) de transbordo legítimo e corrigir o gatilho que transfere sem pedido",
+                              "vertical_tema":  "Agente CC Produção / Transbordos sem pedido do cliente",
+                              "problema":  "32 conversas foram transferidas sem o cliente pedir atendente; na amostra, os 2 casos classificados terminaram em transferência após loop ou interpretação errada, o que contraria a política do cartão.",
+                              "evidencia":  "SQL: 32 de 398 (8,0%). Amostra de contenção: 2 observados. Fluxo: parte vem de falha de interpretação anterior ao pedido de atendente. Prioridade alta pelo universo SQL (8,0% do total), não pelo estimado da amostra.",
+                              "tickets":  [
+                                              "46607623",
+                                              "46610432",
+                                              "46611276"
+                                          ],
+                              "contatos":  {
+                                               "observado":  2,
+                                               "estimado":  9,
+                                               "pct_total":  2.3
+                                           },
+                              "nota_impacto":  "Estimado pela amostra: 9 (2,3%). O universo sinalizado pelo SQL é de 32 contatos (8,0%), ainda não classificados como evitáveis: é o teto do que esta análise pode recuperar.",
+                              "antes":  "Acertou Tap to Pay no 1º turno e, após \u0027foi no cartão do meu esposo\u0027, tratou como empréstimo, repetiu o bloco de resgate 5 vezes e transferiu só após cerca de 20 minutos e aceite do cliente; em outra conversa transferiu sem pedido em dúvida de entrega do cartão.",
+                              "depois":  "\u0027A venda do Tap to Pay pode ter ido como limite do Cartão Empreendedor, que aparece em Cartão RP, Meu limite, Resgatar.\u0027 Sem cartão ativo, transferir logo com o caso resumido.",
+                              "proposta":  "1) Análise (Produto CX, até 1 sprint): ler os 32 tickets e registrar o gatilho que gerou varTransbordo, a última resposta do bot antes da transferência, se houve pedido de atendente e a classificação (interpretação, loop, política, handoff legítimo). 2) Após a análise e sob validação: o bot só transfere sem pedido em tema de classe D, com o handoff da OPO-014; nos demais usa a sondagem da OPO-003. 3) Tap to Pay: manter o tema já definido pelo cliente e confirmar a origem antes de mudar de assunto.",
+                              "no":  "Condição Transbordo 2 e o ponto que define varTransbordo: nó a confirmar pelo Produto CX",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Acesso às transcrições dos 32 tickets.",
+                              "como_medir":  "% de transbordos sem pedido do cliente (hoje 8,0%, 32 de 398), semana a semana; parte desses casos com loop ou \u0027Não entendi\u0027 antes da transferência."
+                          },
+                          {
+                              "id":  "OPO-009",
+                              "prioridade":  "alta",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt do Agente CC Produção: ao cliente dizer que perdeu ou teve o cartão roubado, abrir com o bloqueio de todos os cartões (formulário de perda/roubo) e como pedir novo cartão, nunca só o bloqueio do físico",
+                              "vertical_tema":  "Agente CC Produção / Perda e roubo do cartão (segurança)",
+                              "problema":  "O bot orientou o bloqueio manual só do físico e disse que os virtuais seguem ativos, o oposto do formulário que bloqueia todos.",
+                              "evidencia":  "1 observada na amostra; fora dela, 46605060 e 46605913. KB: artigo \u0027Roubaram meu cartão RecargaPay, e agora?\u0027 com 8 de 9 conversas com problema (kb_score médio 5,4). Prioridade alta por risco de fraude, não pelo volume.",
+                              "tickets":  [
+                                              "46605567",
+                                              "46605060",
+                                              "46605913"
+                                          ],
+                              "contatos":  {
+                                               "observado":  1,
+                                               "estimado":  5,
+                                               "pct_total":  1.3
+                                           },
+                              "nota_impacto":  "Alta por risco de fraude e segurança, não pelo volume. TFC do tema de 66,7% na amostra pequena (n=6).",
+                              "antes":  "Orientou o bloqueio manual do cartão físico e disse que os virtuais continuam ativos.",
+                              "depois":  "Bloqueie agora pelo formulário de perda ou roubo, que bloqueia todos os cartões, físicos e virtuais. Depois, solicite um novo cartão na opção de cartões.",
+                              "proposta":  "Bloco \u0027Perda ou roubo do cartão (prioridade máxima)\u0027: ao ouvir perdi, roubaram ou furtaram, abrir a resposta com o formulário de perda/roubo (URL idêntica à do artigo); em seguida, como pedir novo cartão; nunca dizer que os virtuais continuam ativos após o formulário; compras feitas depois do roubo seguem a OPO-001; não explicar limite garantido nem anuidade neste tema. Oferta imediata de atendente quando o cliente não achar o caminho. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção; artigo \u0027Roubaram meu cartão RecargaPay, e agora?\u0027",
+                              "dono":  "Produto CX",
+                              "prazo":  "Imediato",
+                              "dependencias":  "Confirmar o caminho de bloqueio direto no app antes de citar.",
+                              "como_medir":  "Conversas do tema em que o bot não oferece o bloqueio na 1ª resposta (deve ir a zero); transbordos e loops no tema."
+                          },
+                          {
+                              "id":  "OPO-010",
+                              "prioridade":  "media",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt do Agente CC Produção: dizer que faturas antigas não ficam mais no app e devem ser buscadas no e-mail de cobrança",
+                              "vertical_tema":  "Agente CC Produção / Faturas antigas",
+                              "problema":  "O bot contradiz o artigo correto e indica um caminho que não existe (deslizar a tela em Minha fatura).",
+                              "evidencia":  "2 observadas; fora da amostra, 46604925. KB: o artigo está correto, o ajuste é no prompt.",
+                              "tickets":  [
+                                              "46607531",
+                                              "46609296",
+                                              "46604925"
+                                          ],
+                              "contatos":  {
+                                               "observado":  2,
+                                               "estimado":  9,
+                                               "pct_total":  2.3
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "Indicou deslizar a tela em Minha fatura para ver meses anteriores.",
+                              "depois":  "As faturas anteriores ficam nos e-mails de cobrança. Após o \u0027Não\u0027, sondar antes de transferir.",
+                              "proposta":  "Acrescentar ao prompt: faturas antigas não ficam mais no app e devem ser consultadas nos e-mails de cobrança; nunca indicar navegar pelos meses anteriores. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção; artigo \u0027Como acessar as faturas antigas do cartão?\u0027",
+                              "dono":  "Produto CX",
+                              "prazo":  "Imediato",
+                              "dependencias":  "Confirmar a expressão \u0027enviados no fechamento\u0027 antes de usar.",
+                              "como_medir":  "Respostas com \u0027deslizar\u0027 ou meses anteriores no tema; \u0027Não\u0027 após resposta de fatura antiga."
+                          },
+                          {
+                              "id":  "OPO-011",
+                              "prioridade":  "media",
+                              "classe":  "B",
+                              "causa":  "variavel_hp",
+                              "tipo":  "variavel",
+                              "frente":  "variavel_hp",
+                              "titulo":  "Agente CC Produção (limitInvested mostrado cru) e template de anuidade do Gold: formatar variável como moeda e tratar payload vazio ou zerado com frase explicativa",
+                              "vertical_tema":  "Agente CC Produção e Agente CC Anuidade / Variável ou template quebrado",
+                              "problema":  "O cliente vê nome de variável interna com asterisco e frase quebrada.",
+                              "evidencia":  "2 observadas; relacionado 46605723. Fluxo e HP: variáveis quebradas em 4 conversas.",
+                              "tickets":  [
+                                              "46608351",
+                                              "46611052",
+                                              "46605723"
+                                          ],
+                              "contatos":  {
+                                               "observado":  2,
+                                               "estimado":  9,
+                                               "pct_total":  2.3
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "\u0027limitInvested R$ 100,30*\u0027 (nome cru e asterisco); \u0027Seu limite disponível agora é de o mesmo valor da anuidade.\u0027",
+                              "depois":  "Valor formatado em R$ sem nome de campo; \u0027Seu limite disponível agora é *${valor}*\u0027; orientar \u0027Encerrar relacionamento com cartão\u0027 quando há dois virtuais.",
+                              "proposta":  "(1) Mapear limitInvested e collateralBalance como moeda formatada; (2) valor nulo ou zerado: frase \u0027você ainda não tem limite garantido adicionado\u0027 (confirmar se zero é real ou falha de carga); (3) corrigir a oração do template da anuidade; (4) incluir carência e multa de resgate antecipado do artigo do CDB quando perguntarem de resgate, sem inventar valores. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção (resposta com limitInvested e collateralBalance); template do Agente CC Anuidade para Gold: nó a confirmar pelo Produto CX",
+                              "dono":  "Produto CX",
+                              "prazo":  "Imediato",
+                              "dependencias":  "Time de dados (zero real ou falha de carga; campos mascarados).",
+                              "como_medir":  "Ocorrências de nome de variável ou asterisco na resposta (deve ir a zero); conversas com todos os limites R$ 0,00 sem explicação."
+                          },
+                          {
+                              "id":  "OPO-012",
+                              "prioridade":  "media",
+                              "classe":  "C",
+                              "causa":  "integracao_acao",
+                              "tipo":  "capacidade",
+                              "frente":  "capacidade",
+                              "titulo":  "Payload/consulta do Agente CC Produção: especificar campos novos (lançamentos recentes com origem, valor do limite exibível, forma de pagamento e horário de compensação da fatura), todos a confirmar com Engenharia",
+                              "vertical_tema":  "Agente CC Produção / Capacidade nova de consulta",
+                              "problema":  "O bot não consegue dizer a origem de uma cobrança pequena, o valor do limite quando o campo é mascarado nem se o pagamento da fatura já foi compensado.",
+                              "evidencia":  "2 observadas na classe C (lançamento de R$ 5,80; valor do limite não exibido). HP: campos ausentes no payload; todos \u0027a confirmar\u0027.",
+                              "tickets":  [
+                                              "46607846",
+                                              "46608785",
+                                              "46610281"
+                                          ],
+                              "contatos":  {
+                                               "observado":  2,
+                                               "estimado":  9,
+                                               "pct_total":  2.3
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; roadmap sem prazo.",
+                              "antes":  "O bot não consegue dizer a origem do débito nem se o pagamento foi compensado.",
+                              "depois":  "Com a consulta, diz a origem do lançamento ou leva ao caminho de contestação; sem ela, informa em 1 frase onde ver o valor no app.",
+                              "proposta":  "Especificar: (1) lançamentos recentes com origem e valor; (2) valor do limite exibível, definindo quando o bot pode exibi-lo; (3) forma de pagamento e horário de compensação da última fatura. Todos os campos a confirmar com dados e Engenharia (dentro do Produto CX).",
+                              "no":  "Payload do Agente CC Produção (seção creditCardAccount); campos novos: a confirmar",
+                              "dono":  "Produto CX",
+                              "prazo":  "Backlog",
+                              "dependencias":  "Engenharia e dados; revisão de privacidade dos campos mascarados.",
+                              "como_medir":  "Contatos nos temas \u0027cobrança que não reconheço\u0027 e \u0027paguei e o limite não voltou\u0027; conversas em que o bot diz que não consegue consultar."
+                          },
+                          {
+                              "id":  "OPO-013",
+                              "prioridade":  "media",
+                              "classe":  "A",
+                              "causa":  "nlu_roteamento",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Agente CC Produção: manter a intenção \u0027compra não aprovada\u0027 e apontar a causa provável pelo payload; desambiguar o \u0027Não\u0027 à oferta de cancelamento antes de iniciar o cancelamento",
+                              "vertical_tema":  "Agente CC Produção / \u0027Compra não aprovada\u0027 e \u0027Não\u0027 ambíguo",
+                              "problema":  "O bot reabre menu e responde sobre cartão virtual; um \u0027Não\u0027 a uma sugestão é lido como desejo de cancelar.",
+                              "evidencia":  "2 observadas, ambas auditadas. HP: recomendação sobre compra recusada.",
+                              "tickets":  [
+                                              "46611210",
+                                              "46608009",
+                                              "46608178"
+                                          ],
+                              "contatos":  {
+                                               "observado":  2,
+                                               "estimado":  9,
+                                               "pct_total":  2.3
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "Reabriu o menu e respondeu sobre cartão virtual; após \u0027Não\u0027 iniciou o cancelamento.",
+                              "depois":  "\u0027A compra não foi aprovada porque o limite disponível era menor que o valor; o valor recusado não é cobrado\u0027 (só se o payload mostrar o limite); \u0027Você quer cancelar o cartão?\u0027 antes de qualquer passo de cancelamento.",
+                              "proposta":  "Acrescentar ao prompt: compra recusada não é cobrada e o valor volta ao saldo ou limite; apontar uma causa provável pelo payload (limite, status do cartão, accountStatus, atraso); \u0027Não\u0027 a uma sugestão do bot: perguntar o que o cliente quer antes de assumir cancelamento. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção; artigo \u0027Compra recusada no Cartão RecargaPay. O que fazer?\u0027",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Confirmar campos com o time de dados; Help Design resolver as marcações \u0027[VALIDAR]\u0027 do artigo.",
+                              "como_medir":  "Pedidos de atendente em compra recusada; cancelamentos iniciados após \u0027Não\u0027."
+                          },
+                          {
+                              "id":  "OPO-014",
+                              "prioridade":  "media",
+                              "classe":  "D",
+                              "causa":  "acao_humana_obrigatoria",
+                              "tipo":  "handoff",
+                              "frente":  "handoff",
+                              "titulo":  "Handoff do Agente CC Produção: antes de transferir, coletar cartão (final), motivo e valor, informar canal e prazo e encerrar numa única mensagem, sem repetir pedidos",
+                              "vertical_tema":  "Agente CC Produção / Handoff improvisado ou tardio (cancelar físico, débito automático de empréstimo, desconto no saldo, cobrança em dobro)",
+                              "problema":  "Casos em que só o humano resolve foram transferidos tarde (loop de cerca de 15 repetições) ou de forma improvisada, sem dizer o que acontece a seguir.",
+                              "evidencia":  "4 conversas de classe D com handoff ruim; outras 3 estão na OPO-015; handoff correto em 2 de 8 (46591281, 46609802).",
+                              "tickets":  [
+                                              "46604601",
+                                              "46607478",
+                                              "46609569"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Classe D não é evitável: ganho em qualidade do handoff. 4 conversas afetadas na amostra, ≈18 (4,5%) no período seguem com humano.",
+                              "antes":  "Cliente repetiu a dúvida cerca de 15 vezes antes de o bot oferecer atendente; cancelar débito automático pedido 3 vezes sem encaminhamento; cancelar físico sem dizer o que acontece a seguir.",
+                              "depois":  "\u0027O cancelamento do cartão físico é feito pelo atendimento. Ele não interrompe a anuidade e pode afetar benefícios em aberto; vou encaminhar com o final do cartão e o motivo.\u0027",
+                              "proposta":  "Regra comum de handoff: (1) reconhecer o caso sem repetir orientação; (2) dizer o que acontece a seguir e em quanto tempo; (3) usar o que o payload já sabe; (4) encerrar sem gancho. Por caso: cancelar físico, desconto no saldo, débito automático do empréstimo e cobrança em dobro com cashback divergente. Escopo: só o que o bot coleta e informa.",
+                              "no":  "Mensagem de transferência: nó a confirmar pelo Produto CX",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Definição do canal e do prazo a informar (não constam nos arquivos).",
+                              "como_medir":  "% dos handoffs de classe D classificados como \u0027correto\u0027 (hoje 2 de 8); turnos até a transferência em casos D."
+                          },
+                          {
+                              "id":  "OPO-015",
+                              "prioridade":  "media",
+                              "classe":  "D",
+                              "causa":  "integracao_acao",
+                              "tipo":  "integracao",
+                              "frente":  "capacidade",
+                              "titulo":  "Fluxo de transferência do Agente CC Produção: corrigir transferência anunciada que não conecta, seleção de canal \u0027ligação\u0027 que volta ao menu e erro \u0027volume alto\u0027 na consulta de fatura (escalar à Engenharia dentro do Produto CX)",
+                              "vertical_tema":  "Agente CC Produção / Transferência anunciada e não concluída; erro de consulta de fatura",
+                              "problema":  "O bot diz \u0027vou te transferir\u0027 e a conversa fecha por inatividade; o cliente escolhe ligação e o bot volta a pedir o canal; a consulta de fatura falha com \u0027volume alto\u0027 e a conversa é abandonada.",
+                              "evidencia":  "46605356 (auditado: transferência nunca conectada), 46606593, 46605878; relacionados 46606431, 46609732, 46607377. Fluxo: bugs técnicos, fora do BQS.",
+                              "tickets":  [
+                                              "46605356",
+                                              "46606593",
+                                              "46605878"
+                                          ],
+                              "contatos":  {
+                                               "observado":  1,
+                                               "estimado":  5,
+                                               "pct_total":  1.3
+                                           },
+                              "nota_impacto":  "1 evitável observada (46605878, classe A); as outras 2 são de classe D com handoff que falha.",
+                              "antes":  "\u0027Vou te transferir\u0027 e a conversa fechou por inatividade sem conexão; após escolher \u0027Receber uma ligação\u0027 o bot voltou a pedir o canal; \u0027Tente novamente em alguns segundos, estou com volume alto\u0027 e abandono.",
+                              "depois":  "Nova tentativa automática ou resposta de fallback para o erro de consulta; confirmar a conexão da transferência e dar o prazo; ao cliente que perguntou \u0027paguei\u0027, responder o prazo de 1 dia útil.",
+                              "proposta":  "Escalar como bug técnico com os tickets de exemplo e relacionados: transferência anunciada sem conexão, canal \u0027ligação\u0027 que volta ao menu e erro de consulta de fatura sem fallback.",
+                              "no":  "Nó de transferência e nó de consulta de fatura: nó a confirmar pelo Produto CX",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Logs da Engenharia.",
+                              "como_medir":  "Conversas com transferência anunciada e sem conexão; erros de consulta de fatura por semana."
+                          },
+                          {
+                              "id":  "OPO-016",
+                              "prioridade":  "media",
+                              "classe":  "A",
+                              "causa":  "prompt_resposta",
+                              "tipo":  "cross-domain",
+                              "frente":  "prompt",
+                              "titulo":  "Prompt do Agente CC Produção: responder só com o que consta no artigo e não citar valores, prazos ou regras ausentes (cashback de 0,5%, carência de 6 meses e multa de 50% no resgate, limite mínimo de R$ 200 para o físico)",
+                              "vertical_tema":  "Agente CC Produção / Informação inventada ou fora do artigo",
+                              "problema":  "O bot cita regra sem respaldo no artigo; risco de promessa indevida ao cliente.",
+                              "evidencia":  "1 observada na amostra (46610566, auditado). Fora da amostra: 46606181, 46604987, 46608756, 46609926, 46611494. Prioridade média por julgamento.",
+                              "tickets":  [
+                                              "46610566",
+                                              "46606181",
+                                              "46608756"
+                                          ],
+                              "contatos":  {
+                                               "observado":  1,
+                                               "estimado":  5,
+                                               "pct_total":  1.3
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; demais tickets não foram classificados.",
+                              "antes":  "Informou cashback de 0,5%; inventou carência de 6 meses e multa de 50%; tratou o bloqueio do resgate como dívida.",
+                              "depois":  "\u0027O cashback do cartão volta como limite, em até 1 dia útil após o vencimento, e somente se a fatura for quitada integralmente até a data.\u0027 Resgate do limite garantido pelo link do artigo, inclusive com o cartão encerrado.",
+                              "proposta":  "Acrescentar ao prompt: nunca citar percentual, carência, multa, valor mínimo ou prazo que não conste no artigo fornecido; se não constar, dizer que a informação não está disponível. Colar as 14 regras de guardrail.",
+                              "no":  "Agente CC Produção; artigos \u0027Como funciona o cashback do cartão de crédito?\u0027 e \u0027Como faço o resgate do saldo não utilizado do meu cartão?\u0027",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "—",
+                              "como_medir":  "Respostas com percentual, carência ou multa ausentes do artigo (amostragem semanal); kb_score do artigo de cashback."
+                          },
+                          {
+                              "id":  "OPO-017",
+                              "prioridade":  "media",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigo \u0027Ainda não recebi meu cartão de crédito físico. E agora?\u0027: incluir o caso \u0027status Entregue, mas o cartão não chegou\u0027 (o que verificar, como pedir nova via, uso do cartão virtual enquanto isso)",
+                              "vertical_tema":  "Central de Ajuda / Cartão físico \u0027Entregue\u0027 mas não recebido",
+                              "problema":  "O artigo só orienta status e previsão; o bot repete \u0027Chegou!\u0027 sem tratar a divergência e o cliente abandona ou pede atendente.",
+                              "evidencia":  "46606857, 46606223, 46607227 (classe A, contado aqui). KB: artigo com 12 de 23 conversas com problema. HP: deliveryStatus disponível.",
+                              "tickets":  [
+                                              "46606857",
+                                              "46606223",
+                                              "46607227"
+                                          ],
+                              "contatos":  {
+                                               "observado":  1,
+                                               "estimado":  5,
+                                               "pct_total":  1.3
+                                           },
+                              "nota_impacto":  "Estimativa pela amostra; ordem de grandeza.",
+                              "antes":  "O bot repetiu o status \u0027Chegou!\u0027 sem reconhecer a divergência e afirmou que a taxa de emissão não é reembolsável, sem respaldo.",
+                              "depois":  "Se o status está como Entregue e o cartão não chegou, [passo a confirmar com Produto: como pedir nova via]; enquanto isso, o cartão virtual e o uso por aproximação na carteira digital continuam disponíveis.",
+                              "proposta":  "Incluir no artigo: por que o status pode constar \u0027Entregue\u0027; o que verificar (status e previsão em Início \u003e Cartão RP \u003e Acompanhar entrega do cartão); como pedir nova via [a confirmar]; se a taxa de emissão de R$ 20 é devolvida [a confirmar]. Frases curtas, sem passo a passo numerado.",
+                              "no":  "Artigo \u0027Ainda não recebi meu cartão de crédito físico. E agora?\u0027 (seção a confirmar no Guide)",
+                              "dono":  "Help Design",
+                              "prazo":  "Imediato",
+                              "dependencias":  "Produto confirma nova via e taxa antes de publicar.",
+                              "como_medir":  "Abandono e transbordo no tema cartão não recebido; respostas do bot com o caso \u0027Entregue\u0027."
+                          },
+                          {
+                              "id":  "OPO-018",
+                              "prioridade":  "baixa",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigo \u0027Como troco a forma de pagamento do meu seguro?\u0027: acrescentar como cancelar o seguro e as regras de reembolso confirmadas por Produto/Jurídico",
+                              "vertical_tema":  "Central de Ajuda / Seguro Proteção Pix e Cartões (cancelamento e reembolso)",
+                              "problema":  "Artigo com kb_score médio de 3,5; o bot citou regras de reembolso que o artigo não traz.",
+                              "evidencia":  "4 conversas no output de KB. Não classificadas na amostra de contenção.",
+                              "tickets":  [
+                                              "46605789",
+                                              "46604834",
+                                              "46607846"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (observado 0 na amostra).",
+                              "antes":  "O bot afirmou regras de reembolso sem respaldo e entrou em ciclo sem cancelar o seguro.",
+                              "depois":  "Para cancelar o Seguro Proteção Pix e Cartões, [caminho no app a confirmar]; a cobrança de R$ 5,99 é debitada automaticamente do saldo da carteira ou do cartão cadastrado.",
+                              "proposta":  "Acrescentar como cancelar o seguro; não publicar regras de reembolso sem confirmação de Produto/Jurídico; considerar artigo separado para cancelamento e reembolso.",
+                              "no":  "Artigo \u0027Como troco a forma de pagamento do meu seguro?\u0027 (localizar no Guide pelo título)",
+                              "dono":  "Help Design",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Confirmação de Produto/Jurídico sobre o reembolso.",
+                              "como_medir":  "kb_score do artigo (3,5); respostas do bot sobre reembolso de seguro."
+                          },
+                          {
+                              "id":  "OPO-019",
+                              "prioridade":  "baixa",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigo \u0027Minha transação está em processamento ou com o status \"Autorizada\". O que faço?\u0027: incluir \u0027por que não consigo contestar agora\u0027 e o retorno ao limite em até 10 dias úteis",
+                              "vertical_tema":  "Central de Ajuda / Transação em processamento ou \u0027Autorizada\u0027",
+                              "problema":  "Artigo com mais problema na vertical (13 de 16 conversas); o bot respondeu contestação de compra não reconhecida a quem queria o prazo de estorno.",
+                              "evidencia":  "46607327, 46608573, 46607304. KB: kb_score médio 6,8.",
+                              "tickets":  [
+                                              "46607327",
+                                              "46608573",
+                                              "46607304"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (observado 0 na amostra).",
+                              "antes":  "Respondeu contestação de compra não reconhecida a quem perguntava o prazo de estorno de compra cancelada.",
+                              "depois":  "Enquanto a compra estiver em processamento ou Autorizada, não é possível contestá-la; se ela for cancelada pelo estabelecimento, o valor volta ao seu limite em até 10 dias úteis.",
+                              "proposta":  "Incluir o caso \u0027não consigo contestar porque a compra está em processamento\u0027 e o prazo de retorno ao limite; incluir o que fazer se o limite não voltar após 10 dias úteis [a confirmar].",
+                              "no":  "Artigo \u0027Minha transação está em processamento ou com o status \"Autorizada\". O que faço?\u0027",
+                              "dono":  "Help Design",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Confirmar com Produto o que fazer após 10 dias úteis.",
+                              "como_medir":  "kb_score do artigo; respostas do bot com prazo errado."
+                          },
+                          {
+                              "id":  "OPO-020",
+                              "prioridade":  "baixa",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigos \u0027Como resgato meu dinheiro investido no CDB?\u0027, \u0027Preciso ter um cartão RecargaPay para receber Rendimento\u0027 e \u0027Quanto passa a render o meu saldo de limite garantido do Cartão de Crédito?\u0027: esclarecer ativação mínima, cartão cancelado com conta ativa e bloqueio por pendência financeira",
+                              "vertical_tema":  "Central de Ajuda / Rendimento e resgate do limite garantido",
+                              "problema":  "O bot repete passo a passo inviável a quem não tem cartão ou conclui que não há rendimento.",
+                              "evidencia":  "46605444, 46607862, 46610566. KB: kb_score 4 nos exemplos.",
+                              "tickets":  [
+                                              "46605444",
+                                              "46607862",
+                                              "46610566"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (observado 0 na amostra; 46610566 está na OPO-016).",
+                              "antes":  "O bot concluiu que não há rendimento para cartão cancelado com conta ativa e tratou bloqueio do resgate como dívida.",
+                              "depois":  "Basta ter ativado o cartão RecargaPay ao menos uma vez para liberar o rendimento; [regra para cartão cancelado com conta ativa a confirmar com Produto].",
+                              "proposta":  "Esclarecer a ativação mínima, o caso de cartão cancelado com conta ativa e que o resgate fica bloqueado enquanto houver pendência financeira [a confirmar]; incluir a regra vigente desde 11/06/2026 [a confirmar].",
+                              "no":  "Artigos de CDB e rendimento do limite garantido (localizar no Guide pelo título)",
+                              "dono":  "Help Design",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Confirmação de Produto sobre as condições e a regra de 11/06/2026.",
+                              "como_medir":  "kb_score dos artigos; respostas do bot sobre rendimento sem cartão."
+                          },
+                          {
+                              "id":  "OPO-021",
+                              "prioridade":  "baixa",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigo novo \u0027Meu cartão aparece como cancelado por inatividade. O que acontece com a fatura e com a carteira digital?\u0027",
+                              "vertical_tema":  "Central de Ajuda / Cartão cancelado por inatividade",
+                              "problema":  "Não há artigo; o bot oscila entre dívida e inatividade.",
+                              "evidencia":  "46606431, 46604614, 46607081. Existência no Guide não verificada em modo curadoria.",
+                              "tickets":  [
+                                              "46606431",
+                                              "46604614",
+                                              "46607081"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (46606431 está contado na OPO-005).",
+                              "antes":  "Oscilou entre dívida e inatividade e prometeu transferência que não concluiu.",
+                              "depois":  "Cartão cancelado por inatividade não pode ser reativado e [se a fatura em aberto continua devida: a confirmar com Produto]; é por isso que ele deixa de funcionar na carteira digital.",
+                              "proposta":  "Criar artigo que responda: por que foi cancelado, fatura pendente, como pedir novo cartão e como contestar compra. Verificar no Guide se já existe artigo equivalente.",
+                              "no":  "Artigo novo (seção Cartão de Crédito \u003e Cancelamento e anuidade, inferida; confirmar)",
+                              "dono":  "Help Design",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Confirmação de Produto sobre a fatura em aberto.",
+                              "como_medir":  "Conversas do tema com loop ou promessa de transferência."
+                          },
+                          {
+                              "id":  "OPO-022",
+                              "prioridade":  "baixa",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigo novo \u0027Um valor foi descontado do meu saldo e eu não reconheço. O que pode ter acontecido?\u0027",
+                              "vertical_tema":  "Central de Ajuda / Valor descontado do saldo da carteira",
+                              "problema":  "Nenhum artigo cobre o tema; o bot reciclou explicações em loop.",
+                              "evidencia":  "46607478 (auditado, classe D: handoff tardio), 46609722, 46607384, 46610384, 46610391. Existência no Guide não verificada.",
+                              "tickets":  [
+                                              "46607478",
+                                              "46609722",
+                                              "46607384"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (observado 0 na amostra).",
+                              "antes":  "O bot reciclou explicações genéricas por cerca de 15 repetições sem localizar o desconto.",
+                              "depois":  "Se um valor saiu do seu saldo da carteira, o motivo mais comum é [causa a confirmar com Produto], e você confere o detalhe em [caminho no app a confirmar].",
+                              "proposta":  "Criar artigo que cubra quais lançamentos debitam o saldo, onde ver o extrato e quando contestar. Verificar no Guide se existe artigo equivalente.",
+                              "no":  "Artigo novo (seção Cartão de Crédito \u003e Pagamentos e saldo, inferida; confirmar)",
+                              "dono":  "Help Design",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Causa e caminho a confirmar com Produto.",
+                              "como_medir":  "Loops no tema."
+                          },
+                          {
+                              "id":  "OPO-023",
+                              "prioridade":  "baixa",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigo novo \u0027Fui cobrado por um empréstimo que não reconheço. O que fazer?\u0027 (confirmar se é do time de Empréstimo)",
+                              "vertical_tema":  "Central de Ajuda / Cobrança de empréstimo que o cliente não reconhece",
+                              "problema":  "O bot trata cobrança de empréstimo como compra do cartão e entra em loop.",
+                              "evidencia":  "46609835, 46604772, 46607623. Existência no Guide não verificada; já existe artigo sobre cancelar o débito automático do empréstimo, que cobre só o débito.",
+                              "tickets":  [
+                                              "46609835",
+                                              "46604772",
+                                              "46607623"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (46609569, relacionado, está na OPO-014).",
+                              "antes":  "Aplicou o artigo de compra não reconhecida a cobrança de empréstimo em cartão de terceiro.",
+                              "depois":  "Se você não reconhece uma cobrança de empréstimo, não a conteste como compra do cartão: [caminho correto a confirmar com Produto/Empréstimo].",
+                              "proposta":  "Criar artigo que separe cobrança de empréstimo de compra do cartão, explique como contestar e trate o caso de cartão de terceiro.",
+                              "no":  "Artigo novo (seção Empréstimo \u003e Cobranças, inferida; confirmar o dono)",
+                              "dono":  "Help Design",
+                              "prazo":  "Backlog",
+                              "dependencias":  "Confirmar se é responsabilidade do time de Empréstimo.",
+                              "como_medir":  "Conversas com cobrança de empréstimo tratada como contestação de compra."
+                          },
+                          {
+                              "id":  "OPO-024",
+                              "prioridade":  "baixa",
+                              "classe":  "A",
+                              "causa":  "loop_fluxo",
+                              "tipo":  "fluxo",
+                              "frente":  "fluxo",
+                              "titulo":  "Fluxo do Agente CC Produção: reconhecer agradecimento, \u0027Ok\u0027 e \u0027Não\u0027 após o fechamento ou depois do CSAT com despedida curta, sem nova busca nem \u0027Não consegui responder\u0027",
+                              "vertical_tema":  "Agente CC Produção / Encerramento e pós-pesquisa de satisfação",
+                              "problema":  "O fim da conversa é lido como nova intenção.",
+                              "evidencia":  "46607377, 46605603, 46609599 (6 conversas no pacote do fluxo).",
+                              "tickets":  [
+                                              "46607377",
+                                              "46605603",
+                                              "46609599"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (observado 0 na amostra); ganho de qualidade rápido.",
+                              "antes":  "Respondeu \u0027Não consegui responder à sua pergunta\u0027 a um agradecimento após o CSAT.",
+                              "depois":  "\u0027Obrigado pelo contato!\u0027 e encerrar.",
+                              "proposta":  "\u0027Obrigada\u0027 e \u0027Ok\u0027 após o fechamento e a resposta à nota 0 a 5 do CSAT não são intenção nova: responder com despedida curta e encerrar.",
+                              "no":  "Nó a confirmar pelo Produto CX",
+                              "dono":  "Produto CX",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Nenhuma.",
+                              "como_medir":  "Conversas com mensagem de erro ou nova busca após o CSAT."
+                          },
+                          {
+                              "id":  "OPO-025",
+                              "prioridade":  "baixa",
+                              "classe":  "B",
+                              "causa":  "artigo",
+                              "tipo":  "artigo",
+                              "frente":  "artigo",
+                              "titulo":  "Artigo novo \u0027Como encerrar o relacionamento com o cartão para parar a cobrança da anuidade\u0027",
+                              "vertical_tema":  "Central de Ajuda / Encerrar relacionamento com cartão",
+                              "problema":  "Não há conteúdo externo que diga como parar a anuidade; o bot só orienta cancelar cada cartão.",
+                              "evidencia":  "46611052, 46591281, 46606986. O artigo de cancelar o físico termina em \u0027conforme detalhado abaixo\u0027 sem conteúdo.",
+                              "tickets":  [
+                                              "46611052",
+                                              "46591281",
+                                              "46606986"
+                                          ],
+                              "contatos":  {
+                                               "observado":  0,
+                                               "estimado":  0,
+                                               "pct_total":  0.0
+                                           },
+                              "nota_impacto":  "Não calculável (46611052 está na OPO-011 e 46606986 na OPO-005). O playbook de cartão marca a lacuna como alta; aqui baixa pela regra de volume.",
+                              "antes":  "O bot orientou cancelar cada cartão virtual, sem dizer como encerrar o relacionamento e parar a anuidade.",
+                              "depois":  "Cancelar o cartão não interrompe a anuidade; para encerrar a cobrança é preciso cancelar todos os cartões, inclusive os virtuais, e escolher Encerrar relacionamento com cartão.",
+                              "proposta":  "Criar artigo com o caminho no app [a confirmar], a irreversibilidade do encerramento e a perda de benefícios em aberto (a validar com Produto).",
+                              "no":  "Artigo novo (título a confirmar pelo Help Design)",
+                              "dono":  "Help Design",
+                              "prazo":  "Sprint",
+                              "dependencias":  "Validação de Produto.",
+                              "como_medir":  "Pedidos de cancelamento repetidos por anuidade; \u0027não consigo cancelar\u0027 (OPO-005)."
+                          }
+                      ],
+    "artigos":  [
+                    {
+                        "acao":  "criar",
+                        "tickets":  [
+                                        "46607478",
+                                        "46609722",
+                                        "46607384"
+                                    ],
+                        "titulo":  "Um valor foi descontado do meu saldo e eu não reconheço. O que pode ter acontecido?",
+                        "secao":  "Cartão de Crédito \u003e Pagamentos e saldo (inferida; confirmar)",
+                        "problema":  "Nenhum artigo cobre o tema; o bot reciclou explicações em loop. Existência no Guide não verificada.",
+                        "primeira_frase":  "Se um valor saiu do seu saldo da carteira, o motivo mais comum é [causa a confirmar com Produto], e você confere o detalhe em [caminho no app a confirmar].",
+                        "conversas":  5,
+                        "prioridade":  "alta"
+                    },
+                    {
+                        "acao":  "criar",
+                        "tickets":  [
+                                        "46606431",
+                                        "46604614",
+                                        "46607081"
+                                    ],
+                        "titulo":  "Meu cartão aparece como cancelado por inatividade. O que acontece com a fatura e com a carteira digital?",
+                        "secao":  "Cartão de Crédito \u003e Cancelamento e anuidade (inferida; confirmar)",
+                        "problema":  "Não há artigo; o bot oscila entre dívida e inatividade. Existência no Guide não verificada.",
+                        "primeira_frase":  "Cartão cancelado por inatividade não pode ser reativado e [se a fatura em aberto continua devida: a confirmar com Produto]; é por isso que ele deixa de funcionar na carteira digital.",
+                        "conversas":  3,
+                        "prioridade":  "media"
+                    },
+                    {
+                        "acao":  "criar",
+                        "tickets":  [
+                                        "46609835",
+                                        "46604772",
+                                        "46607623"
+                                    ],
+                        "titulo":  "Fui cobrado por um empréstimo que não reconheço. O que fazer?",
+                        "secao":  "Empréstimo \u003e Cobranças (inferida; confirmar o dono)",
+                        "problema":  "O bot trata cobrança de empréstimo como compra do cartão. Existência no Guide não verificada.",
+                        "primeira_frase":  "Se você não reconhece uma cobrança de empréstimo, não a conteste como compra do cartão: [caminho correto a confirmar com Produto/Empréstimo].",
+                        "conversas":  3,
+                        "prioridade":  "baixa"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46605789",
+                                        "46604834",
+                                        "46607846"
+                                    ],
+                        "titulo":  "Como troco a forma de pagamento do meu seguro?",
+                        "secao":  "Seguro Proteção Pix e Cartões",
+                        "problema":  "O artigo trata só da forma de pagamento (kb_score médio 3,5); faltam cancelamento e as regras de reembolso que o bot citou sem respaldo.",
+                        "primeira_frase":  "Para cancelar o Seguro Proteção Pix e Cartões, [caminho no app a confirmar]; a cobrança de R$ 5,99 é debitada automaticamente do saldo da carteira ou do cartão cadastrado.",
+                        "conversas":  4,
+                        "prioridade":  "alta"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46606857",
+                                        "46606223"
+                                    ],
+                        "titulo":  "Ainda não recebi meu cartão de crédito físico. E agora?",
+                        "secao":  "Cartão físico",
+                        "problema":  "Não trata o caso \u0027status Entregue, mas o cartão não chegou\u0027 nem a taxa de emissão.",
+                        "primeira_frase":  "Se o status está como Entregue e o cartão não chegou, [passo a confirmar com Produto: como pedir nova via]; enquanto isso você pode usar o cartão virtual.",
+                        "conversas":  2,
+                        "prioridade":  "alta"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46605444",
+                                        "46607862"
+                                    ],
+                        "titulo":  "Preciso ter um cartão RecargaPay para receber Rendimento",
+                        "secao":  "Rendimento",
+                        "problema":  "Não esclarece que basta ativar o cartão ao menos uma vez nem o caso de cartão cancelado com conta ativa (kb_score 4 nos exemplos).",
+                        "primeira_frase":  "Basta ter ativado o cartão RecargaPay ao menos uma vez para liberar o rendimento; [regra para cartão cancelado com conta ativa a confirmar com Produto].",
+                        "conversas":  2,
+                        "prioridade":  "alta"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46605444",
+                                        "46607862"
+                                    ],
+                        "titulo":  "Quanto passa a render o meu saldo de limite garantido do Cartão de Crédito?",
+                        "secao":  "Rendimento",
+                        "problema":  "Mesmo problema do artigo de rendimento: condições de ativação e cartão cancelado não esclarecidas.",
+                        "primeira_frase":  "Basta ter ativado o cartão RecargaPay ao menos uma vez para liberar o rendimento; [condições a confirmar com Produto].",
+                        "conversas":  2,
+                        "prioridade":  "alta"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46607327",
+                                        "46608573",
+                                        "46607304"
+                                    ],
+                        "titulo":  "Minha transação está em processamento ou com o status \"Autorizada\". O que faço?",
+                        "secao":  "Transações",
+                        "problema":  "Artigo mais problemático da vertical (13 de 16 conversas): falta explicar por que não é possível contestar agora e o retorno ao limite em até 10 dias úteis.",
+                        "primeira_frase":  "Enquanto a compra estiver em processamento ou Autorizada, não é possível contestá-la; se ela for cancelada pelo estabelecimento, o valor volta ao seu limite em até 10 dias úteis.",
+                        "conversas":  3,
+                        "prioridade":  "media"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46608190",
+                                        "46609830"
+                                    ],
+                        "titulo":  "Posso cancelar um pagamento?",
+                        "secao":  "Pagamentos",
+                        "problema":  "Não cobre compra estornada cuja parcela continua na fatura nem o pagamento de fatura já liquidado.",
+                        "primeira_frase":  "Depois que o pagamento é liquidado ele não pode ser cancelado, e a devolução depende da emissora; se a compra foi estornada, o lançamento continua visível na fatura, mas o valor já voltou ao seu limite.",
+                        "conversas":  2,
+                        "prioridade":  "media"
+                    },
+                    {
+                        "acao":  "atualizar",
+                        "tickets":  [
+                                        "46610566"
+                                    ],
+                        "titulo":  "Como resgato meu dinheiro investido no CDB?",
+                        "secao":  "Investimentos / CDB",
+                        "problema":  "Não cobre o resgate do limite garantido, a regra vigente desde 11/06/2026 nem o bloqueio por pendência financeira.",
+                        "primeira_frase":  "Você pode resgatar o valor do limite garantido [condições a confirmar com Produto, conforme a regra vigente desde 11/06/2026], e o resgate fica bloqueado enquanto houver pendência financeira.",
+                        "conversas":  1,
+                        "prioridade":  "baixa"
+                    }
+                ]
 }

@@ -375,6 +375,16 @@ function visao(){
   h+='<section class="block"><h2>Sinalizados para análise</h2><p class="sub">Transbordo que o cliente não pediu reprova a conversa no BQS 2.0 e é reportado aqui: pode ser erro do bot.</p>';
   h+=sinal.length?'<div class="panel">'+sinal.map(function(x){return '<div class="exrow"><span class="lbl"><b>'+esc(x.f.nome)+'</b> · '+int(x.s.n)+' transbordos sem pedido ('+fmt(x.s.pct,1)+'%)</span>'+tix(x.s.tickets,3)+'</div>'}).join("")+'</div>':empty("Nenhum transbordo sem pedido","Neste período não houve transferência que o cliente não tenha pedido.");
   h+='</section>';
+  // entraram sem artigo da Central (tag chat-default-instead-form)
+  var DESF={resolutiva:"Resolvida pelo bot",abandono:"Abandono",transbordo:"Transbordo",loop:"Loop"};
+  var sp=FLUXOS.map(function(f){var d=fluxoDados(f);var s=g(d,"metricas.sem_artigo_porta",null);return s&&num(s.n)?{f:f,s:s}:null}).filter(Boolean);
+  h+='<section class="block"><h2>Entraram sem artigo da Central</h2><p class="sub">Contatos que abriram o chat sem passar por nenhum artigo da Central de Ajuda (tag <code>chat-default-instead-form</code>): são portas não mapeadas, de telas do app ou MCTs sem artigo associado. Sem o artigo, o bot reconhece pior o assunto. É um indicador para análise manual e não entra na conta do BQS 2.0.</p>';
+  if(sp.length){
+    h+='<div class="panel scroll"><table><thead><tr><th>Rotina</th><th class="n">Contatos com a tag</th><th class="n">% das conversas</th><th class="n">Aprovadas pelo avaliador</th></tr></thead><tbody>'+sp.map(function(x){return '<tr><td>'+esc(x.f.nome)+'</td><td class="n">'+int(x.s.n)+'</td><td class="n">'+fmt(x.s.pct,1)+'%</td><td class="n">'+(num(x.s.pct_aprovadas_avaliador)?fmt(x.s.pct_aprovadas_avaliador,1)+'%':'—')+'</td></tr>'}).join("")+'</tbody></table></div>';
+    var linhasSp=[];sp.forEach(function(x){arr(x.s.itens).forEach(function(it){linhasSp.push({f:x.f,it:it})})});
+    if(linhasSp.length)h+='<div class="panel scroll"><h3>Tickets para analisar ('+linhasSp.length+')</h3><table><thead><tr><th>Rotina</th><th>Ticket</th><th>Tema</th><th>Vertical</th><th>Desfecho</th><th>Avaliador</th></tr></thead><tbody>'+linhasSp.map(function(r){var it=r.it;return '<tr><td>'+esc(r.f.nome)+'</td><td><code>'+esc(it.ticket_id)+'</code></td><td>'+esc(it.tema||"—")+'</td><td>'+esc(it.vertical||"—")+'</td><td>'+esc(DESF[it.desfecho]||it.desfecho||"—")+'</td><td>'+(it.aprovada_avaliador?chip("Aprovada","good"):chip("Reprovada","warn"))+'</td></tr>'}).join("")+'</tbody></table></div>';
+  }else h+=empty("Sem dados ainda","A tabela aparece quando uma rotina publicar o indicador de contatos que entraram sem artigo.");
+  h+='</section>';
   // auditoria
   h+='<section class="block"><h2>Quanto o avaliador automático erra</h2><p class="sub">O auditor lê a transcrição de casos duvidosos (amostra seletiva) e de uma amostra aleatória das aprovações (calibração). A nota revisada e a taxa de aprovações revertidas entram no BQS 2.0.</p>';
   var au=FLUXOS.map(function(f){var d=fluxoDados(f);return d&&g(d,"auditoria.auditados")!=null?{f:f,a:d.auditoria}:null}).filter(Boolean);
