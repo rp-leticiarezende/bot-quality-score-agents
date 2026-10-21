@@ -495,7 +495,7 @@ function fluxo(f){
   if(g(d,"meta.origem")==="teste")h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> '+esc(g(d,"meta.nota","Dados de validação."))+'</div></div>';
   h+='<div class="kpis">'+
     kpi("BQS 2.0",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f,per),d))+
-    kpi("TFC",fmt(m.tfc,1)+'%','falha de condução sem pedido do cliente')+
+    kpi("TFC",fmt(m.tfc,1)+'%','loop, transbordo sem pedido ou abandono após resposta fraca')+
     kpi("Contatos evitáveis",num(c.ce_pct_total)?'≈ '+fmt(c.ce_pct_total,0)+'%':'—',num(c.pct_evitavel)?fmt(c.pct_evitavel,0)+'% das classificadas'+(c.ic95?' (IC '+esc(c.ic95.join("–"))+'%)':''):'sem classificação')+
     kpi("Pediram humano",fmt(m.pct_pediu_humano,1)+'%',int(m.n_total)+' conversas · '+int(m.n_avaliaveis)+' avaliáveis')+
     kpi("Auditados",int(a.auditados),int(a.revisados)+' notas revisadas')+
@@ -643,7 +643,7 @@ function comoLer(){
   '<dt>Recontato em 24h</dt><dd>Percentual de conversas cujo cliente voltou a falar com o atendimento em até 24 horas. É um indicador de acompanhamento e não entra no BQS 2.0.</dd>'+
   '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 2.0 e vão para análise, porque podem ser erro do bot.</dd>'+
   '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS 2.0 (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
-  '<dt>TFC</dt><dd>Taxa de falha de condução: conversas que terminaram em transbordo, abandono ou loop sem o cliente ter pedido atendente.</dd>'+
+  '<dt>TFC</dt><dd>Taxa de falha de condução: conversas em loop, em transbordo que o cliente não pediu ou em abandono depois de uma resposta fraca (resolução abaixo de 7). Abandonar não é falha, e pedir atendente também não: o cliente pode sair ou chamar um humano a qualquer momento. Só conta quando o bot errou.</dd>'+
   '<dt>Contatos evitáveis</dt><dd>Entre as conversas classificadas, as que o bot poderia ter resolvido hoje (A), resolveria com ajuste de conteúdo, variável ou roteamento (B) ou exigiria uma capacidade nova (C). A estimativa para o período vem de uma amostra aleatória e traz intervalo de confiança.</dd>'+
   '<dt>Classes</dt><dd>A bot resolvia hoje · B resolveria com ajuste · C exigiria capacidade nova · D só humano resolve (mede o handoff do bot) · R retido provável · E indeterminado.</dd>'+
   '<dt>Auditoria</dt><dd>Um segundo agente lê a transcrição dos casos duvidosos, refaz as 6 notas e a classe. Tende a mostrar onde o avaliador automático erra, por exemplo aprovar transbordo depois de uma resposta falha.</dd>'+

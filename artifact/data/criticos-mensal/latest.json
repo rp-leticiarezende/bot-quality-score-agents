@@ -12,7 +12,7 @@
     "prompt_version": "v1",
     "pct_recontato_24h": 32.3,
     "sinalizados": { "transbordo_sem_pedido": { "n": 0, "pct": 0.0, "tickets": [] } },
-    "tfc": 15.4, "pct_pediu_humano": 13.5, "pct_transbordo": 5.8, "n_transbordo_nota_ok": 2,
+    "tfc": 10.6, "pct_pediu_humano": 13.5, "pct_transbordo": 5.8, "n_transbordo_nota_ok": 2,
     "labels": { "excelente": 19, "bom": 8, "regular": 5, "ruim": 6, "critico": 12 },
     "retention": { "resolutiva": 40, "abandono": 8, "transbordo": 3, "loop": 0 },
     "criterios": { "understanding": 6.12, "resolution": 5.50, "clarity": 6.46, "tone": 6.94, "efficiency": 5.77, "escalation": 5.67 }

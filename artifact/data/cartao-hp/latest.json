@@ -23,7 +23,7 @@
     "bqs_anterior": null,
     "ultimo_ponto_anterior": null,
     "prompt_version": "v1",
-    "tfc": 42.5,
+    "tfc": 30.4,
     "pct_pediu_humano": 25.4,
     "pct_transbordo": 32.7,
     "n_transbordo_nota_ok": 115,
@@ -47,21 +47,21 @@
   },
   "dimensoes": {
     "effective_vertical": [
-      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 63.5, "tfc": 42.2, "pct_pediu_humano": 27.4 },
-      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 69.2, "tfc": 43.5, "pct_pediu_humano": 15.9 }
+      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 329, "pct_volume": 82.7, "bqs": 63.5, "tfc": 30.4, "pct_pediu_humano": 27.4 },
+      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 69, "pct_volume": 17.3, "bqs": 69.2, "tfc": 30.4, "pct_pediu_humano": 15.9 }
     ],
     "topic": [
-      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 73.0, "tfc": 39.8, "pct_pediu_humano": null },
+      { "valor": "cartao-recargapay", "n": 249, "pct_volume": 62.6, "bqs": 73.0, "tfc": 24.9, "pct_pediu_humano": null },
       { "valor": "pix", "n": 17, "pct_volume": null, "bqs": 47.1, "tfc": 41.2, "pct_pediu_humano": null },
       { "valor": "recargapay-cards", "n": 15, "pct_volume": null, "bqs": 53.3, "tfc": 26.7, "pct_pediu_humano": null },
-      { "valor": "pix-payment", "n": 8, "pct_volume": null, "bqs": 62.5, "tfc": null, "pct_pediu_humano": null },
+      { "valor": "pix-payment", "n": 8, "pct_volume": null, "bqs": 62.5, "tfc": 37.5, "pct_pediu_humano": null },
       { "valor": "por-que-recebi-uma-fatura", "n": 8, "pct_volume": null, "bqs": 37.5, "tfc": 50.0, "pct_pediu_humano": null },
-      { "valor": "investimentos", "n": 6, "pct_volume": null, "bqs": 33.3, "tfc": null, "pct_pediu_humano": null },
-      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": null, "bqs": 33.3, "tfc": 100.0, "pct_pediu_humano": null },
-      { "valor": "fatura", "n": 5, "pct_volume": null, "bqs": 60.0, "tfc": null, "pct_pediu_humano": null },
-      { "valor": "cashback-e-rendimento", "n": 4, "pct_volume": null, "bqs": null, "tfc": null, "pct_pediu_humano": null },
-      { "valor": "roubaram-meu-cartao", "n": 4, "pct_volume": null, "bqs": null, "tfc": null, "pct_pediu_humano": null },
-      { "valor": "wallet-blocked", "n": 4, "pct_volume": null, "bqs": null, "tfc": null, "pct_pediu_humano": null },
+      { "valor": "investimentos", "n": 6, "pct_volume": null, "bqs": 33.3, "tfc": 66.7, "pct_pediu_humano": null },
+      { "valor": "roubaram-meu-cartão", "n": 6, "pct_volume": null, "bqs": 33.3, "tfc": 66.7, "pct_pediu_humano": null },
+      { "valor": "fatura", "n": 5, "pct_volume": null, "bqs": 60.0, "tfc": 40.0, "pct_pediu_humano": null },
+      { "valor": "cashback-e-rendimento", "n": 4, "pct_volume": null, "bqs": null, "tfc": 25.0, "pct_pediu_humano": null },
+      { "valor": "roubaram-meu-cartao", "n": 4, "pct_volume": null, "bqs": null, "tfc": 50.0, "pct_pediu_humano": null },
+      { "valor": "wallet-blocked", "n": 4, "pct_volume": null, "bqs": null, "tfc": 25.0, "pct_pediu_humano": null },
       { "valor": "chargeback-recovery", "n": 3, "pct_volume": null, "bqs": null, "tfc": null, "pct_pediu_humano": null }
     ]
   },
@@ -89,7 +89,7 @@
   "pontos_atencao": [
     { "tipo": "warn", "texto": "32 transbordos sem pedido do cliente (8,0%): possíveis erros do bot, sinalizados para análise.", "tickets": ["46607623", "46610432", "46611276"] },
     { "tipo": "warn", "texto": "Maior bloco de contatos evitáveis: resposta do prompt (classe A), 18 de 47 evitáveis na amostra, ≈83 contatos estimados no período, dono Produto CX. Evitáveis: 78,3% das classificadas (IC 66–87%).", "tickets": ["46605017", "46604988", "46607227"] },
-    { "tipo": "warn", "texto": "TFC 42,5% (limiar provisório 40%) e pediram atendente 25,4% (limiar provisório 20%); Agente CC Produção (n=329) com BQS 2.0 de 63,5%, abaixo de 65%." },
+    { "tipo": "warn", "texto": "TFC 30,4%, abaixo do limiar provisório de 40%. 25,4% dos clientes pediram atendente (limiar provisório de 20%): pedir atendente não é falha do bot, mas mostra demanda por humano que o bot pode tentar reter. Agente CC Produção (n=329) com BQS por agente de 63,5% pela nota do avaliador (ainda sem calibração por recorte)." },
     { "tipo": "info", "texto": "Auditoria: 9 tickets lidos, 8 notas revisadas, 4 aprovado→reprovado. O avaliador automático tende a premiar o transbordo mesmo quando a resposta anterior falhou." },
     { "tipo": "info", "texto": "Cobertura baixa (dados em 2 dos 7 dias: 15 e 16/10) e sem base de comparação: ler como ordem de grandeza. BQS 2.0 de 63,4% com histórico recomeçando em 20/10/2026." }
   ],
@@ -238,7 +238,7 @@
       "evidencia": "1 observada na amostra; fora dela, 46605060 e 46605913. KB: artigo 'Roubaram meu cartão RecargaPay, e agora?' com 8 de 9 conversas com problema (kb_score médio 5,4). Prioridade alta por risco de fraude, não pelo volume.",
       "tickets": ["46605567", "46605060", "46605913"],
       "contatos": { "observado": 1, "estimado": 5, "pct_total": 1.3 },
-      "nota_impacto": "Alta por risco de fraude e segurança, não pelo volume. TFC do tema de 100% na amostra pequena (n=6).",
+      "nota_impacto": "Alta por risco de fraude e segurança, não pelo volume. TFC do tema de 66,7% na amostra pequena (n=6).",
       "antes": "Orientou o bloqueio manual do cartão físico e disse que os virtuais continuam ativos.",
       "depois": "Bloqueie agora pelo formulário de perda ou roubo, que bloqueia todos os cartões, físicos e virtuais. Depois, solicite um novo cartão na opção de cartões.",
       "proposta": "Bloco 'Perda ou roubo do cartão (prioridade máxima)': ao ouvir perdi, roubaram ou furtaram, abrir a resposta com o formulário de perda/roubo (URL idêntica à do artigo); em seguida, como pedir novo cartão; nunca dizer que os virtuais continuam ativos após o formulário; compras feitas depois do roubo seguem a OPO-001; não explicar limite garantido nem anuidade neste tema. Oferta imediata de atendente quando o cliente não achar o caminho. Colar as 14 regras de guardrail.",

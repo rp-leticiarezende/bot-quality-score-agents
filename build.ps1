@@ -145,7 +145,7 @@ function New-DimAgg([string[]]$dims, [string]$extra) {
   SELECT '$d' AS dimensao, COALESCE(NULLIF(TRIM(CAST($d AS STRING)), ''), '(sem valor)') AS valor, COUNT(*) AS n,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct_volume,
     ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
-    ROUND(100.0 * SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
+    ROUND(100.0 * SUM(CASE WHEN (retention_type = 'loop' OR (retention_type = 'transbordo' AND COALESCE(customer_requested_transfer, false) = false) OR (retention_type = 'abandono' AND score_resolution < 7)) THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
     ROUND(100.0 * SUM(CASE WHEN customer_requested_transfer = true THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_pediu_humano$extra
   FROM base WHERE periodo = 'atual' GROUP BY $d
 "@

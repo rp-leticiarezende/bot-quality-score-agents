@@ -24,7 +24,7 @@ O BQS mede a **qualidade da condução** do bot. A taskforce quer saber, além d
 | Indicador | Pergunta que responde |
 |---|---|
 | **BQS** (estrito) | O bot conduziu bem a conversa? |
-| **TFC** (taxa de falha de condução) | Quantas conversas terminaram em transbordo, abandono ou loop sem o cliente ter pedido humano? |
+| **TFC** (taxa de falha de condução) | Quantas conversas o bot conduziu mal: loop, transbordo que o cliente não pediu ou abandono depois de uma resposta fraca? Abandono depois de resposta boa e transbordo pedido pelo cliente NÃO são falha. |
 | **CE** (contatos evitáveis) | Quantas conversas o bot poderia ter resolvido/retido — e por qual causa, com qual dono? |
 
 **Conteúdo da Central: somente externo.** O bot só consome artigos públicos. Artigo cujo título começa com 🔒 ou 🔍 é interno: nunca entra como fonte, evidência, lacuna ou recomendação (nem "criar/atualizar"). Se algum `kb_matched_article_title` vier com esse prefixo, trate a conversa como "sem artigo externo".
@@ -54,7 +54,7 @@ BQS 2.0    = (n_ok_revisado − aprovados_nao_auditados × taxa_falso_aprovado) 
              taxa_falso_aprovado = aprovações revertidas / tickets da auditoria de calibração (amostra aleatória dos aprovados, Passo 5C)
              O BQS 2.0 é exibido SEMPRE como um número só; a faixa de incerteza fica apenas no JSON do painel (`calibracao.faixa`)
 Recontato 24h = % das conversas cujo cliente voltou a falar com o atendimento em até 24h (prod.cx.fat_botmaker_metrics.recontacts_24h > 0). INDICADOR de acompanhamento: NÃO entra no BQS 2.0.
-TFC        = conversas com retention_type IN ('transbordo','abandono','loop') E customer_requested_transfer = false / N_total * 100
+TFC        = conversas com falha de condução / N_total * 100. Falha = loop; OU transbordo que o cliente NÃO pediu (também sinalizado); OU abandono depois de resposta fraca (score_resolution < 7). NÃO é falha: abandono depois de resposta boa, nem transbordo pedido pelo cliente (inclusive quando ele chega e pede humano sem perguntar nada)
 CE         = conversas classificadas A, B ou C pelo bqs-contencao / conversas classificadas   (e estimativa sobre o total — Passo 6)
 ```
 
@@ -174,8 +174,8 @@ SELECT periodo,
   SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END) AS n_avaliaveis,
   SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) AS n_ok,
   ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
-  SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) AS n_falha_conducao,
-  ROUND(100.0 * SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
+  SUM(CASE WHEN (retention_type = 'loop' OR (retention_type = 'transbordo' AND COALESCE(customer_requested_transfer, false) = false) OR (retention_type = 'abandono' AND score_resolution < 7)) THEN 1 ELSE 0 END) AS n_falha_conducao,
+  ROUND(100.0 * SUM(CASE WHEN (retention_type = 'loop' OR (retention_type = 'transbordo' AND COALESCE(customer_requested_transfer, false) = false) OR (retention_type = 'abandono' AND score_resolution < 7)) THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
   SUM(CASE WHEN nota_ok IS NOT NULL AND (retention_type IN ('transbordo','abandono','loop') OR nota_ok = false) THEN 1 ELSE 0 END) AS n_elegiveis_contencao,
   SUM(CASE WHEN quality_label = 'excelente' THEN 1 ELSE 0 END) AS lbl_excelente,
   SUM(CASE WHEN quality_label = 'bom' THEN 1 ELSE 0 END) AS lbl_bom,
@@ -222,7 +222,7 @@ agg AS (
   SELECT 'effective_vertical' AS dimensao, COALESCE(NULLIF(TRIM(CAST(effective_vertical AS STRING)), ''), '(sem valor)') AS valor, COUNT(*) AS n,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct_volume,
     ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
-    ROUND(100.0 * SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
+    ROUND(100.0 * SUM(CASE WHEN (retention_type = 'loop' OR (retention_type = 'transbordo' AND COALESCE(customer_requested_transfer, false) = false) OR (retention_type = 'abandono' AND score_resolution < 7)) THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
     ROUND(100.0 * SUM(CASE WHEN customer_requested_transfer = true THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_pediu_humano,
     ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND welcome_not_found = false AND pages_fetched > 0 THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL AND welcome_not_found = false AND pages_fetched > 0 THEN 1 ELSE 0 END), 0), 1) AS bqs_hp_pleno,
     ROUND(100.0 * SUM(CASE WHEN welcome_not_found = true OR pages_fetched = 0 THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_degradado
@@ -230,7 +230,7 @@ agg AS (
   SELECT 'topic' AS dimensao, COALESCE(NULLIF(TRIM(CAST(topic AS STRING)), ''), '(sem valor)') AS valor, COUNT(*) AS n,
     ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct_volume,
     ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND desfecho_ok = true THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL THEN 1 ELSE 0 END), 0), 1) AS bqs,
-    ROUND(100.0 * SUM(CASE WHEN retention_type IN ('transbordo','abandono','loop') AND COALESCE(customer_requested_transfer, false) = false THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
+    ROUND(100.0 * SUM(CASE WHEN (retention_type = 'loop' OR (retention_type = 'transbordo' AND COALESCE(customer_requested_transfer, false) = false) OR (retention_type = 'abandono' AND score_resolution < 7)) THEN 1 ELSE 0 END) / COUNT(*), 1) AS tfc,
     ROUND(100.0 * SUM(CASE WHEN customer_requested_transfer = true THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_pediu_humano,
     ROUND(100.0 * SUM(CASE WHEN nota_ok = true AND welcome_not_found = false AND pages_fetched > 0 THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN nota_ok IS NOT NULL AND welcome_not_found = false AND pages_fetched > 0 THEN 1 ELSE 0 END), 0), 1) AS bqs_hp_pleno,
     ROUND(100.0 * SUM(CASE WHEN welcome_not_found = true OR pages_fetched = 0 THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct_degradado

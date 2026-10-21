@@ -121,3 +121,16 @@ Decidido pela Leticia: auditoria de calibração em todos os fluxos; o BQS é **
 - **Régua do auditor:** transbordo pedido pelo cliente só recebe 9–10 se o bot tentou ajudar antes e transferiu com canal e prazo; transferência anunciada e nunca conectada vale 0–2; "transferir não é resolver".
 - **Faixa de incerteza:** calculada (Wilson 95%) e guardada só no JSON (`metricas.calibracao.faixa`); não é exibida.
 - **Primeiro número calibrado (teste):** Aleatório 25,6% na semana 12 a 18/10 e 25,8% em outubro (o avaliador marcava 76,9% e 77,5%).
+
+## 11. TFC: abandonar e pedir atendente não são falhas (21/10/2026)
+
+Decisão da Leticia: o cliente pode abandonar a conversa ou pedir um humano a qualquer momento, e isso **não é falha de condução**. Antes, o TFC contava todo abandono e todo loop como falha e só excluía o transbordo pedido pelo cliente.
+
+**TFC (nova definição)** = conversas com falha de condução ÷ total de conversas. Falha é:
+- **loop**;
+- **transbordo que o cliente não pediu** (também sinalizado, e reprova no BQS 2.0);
+- **abandono depois de uma resposta fraca** (`score_resolution < 7`, o mesmo corte do BQS 2.0).
+
+**Não é falha:** abandono depois de resposta boa; transbordo pedido pelo cliente, inclusive quando ele chega e pede o humano sem fazer pergunta nenhuma. A conduta de um transbordo pedido continua sendo avaliada no BQS (a nota de transbordo cobre se o bot ajudou antes ou transferiu com canal e prazo), mas pedir o humano em si nunca pesa contra o bot.
+
+No `bqs-contencao`: pedido direto de humano sem dúvida informada é classe `D` (causa `pedido_humano_direto`), nunca contato evitável; abandono depois de resposta correta e completa é `R`.
