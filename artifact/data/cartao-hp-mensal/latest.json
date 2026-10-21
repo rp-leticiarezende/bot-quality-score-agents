@@ -1,47 +1,375 @@
 {
-  "schema": "bqs-run/1",
-  "chave": "cartao-hp-mensal",
-  "rotina": "Agente de Cartão de Crédito (mensal)",
-  "meta": { "origem": "teste", "nota": "BQS 2.0, visão mensal de teste: métricas do Databricks para outubro até 20/10/2026, calibrado pela taxa de falsos aprovados da auditoria da semana de 12/10 a 18/10 (8 de 25 revertidos). Contatos evitáveis, oportunidades e artigos serão consolidados a partir das rodadas semanais." },
-  "periodo": { "tipo": "mensal", "inicio": "2026-10-01", "fim": "2026-10-20", "label": "Outubro/2026 (até 20/10)" },
-  "gerado_em": "2026-10-20T14:10:00-03:00",
-  "cobertura": { "baixa": true, "comparacao_indisponivel": false, "texto": "mês parcial: dados em 4 dias (15, 16, 19 e 20/10); setembro também tem só 9 dias, por causa do hiato." },
-  "metricas": {
-    "n_total": 673, "n_avaliaveis": 660, "n_ok": 421,
-    "bqs": 43.4, "bqs_avaliador": 63.8, "calibracao": { "calibrado": true, "n_amostra": 25, "n_revertidos": 8, "taxa_falso_aprovado": 32.0, "faixa": [30.9, 52.8] }, "bqs_anterior": null, "ultimo_ponto_anterior": null,
-    "prompt_version": "v1",
-    "pct_recontato_24h": 9.2,
-    "sinalizados": { "transbordo_sem_pedido": { "n": 63, "pct": 9.4, "tickets": [46607623, 46610432, 46626584] } },
-    "tfc": 31.4, "pct_pediu_humano": 25.0, "pct_transbordo": 33.7, "n_transbordo_nota_ok": 197,
-    "labels": { "excelente": 307, "bom": 170, "regular": 88, "ruim": 69, "critico": 26 },
-    "retention": { "resolutiva": 196, "abandono": 234, "transbordo": 227, "loop": 12 },
-    "criterios": { "understanding": 7.69, "resolution": 6.78, "clarity": 7.38, "tone": 8.30, "efficiency": 6.82, "escalation": 7.84 },
-    "qualidade_dado": null
-  },
-  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
-  "dimensoes": {
-    "effective_vertical": [
-      { "valor": "cartao_credito", "rotulo": "Agente CC Produção", "n": 556, "pct_volume": 82.6, "bqs": 63.1, "tfc": 31.5, "pct_pediu_humano": 26.3 },
-      { "valor": "cc_anuidade", "rotulo": "Agente CC Anuidade", "n": 117, "pct_volume": 17.4, "bqs": 67.0, "tfc": 31.3, "pct_pediu_humano": 18.8 }
-    ],
-    "topic": [
-      { "valor": "cartao-recargapay", "n": 408, "pct_volume": 60.6, "bqs": 71.1, "tfc": 26.5, "pct_pediu_humano": 24.5 },
-      { "valor": "recargapay-cards", "n": 32, "pct_volume": 4.8, "bqs": 58.1, "tfc": 20.0, "pct_pediu_humano": 15.6 },
-      { "valor": "pix", "n": 24, "pct_volume": 3.6, "bqs": 41.7, "tfc": 52.2, "pct_pediu_humano": 29.2 },
-      { "valor": "pix-payment", "n": 12, "pct_volume": 1.8, "bqs": 58.3, "tfc": 30.0, "pct_pediu_humano": 33.3 },
-      { "valor": "roubaram-meu-cartão", "n": 11, "pct_volume": 1.6, "bqs": 54.5, "tfc": 45.5, "pct_pediu_humano": 9.1 },
-      { "valor": "roubaram-meu-cartao", "n": 10, "pct_volume": 1.5, "bqs": 50.0, "tfc": 44.4, "pct_pediu_humano": 20.0 },
-      { "valor": "por-que-recebi-uma-fatura", "n": 10, "pct_volume": 1.5, "bqs": 50.0, "tfc": 40.0, "pct_pediu_humano": 40.0 },
-      { "valor": "fatura", "n": 9, "pct_volume": 1.3, "bqs": 55.6, "tfc": 50.0, "pct_pediu_humano": 22.2 },
-      { "valor": "faturas-e-limite", "n": 9, "pct_volume": 1.3, "bqs": 77.8, "tfc": 25.0, "pct_pediu_humano": 33.3 },
-      { "valor": "cashback-e-rendimento", "n": 6, "pct_volume": 0.9, "bqs": 50.0, "tfc": 33.3, "pct_pediu_humano": 33.3 },
-      { "valor": "chargeback-recovery", "n": 6, "pct_volume": 0.9, "bqs": 50.0, "tfc": 33.3, "pct_pediu_humano": 66.7 },
-      { "valor": "investimentos", "n": 6, "pct_volume": 0.9, "bqs": 33.3, "tfc": 66.7, "pct_pediu_humano": 16.7 }
-    ]
-  },
-  "pontos_atencao": [
-    { "tipo": "info", "texto": "Visão mensal de teste: sem classificação de contatos evitáveis nem auditoria. Para os casos concretos e o que mudar, abra a visão semanal." }
-  ],
-  "oportunidades": [],
-  "artigos": []
+    "schema":  "bqs-run/1",
+    "chave":  "cartao-hp-mensal",
+    "rotina":  "Agente de Cartão de Crédito (mensal)",
+    "meta":  {
+                 "origem":  "teste",
+                 "nota":  "Visão mensal acumulada de outubro: soma das rodadas do mês até agora (por enquanto, só a semana de 12/10 a 18/10). Rodada de teste, números ainda não oficiais."
+             },
+    "periodo":  {
+                    "tipo":  "mensal",
+                    "inicio":  "2026-10-01",
+                    "fim":  "2026-10-18",
+                    "label":  "Outubro/2026 (até 18/10)"
+                },
+    "gerado_em":  "2026-10-20T15:15:00-03:00",
+    "cobertura":  {
+                      "baixa":  true,
+                      "comparacao_indisponivel":  true,
+                      "texto":  "1 rodada semanal no mês (12/10 a 18/10), com dados em 2 dos 7 dias; o mensal acumula as próximas rodadas."
+                  },
+    "metricas":  {
+                     "n_total":  398,
+                     "n_avaliaveis":  388,
+                     "n_ok":  250,
+                     "bqs":  43.2,
+                     "bqs_avaliador":  64.4,
+                     "calibracao":  {
+                                        "calibrado":  true,
+                                        "n_amostra":  25,
+                                        "n_revertidos":  8,
+                                        "taxa_falso_aprovado":  32.0,
+                                        "faixa":  [
+                                                      32.1,
+                                                      51.6
+                                                  ]
+                                    },
+                     "bqs_anterior":  null,
+                     "ultimo_ponto_anterior":  null,
+                     "prompt_version":  "v1",
+                     "tfc":  30.4,
+                     "pct_pediu_humano":  25.4,
+                     "pct_transbordo":  32.7,
+                     "n_transbordo_nota_ok":  115,
+                     "labels":  {
+                                    "excelente":  183,
+                                    "bom":  98,
+                                    "regular":  49,
+                                    "ruim":  41,
+                                    "critico":  17
+                                },
+                     "retention":  {
+                                       "resolutiva":  125,
+                                       "abandono":  130,
+                                       "transbordo":  130,
+                                       "loop":  9
+                                   },
+                     "criterios":  {
+                                       "understanding":  7.66,
+                                       "resolution":  6.77,
+                                       "clarity":  7.37,
+                                       "tone":  8.24,
+                                       "efficiency":  6.81,
+                                       "escalation":  7.79
+                                   },
+                     "pct_recontato_24h":  12.2,
+                     "sinalizados":  {
+                                         "transbordo_sem_pedido":  {
+                                                                       "n":  32,
+                                                                       "pct":  8.0,
+                                                                       "tickets":  [
+                                                                                       "46607623",
+                                                                                       "46610432",
+                                                                                       "46611276"
+                                                                                   ]
+                                                                   }
+                                     },
+                     "qualidade_dado":  {
+                                            "n_sem_boas_vindas":  21,
+                                            "pct_sem_boas_vindas":  5.3
+                                        }
+                 },
+    "auditoria":  {
+                      "auditados":  9,
+                      "revisados":  8,
+                      "aprovado_para_reprovado":  4,
+                      "reprovado_para_aprovado":  0,
+                      "divergencias":  [
+                                           "O avaliador automático premiou o transbordo executado sem checar a resposta anterior: resolução 9-10 e transbordo 10 em respostas que não resolveram ou estavam erradas (tickets 46611210, 46610566, 46610959).",
+                                           "Transferência anunciada e nunca conectada recebeu nota 9 de transbordo (ticket 46605356).",
+                                           "Handoff tardio depois de loop longo recebeu nota 5 de transbordo quando só o humano resolvia (ticket 46607478)."
+                                       ]
+                  },
+    "dimensoes":  {
+                      "effective_vertical":  [
+                                                 {
+                                                     "valor":  "cartao_credito",
+                                                     "rotulo":  "Agente CC Produção",
+                                                     "n":  329,
+                                                     "pct_volume":  82.7,
+                                                     "bqs":  63.5,
+                                                     "tfc":  30.4,
+                                                     "pct_pediu_humano":  27.4
+                                                 },
+                                                 {
+                                                     "valor":  "cc_anuidade",
+                                                     "rotulo":  "Agente CC Anuidade",
+                                                     "n":  69,
+                                                     "pct_volume":  17.3,
+                                                     "bqs":  69.2,
+                                                     "tfc":  30.4,
+                                                     "pct_pediu_humano":  15.9
+                                                 }
+                                             ],
+                      "topic":  [
+                                    {
+                                        "valor":  "cartao-recargapay",
+                                        "n":  249,
+                                        "pct_volume":  62.6,
+                                        "bqs":  73.0,
+                                        "tfc":  24.9,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "pix",
+                                        "n":  17,
+                                        "pct_volume":  null,
+                                        "bqs":  47.1,
+                                        "tfc":  41.2,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "recargapay-cards",
+                                        "n":  15,
+                                        "pct_volume":  null,
+                                        "bqs":  53.3,
+                                        "tfc":  26.7,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "pix-payment",
+                                        "n":  8,
+                                        "pct_volume":  null,
+                                        "bqs":  62.5,
+                                        "tfc":  37.5,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "por-que-recebi-uma-fatura",
+                                        "n":  8,
+                                        "pct_volume":  null,
+                                        "bqs":  37.5,
+                                        "tfc":  50.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "investimentos",
+                                        "n":  6,
+                                        "pct_volume":  null,
+                                        "bqs":  33.3,
+                                        "tfc":  66.7,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "roubaram-meu-cartão",
+                                        "n":  6,
+                                        "pct_volume":  null,
+                                        "bqs":  33.3,
+                                        "tfc":  66.7,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "fatura",
+                                        "n":  5,
+                                        "pct_volume":  null,
+                                        "bqs":  60.0,
+                                        "tfc":  40.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "cashback-e-rendimento",
+                                        "n":  4,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  25.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "roubaram-meu-cartao",
+                                        "n":  4,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  50.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "wallet-blocked",
+                                        "n":  4,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  25.0,
+                                        "pct_pediu_humano":  null
+                                    },
+                                    {
+                                        "valor":  "chargeback-recovery",
+                                        "n":  3,
+                                        "pct_volume":  null,
+                                        "bqs":  null,
+                                        "tfc":  null,
+                                        "pct_pediu_humano":  null
+                                    }
+                                ]
+                  },
+    "contencao":  {
+                      "n_classificadas":  60,
+                      "n_elegiveis":  276,
+                      "pct_evitavel":  78.3,
+                      "ic95":  [
+                                   66,
+                                   87
+                               ],
+                      "ce_pct_total":  54.3,
+                      "classes":  {
+                                      "A":  43,
+                                      "B":  2,
+                                      "C":  2,
+                                      "D":  8,
+                                      "R":  5,
+                                      "E":  0
+                                  },
+                      "causas":  [
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "prompt_resposta",
+                                         "causa_rotulo":  "Resposta do prompt (incompleta, genérica ou contraditória ao artigo)",
+                                         "n":  18,
+                                         "tickets":  [
+                                                         "46605017",
+                                                         "46604988",
+                                                         "46607227"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "nlu_roteamento",
+                                         "causa_rotulo":  "Entendimento e roteamento (frase clara tratada como \u0027Não entendi\u0027 ou tema trocado)",
+                                         "n":  11,
+                                         "tickets":  [
+                                                         "46610868",
+                                                         "46609275",
+                                                         "46609389"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "loop_fluxo",
+                                         "causa_rotulo":  "Loop do fluxo (repetição de passo a passo ou de pedido de reformulação)",
+                                         "n":  8,
+                                         "tickets":  [
+                                                         "46606986",
+                                                         "46607050",
+                                                         "46606431"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "politica_produto",
+                                         "causa_rotulo":  "Política: sem sondagem após o \u0027Não\u0027 na confirmação",
+                                         "n":  5,
+                                         "tickets":  [
+                                                         "46609030",
+                                                         "46607711",
+                                                         "46611090"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "A",
+                                         "causa":  "integracao_acao",
+                                         "causa_rotulo":  "Integração: falha técnica de consulta",
+                                         "n":  1,
+                                         "tickets":  [
+                                                         "46605878"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "B",
+                                         "causa":  "variavel_hp",
+                                         "causa_rotulo":  "Variável HP quebrada ou mal formatada",
+                                         "n":  2,
+                                         "tickets":  [
+                                                         "46608351",
+                                                         "46611052"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "C",
+                                         "causa":  "integracao_acao",
+                                         "causa_rotulo":  "Capacidade ausente: consulta que o bot não faz",
+                                         "n":  2,
+                                         "tickets":  [
+                                                         "46608785",
+                                                         "46607846"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "D",
+                                         "causa":  "acao_humana_obrigatoria",
+                                         "causa_rotulo":  "Só o humano resolve (qualidade do handoff do bot)",
+                                         "n":  8,
+                                         "tickets":  [
+                                                         "46606593",
+                                                         "46611425",
+                                                         "46604601"
+                                                     ]
+                                     },
+                                     {
+                                         "classe":  "R",
+                                         "causa":  "nenhuma",
+                                         "causa_rotulo":  "Resolvida sem falha concreta do bot",
+                                         "n":  5,
+                                         "tickets":  [
+                                                         "46607859",
+                                                         "46605126",
+                                                         "46609707"
+                                                     ]
+                                     }
+                                 ],
+                      "por_dono":  {
+                                       "Produto CX":  47,
+                                       "Help Design":  0
+                                   },
+                      "handoff":  {
+                                      "correto":  2,
+                                      "improvisado":  3,
+                                      "tardio":  3
+                                  }
+                  },
+    "pontos_atencao":  [
+                           {
+                               "tipo":  "warn",
+                               "texto":  "32 transbordos sem pedido do cliente (8,0%): possíveis erros do bot, sinalizados para análise.",
+                               "tickets":  [
+                                               "46607623",
+                                               "46610432",
+                                               "46611276"
+                                           ]
+                           },
+                           {
+                               "tipo":  "warn",
+                               "texto":  "Maior bloco de contatos evitáveis: resposta do prompt (classe A), 18 de 47 evitáveis na amostra, ≈83 contatos estimados no período, dono Produto CX. Evitáveis: 78,3% das classificadas (IC 66–87%).",
+                               "tickets":  [
+                                               "46605017",
+                                               "46604988",
+                                               "46607227"
+                                           ]
+                           },
+                           {
+                               "tipo":  "warn",
+                               "texto":  "TFC 30,4%, abaixo do limiar provisório de 40%. 25,4% dos clientes pediram atendente (limiar provisório de 20%): pedir atendente não é falha do bot, mas mostra demanda por humano que o bot pode tentar reter. Agente CC Produção (n=329) com BQS por agente de 63,5% pela nota do avaliador (ainda sem calibração por recorte)."
+                           },
+                           {
+                               "tipo":  "info",
+                               "texto":  "Auditoria: 9 tickets lidos, 8 notas revisadas, 4 aprovado→reprovado. O avaliador automático tende a premiar o transbordo mesmo quando a resposta anterior falhou."
+                           },
+                           {
+                               "tipo":  "info",
+                               "texto":  "Cobertura baixa (dados em 2 dos 7 dias: 15 e 16/10) e sem base de comparação: ler como ordem de grandeza. BQS 2.0 de 63,4% com histórico recomeçando em 20/10/2026."
+                           }
+                       ],
+    "oportunidades":  [
+
+                      ],
+    "artigos":  [
+
+                ]
 }

@@ -1,27 +1,93 @@
 {
-  "schema": "bqs-run/1",
-  "chave": "aleatorio-mensal",
-  "rotina": "Aleatório (mensal)",
-  "meta": { "origem": "teste", "nota": "BQS 2.0, visão mensal de teste: métricas do Databricks para outubro até 20/10/2026, calibrado pela taxa de falsos aprovados das auditorias de outubro (21 de 27 revertidos); sem classificação de contatos evitáveis." },
-  "periodo": { "tipo": "mensal", "inicio": "2026-10-01", "fim": "2026-10-20", "label": "Outubro/2026 (até 20/10)" },
-  "gerado_em": "2026-10-20T14:10:00-03:00",
-  "cobertura": { "baixa": true, "comparacao_indisponivel": false, "texto": "mês parcial: dados em 4 dias (15, 16, 19 e 20/10); setembro tem só 10 dias, por causa do hiato." },
-  "metricas": {
-    "n_total": 120, "n_avaliaveis": 120, "n_ok": 93,
-    "bqs": 17.2, "bqs_avaliador": 77.5, "bqs_anterior": null, "ultimo_ponto_anterior": null,
-    "prompt_version": "v1",
-    "calibracao": { "calibrado": true, "n_amostra": 27, "n_revertidos": 21, "taxa_falso_aprovado": 77.8, "faixa": [8.2, 31.5] },
-    "pct_recontato_24h": 11.7,
-    "sinalizados": { "transbordo_sem_pedido": { "n": 5, "pct": 4.2, "tickets": [46626986, 46627582, 46608599] } },
-    "tfc": 4.3, "pct_pediu_humano": 95.8, "pct_transbordo": 100.0, "n_transbordo_nota_ok": 96,
-    "labels": { "excelente": 42, "bom": 54, "regular": 9, "ruim": 15, "critico": 0 },
-    "retention": { "resolutiva": 0, "abandono": 0, "transbordo": 120, "loop": 0 },
-    "criterios": { "understanding": 7.19, "resolution": 6.94, "clarity": 7.14, "tone": 8.12, "efficiency": 6.59, "escalation": 9.79 }
-  },
-  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
-  "pontos_atencao": [
-    { "tipo": "info", "texto": "Todas as 120 conversas da amostra terminaram em transbordo e 95,8% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot." }
-  ],
-  "oportunidades": [],
-  "artigos": []
+    "schema":  "bqs-run/1",
+    "chave":  "aleatorio-mensal",
+    "rotina":  "Aleatório (mensal)",
+    "meta":  {
+                 "origem":  "teste",
+                 "nota":  "Visão mensal acumulada de outubro: soma das rodadas do mês até agora (por enquanto, só a semana de 12/10 a 18/10). Rodada de teste, números ainda não oficiais."
+             },
+    "periodo":  {
+                    "tipo":  "mensal",
+                    "inicio":  "2026-10-01",
+                    "fim":  "2026-10-18",
+                    "label":  "Outubro/2026 (até 18/10)"
+                },
+    "gerado_em":  "2026-10-20T11:55:00-03:00",
+    "cobertura":  {
+                      "baixa":  true,
+                      "comparacao_indisponivel":  true,
+                      "texto":  "1 rodada semanal no mês (12/10 a 18/10), com dados em 2 dos 7 dias; o mensal acumula as próximas rodadas."
+                  },
+    "metricas":  {
+                     "n_total":  52,
+                     "n_avaliaveis":  52,
+                     "n_ok":  40,
+                     "bqs":  10.3,
+                     "bqs_avaliador":  76.9,
+                     "calibracao":  {
+                                        "calibrado":  true,
+                                        "n_amostra":  15,
+                                        "n_revertidos":  13,
+                                        "taxa_falso_aprovado":  86.7,
+                                        "faixa":  [
+                                                      5.6,
+                                                      22.1
+                                                  ]
+                                    },
+                     "bqs_anterior":  null,
+                     "pct_recontato_24h":  12.8,
+                     "sinalizados":  {
+                                         "transbordo_sem_pedido":  {
+                                                                       "n":  2,
+                                                                       "pct":  3.8,
+                                                                       "tickets":  [
+                                                                                       46608599,
+                                                                                       46608013
+                                                                                   ]
+                                                                   }
+                                     },
+                     "tfc":  3.8,
+                     "pct_pediu_humano":  96.2,
+                     "pct_transbordo":  100,
+                     "labels":  {
+                                    "excelente":  19,
+                                    "bom":  23,
+                                    "regular":  2,
+                                    "ruim":  8,
+                                    "critico":  0
+                                },
+                     "retention":  {
+                                       "resolutiva":  0,
+                                       "abandono":  0,
+                                       "transbordo":  52,
+                                       "loop":  0
+                                   },
+                     "criterios":  {
+                                       "understanding":  7.15,
+                                       "resolution":  6.88,
+                                       "clarity":  7.04,
+                                       "tone":  8.08,
+                                       "efficiency":  6.54,
+                                       "escalation":  9.77
+                                   }
+                 },
+    "pontos_atencao":  [
+                           {
+                               "tipo":  "warn",
+                               "texto":  "2 transbordos sem pedido do cliente (3,8% das conversas) reprovam o BQS 2.0 e foram sinalizados para análise. Exemplos:",
+                               "tickets":  [
+                                               46608599,
+                                               46608013
+                                           ]
+                           },
+                           {
+                               "tipo":  "info",
+                               "texto":  "Todas as 52 conversas da amostra terminaram em transbordo e 96,2% foram pedidos de atendente. O BQS mede a conduta até o transbordo, não a qualidade geral do bot. Exemplos de transbordos com resolução baixa: os contatos evitáveis são o número principal desta rotina.",
+                               "tickets":  [
+                                               46607730,
+                                               46608607,
+                                               46609156
+                                           ]
+                           }
+                       ]
 }

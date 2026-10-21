@@ -1,26 +1,94 @@
 {
-  "schema": "bqs-run/1",
-  "chave": "criticos-mensal",
-  "rotina": "Casos críticos (mensal)",
-  "meta": { "origem": "teste", "nota": "BQS 2.0, visão mensal de teste: métricas do Databricks para outubro até 20/10/2026, calibrado pela auditoria da semana de 12/10 a 18/10 (6 de 14 revertidos)." },
-  "periodo": { "tipo": "mensal", "inicio": "2026-10-01", "fim": "2026-10-20", "label": "Outubro/2026 (até 20/10)" },
-  "gerado_em": "2026-10-20T14:10:00-03:00",
-  "cobertura": { "baixa": true, "comparacao_indisponivel": false, "texto": "mês parcial: dados em 4 dias (15, 16, 19 e 20/10); em agosto eram 852 conversas no mês." },
-  "metricas": {
-    "n_total": 52, "n_avaliaveis": 50, "n_ok": 27,
-    "bqs": 30.8, "bqs_avaliador": 54.0, "calibracao": { "calibrado": true, "n_amostra": 14, "n_revertidos": 6, "taxa_falso_aprovado": 42.9, "faixa": [17.6, 42.4] }, "bqs_anterior": null, "ultimo_ponto_anterior": null,
-    "prompt_version": "v1",
-    "pct_recontato_24h": 32.3,
-    "sinalizados": { "transbordo_sem_pedido": { "n": 0, "pct": 0.0, "tickets": [] } },
-    "tfc": 10.6, "pct_pediu_humano": 13.5, "pct_transbordo": 5.8, "n_transbordo_nota_ok": 2,
-    "labels": { "excelente": 19, "bom": 8, "regular": 5, "ruim": 6, "critico": 12 },
-    "retention": { "resolutiva": 40, "abandono": 8, "transbordo": 3, "loop": 0 },
-    "criterios": { "understanding": 6.12, "resolution": 5.50, "clarity": 6.46, "tone": 6.94, "efficiency": 5.77, "escalation": 5.67 }
-  },
-  "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": [] },
-  "pontos_atencao": [
-    { "tipo": "warn", "texto": "40 das 52 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. A resolução é o critério mais baixo (5,50)." }
-  ],
-  "oportunidades": [],
-  "artigos": []
+    "schema":  "bqs-run/1",
+    "chave":  "criticos-mensal",
+    "rotina":  "Casos críticos (mensal)",
+    "meta":  {
+                 "origem":  "teste",
+                 "nota":  "Visão mensal acumulada de outubro: soma das rodadas diárias de 19/10 e 20/10, com médias ponderadas pelo número de conversas. Sem calibração (amostra do diário abaixo do mínimo). Números ainda não oficiais."
+             },
+    "periodo":  {
+                    "tipo":  "mensal",
+                    "inicio":  "2026-10-01",
+                    "fim":  "2026-10-20",
+                    "label":  "Outubro/2026 (até 20/10)"
+                },
+    "gerado_em":  "2026-10-20T14:10:00-03:00",
+    "cobertura":  {
+                      "baixa":  true,
+                      "comparacao_indisponivel":  true,
+                      "texto":  "2 rodadas diárias no mês (19/10 e 20/10), 54 conversas."
+                  },
+    "metricas":  {
+                     "n_total":  54,
+                     "n_avaliaveis":  53,
+                     "n_ok":  25,
+                     "bqs":  47.1,
+                     "bqs_avaliador":  47.1,
+                     "calibracao":  {
+                                        "calibrado":  false,
+                                        "n_amostra":  0,
+                                        "n_revertidos":  0,
+                                        "taxa_falso_aprovado":  null,
+                                        "faixa":  null
+                                    },
+                     "bqs_anterior":  null,
+                     "ultimo_ponto_anterior":  null,
+                     "prompt_version":  "v1",
+                     "pct_recontato_24h":  26.0,
+                     "sinalizados":  {
+                                         "transbordo_sem_pedido":  {
+                                                                       "n":  0,
+                                                                       "pct":  0.0,
+                                                                       "tickets":  [
+
+                                                                                   ]
+                                                                   }
+                                     },
+                     "tfc":  12.9,
+                     "pct_pediu_humano":  9.2,
+                     "pct_transbordo":  3.7,
+                     "n_transbordo_nota_ok":  2,
+                     "labels":  {
+                                    "excelente":  21,
+                                    "bom":  7,
+                                    "regular":  5,
+                                    "ruim":  8,
+                                    "critico":  12
+                                },
+                     "retention":  {
+                                       "resolutiva":  42,
+                                       "abandono":  9,
+                                       "transbordo":  2,
+                                       "loop":  0
+                                   },
+                     "criterios":  {
+                                       "understanding":  6.4,
+                                       "resolution":  5.6,
+                                       "clarity":  6.6,
+                                       "tone":  7.2,
+                                       "efficiency":  5.9,
+                                       "escalation":  5.7
+                                   }
+                 },
+    "auditoria":  {
+                      "auditados":  0,
+                      "revisados":  0,
+                      "aprovado_para_reprovado":  0,
+                      "reprovado_para_aprovado":  0,
+                      "divergencias":  [
+
+                                       ]
+                  },
+    "pontos_atencao":  [
+                           {
+                               "tipo":  "warn",
+                               "texto":  "40 das 52 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. A resolução é o critério mais baixo (5,50)."
+                           }
+                       ],
+    "oportunidades":  [
+
+                      ],
+    "artigos":  [
+
+                ]
 }
