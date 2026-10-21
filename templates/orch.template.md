@@ -331,6 +331,35 @@ prompt: |
 ```
 3. Guarde as linhas `CONFIRMA` e `REVISA` como `output_calibracao` (as notas entram no SQL do Passo 6.2 com `origem = 'cal'`). Tickets `SEM_TRANSCRICAO` ou de auditor com `FALHA DE COLETA` saem da amostra (informe quantos). Se a amostra final tiver **menos de 5 tickets**, não calibre: use `n_cal = 0` e avise no relatório que o BQS 2.0 desta rodada não foi calibrado.
 
+### 5C-2 — Calibração dos reprovados (falsos reprovados)
+
+O avaliador também **reprova demais** em alguns casos (por exemplo, por causa do que veio depois da pesquisa de satisfação, que não conta). Para medir isso, o `bqs-auditor` lê uma **pequena amostra aleatória das conversas reprovadas só pela nota** (`nota_ok = false` e `desfecho_ok = true`; loop e transbordo sem pedido continuam reprovados de qualquer forma) e a taxa de reprovações que não se sustentam corrige o número (Passo 6.2). Tamanho da amostra neste fluxo: **no máximo {{N_CAL_REP}} tickets** (se houver menos reprovados desse tipo, audite todos).
+
+1. **Sorteio (SQL, sem contas):** troque `[IDS_5B]` pelos `ticket_id` auditados no Passo 5B (ou `0` se nenhum).
+
+```sql
+[BASE]
+SELECT ticket_id, effective_vertical, topic, retention_type
+FROM base
+WHERE periodo = 'atual' AND nota_ok = false AND desfecho_ok = true
+  AND ticket_id NOT IN ([IDS_5B])
+ORDER BY xxhash64(CONCAT(request_id, 'calibracao_rep'))
+LIMIT {{N_CAL_REP}}
+```
+
+2. **Distribuição:** um único auditor (a amostra é pequena), com este prompt:
+
+```
+subagent_type: bqs-auditor
+prompt: |
+  MODO CALIBRAÇÃO DE REPROVADOS ativo.
+  Fluxo: {{ROTINA}} | flow (valor exato da coluna `flow`): {{FLOW}} | Período: [data_inicio] a [data_fim] | AUDITOR DE CALIBRAÇÃO DE REPROVADOS
+
+  Estes tickets foram REPROVADOS pelo avaliador automático e vieram de sorteio aleatório. Audite conforme o seu sistema (MODO CALIBRAÇÃO DE REPROVADOS). Identifique-os só por ticket_id.
+  [uma linha por ticket: ticket_id]
+```
+3. Guarde as linhas `CONFIRMA` (a reprovação se sustenta) e `REVISA` como `output_calibracao_rep` (as notas entram no SQL do Passo 6.2 com `origem = 'calr'`). `SEM_TRANSCRICAO` e `FALHA DE COLETA` saem da amostra. Se a amostra final tiver **menos de 5 tickets**, não corrija os reprovados: use `n_calr = 0`.
+
 ---
 
 ## PASSO 6 — CONSOLIDAÇÃO (SQL): CONTENÇÃO E BQS FINAL
@@ -378,9 +407,9 @@ Substitua `[n_elegiveis_contencao]` e `[n_total]` pelos números do item 3.1 (pe
 
 ### 6.2 — BQS 2.0 (nota revisada nos tickets auditados e calibração pela auditoria aleatória)
 
-Monte a lista `VALUES` com as linhas de `output_auditoria` (Passo 5B, `origem = 'sel'`) e de `output_calibracao` (Passo 5C, `origem = 'cal'`) cuja `decisao` seja `CONFIRMA` ou `REVISA`: `ticket_id`, `decisao`, as seis notas (`res, eff, esc, und, cla, ton`) e a `origem`. Tickets `SEM_TRANSCRICAO` ficam de fora. A nota geral revisada é calculada **aqui, em SQL**: `ROUND(0,30·res + 0,20·eff + 0,20·esc + 0,15·und + 0,10·cla + 0,05·ton)`, aprovada com `≥ 7` e piso (`res > 2` e `esc > 2`); o desfecho continua valendo (se a auditoria revisar a resolução, o abandono é reavaliado com a resolução revisada). Tickets `CONFIRMA` mantêm a nota original; só `REVISA` a substitui.
+Monte a lista `VALUES` com as linhas de `output_auditoria` (Passo 5B, `origem = 'sel'`) de `output_calibracao` (Passo 5C, `origem = 'cal'`) e de `output_calibracao_rep` (Passo 5C-2, `origem = 'calr'`) cuja `decisao` seja `CONFIRMA` ou `REVISA`: `ticket_id`, `decisao`, as seis notas (`res, eff, esc, und, cla, ton`) e a `origem`. Tickets `SEM_TRANSCRICAO` ficam de fora. A nota geral revisada é calculada **aqui, em SQL**: `ROUND(0,30·res + 0,20·eff + 0,20·esc + 0,15·und + 0,10·cla + 0,05·ton)`, aprovada com `≥ 7` e piso (`res > 2` e `esc > 2`); o desfecho continua valendo (se a auditoria revisar a resolução, o abandono é reavaliado com a resolução revisada). Tickets `CONFIRMA` mantêm a nota original; só `REVISA` a substitui.
 
-O BQS 2.0 é calculado assim: parte-se do número de aprovados **já com as notas revisadas** (`n_ok_revisado`) e subtrai-se a parcela de aprovações indevidas **esperada entre os aprovados não auditados** (`m_nao_auditados × taxa`), onde `taxa` = aprovações revertidas ÷ tickets da amostra de calibração. Com menos de 5 tickets na amostra (`n_cal < 5`), a taxa é 0 e o relatório diz que o BQS 2.0 da rodada **não foi calibrado**.
+O BQS 2.0 é calculado assim: parte-se do número de aprovados **já com as notas revisadas** (`n_ok_revisado`) e subtrai-se a parcela de aprovações indevidas **esperada entre os aprovados não auditados** (`m_nao_auditados × taxa`), onde `taxa` = aprovações revertidas ÷ tickets da amostra de calibração. Com menos de 5 tickets na amostra (`n_cal < 5`), a taxa é 0 e o relatório diz que o BQS 2.0 da rodada **não foi calibrado**. A correção também vale para o outro lado: soma-se a parcela de reprovações indevidas **esperada entre os reprovados só pela nota e não auditados** (`m_rep_nao_auditados × taxa_falso_reprovado`), onde `taxa_falso_reprovado` = reprovações revertidas para aprovado ÷ tickets da amostra do Passo 5C-2 (com menos de 5, a taxa é 0).
 
 ```sql
 WITH a(ticket_id, decisao, res, eff, esc, und, cla, ton, origem) AS (
@@ -403,7 +432,8 @@ fin AS (
          AND (b.retention_type = 'resolutiva'
               OR (b.retention_type = 'transbordo' AND COALESCE(b.customer_requested_transfer, false) = true)
               OR (b.retention_type = 'abandono' AND (CASE WHEN r.ticket_id IS NULL OR r.decisao = 'CONFIRMA' THEN b.score_resolution ELSE r.res END) >= 7)) AS nota_final,
-         (r.ticket_id IS NOT NULL) AS auditado, r.decisao, r.origem
+         (r.ticket_id IS NOT NULL) AS auditado, r.decisao, r.origem,
+         (b.nota_ok = false AND b.desfecho_ok = true) AS reprovado_so_nota
   FROM base b LEFT JOIN rev r ON r.ticket_id = b.ticket_id
   WHERE b.periodo = 'atual' AND b.nota_ok IS NOT NULL
 ),
@@ -417,28 +447,36 @@ t AS (
          SUM(CASE WHEN origem = 'sel' AND nota_orig AND NOT nota_final THEN 1 ELSE 0 END) AS n_aprovado_para_reprovado_sel,
          SUM(CASE WHEN origem = 'sel' AND NOT nota_orig AND nota_final THEN 1 ELSE 0 END) AS n_reprovado_para_aprovado_sel,
          SUM(CASE WHEN origem = 'cal' THEN 1 ELSE 0 END) AS n_cal,
-         SUM(CASE WHEN origem = 'cal' AND nota_orig AND NOT nota_final THEN 1 ELSE 0 END) AS n_cal_revertidos
+         SUM(CASE WHEN origem = 'cal' AND nota_orig AND NOT nota_final THEN 1 ELSE 0 END) AS n_cal_revertidos,
+         SUM(CASE WHEN reprovado_so_nota AND NOT auditado THEN 1 ELSE 0 END) AS m_rep_nao_auditados,
+         SUM(CASE WHEN origem = 'calr' THEN 1 ELSE 0 END) AS n_calr,
+         SUM(CASE WHEN origem = 'calr' AND NOT nota_orig AND nota_final THEN 1 ELSE 0 END) AS n_calr_revertidos
   FROM fin
 ),
 c AS (
   SELECT t.*,
          CASE WHEN n_cal >= 5 THEN n_cal_revertidos / n_cal ELSE 0.0 END AS taxa,
-         (n_cal >= 5) AS calibrado
+         (n_cal >= 5) AS calibrado,
+         CASE WHEN n_calr >= 5 THEN n_calr_revertidos / n_calr ELSE 0.0 END AS taxa_r,
+         (n_calr >= 5) AS calibrado_r
   FROM t
 ),
 w AS (
   SELECT c.*,
          CASE WHEN calibrado THEN (taxa + 1.96 * 1.96 / (2 * n_cal)) / (1 + 1.96 * 1.96 / n_cal) ELSE 0.0 END AS centro,
-         CASE WHEN calibrado THEN 1.96 * SQRT(taxa * (1 - taxa) / n_cal + 1.96 * 1.96 / (4 * n_cal * n_cal)) / (1 + 1.96 * 1.96 / n_cal) ELSE 0.0 END AS meia
+         CASE WHEN calibrado THEN 1.96 * SQRT(taxa * (1 - taxa) / n_cal + 1.96 * 1.96 / (4 * n_cal * n_cal)) / (1 + 1.96 * 1.96 / n_cal) ELSE 0.0 END AS meia,
+         CASE WHEN calibrado_r THEN (taxa_r + 1.96 * 1.96 / (2 * n_calr)) / (1 + 1.96 * 1.96 / n_calr) ELSE 0.0 END AS centro_r,
+         CASE WHEN calibrado_r THEN 1.96 * SQRT(taxa_r * (1 - taxa_r) / n_calr + 1.96 * 1.96 / (4 * n_calr * n_calr)) / (1 + 1.96 * 1.96 / n_calr) ELSE 0.0 END AS meia_r
   FROM c
 )
-SELECT n_avaliaveis, n_ok_original, n_ok_revisado, m_nao_auditados,
-       ROUND(100.0 * (n_ok_revisado - m_nao_auditados * taxa) / n_avaliaveis, 1) AS bqs_final,
+SELECT n_avaliaveis, n_ok_original, n_ok_revisado, m_nao_auditados, m_rep_nao_auditados,
+       ROUND(100.0 * (n_ok_revisado - m_nao_auditados * taxa + m_rep_nao_auditados * taxa_r) / n_avaliaveis, 1) AS bqs_final,
        ROUND(100.0 * n_ok_original / n_avaliaveis, 1) AS bqs_avaliador,
-       ROUND(100.0 * (n_ok_revisado - m_nao_auditados * LEAST(1.0, centro + meia)) / n_avaliaveis, 1) AS bqs_faixa_min,
-       ROUND(100.0 * (n_ok_revisado - m_nao_auditados * GREATEST(0.0, centro - meia)) / n_avaliaveis, 1) AS bqs_faixa_max,
-       ROUND(n_ok_revisado - m_nao_auditados * taxa, 1) AS n_ok_calibrado,
+       ROUND(100.0 * (n_ok_revisado - m_nao_auditados * LEAST(1.0, centro + meia) + m_rep_nao_auditados * GREATEST(0.0, centro_r - meia_r)) / n_avaliaveis, 1) AS bqs_faixa_min,
+       ROUND(100.0 * (n_ok_revisado - m_nao_auditados * GREATEST(0.0, centro - meia) + m_rep_nao_auditados * LEAST(1.0, centro_r + meia_r)) / n_avaliaveis, 1) AS bqs_faixa_max,
+       ROUND(n_ok_revisado - m_nao_auditados * taxa + m_rep_nao_auditados * taxa_r, 1) AS n_ok_calibrado,
        n_cal, n_cal_revertidos, ROUND(100.0 * taxa, 1) AS taxa_falso_aprovado_pct, calibrado,
+       n_calr, n_calr_revertidos, ROUND(100.0 * taxa_r, 1) AS taxa_falso_reprovado_pct, calibrado_r,
        n_auditados_sel, n_revisados_sel, n_aprovado_para_reprovado_sel, n_reprovado_para_aprovado_sel
 FROM w
 ```
@@ -527,7 +565,8 @@ prompt: |
   - **BQS 2.0: [bqs_final]%** ([n_ok_final]/[n_avaliaveis]) | período anterior: [bqs_anterior]% ou "sem base de comparação" | último ponto da série antes de um hiato (se houver): [ultimo_ponto_anterior]
   - Versão de prompt do bot no período (Pacote V): [bot_prompt_version dominante] — compare com a do item anterior do history.json para registrar evento de mudança
   - Auditoria (transcrição real): [n_auditados] tickets auditados, [n_revisados] com nota revisada; aprovado→reprovado: [n]; reprovado→aprovado: [n]. As tabelas por dimensão e o BQS por período são **originais** (a auditoria cobre só casos duvidosos).
-  - **Calibração** (auditoria aleatória dos aprovados): [n_cal] tickets lidos, [n_cal_revertidos] aprovações revertidas (taxa [taxa_falso_aprovado_pct]%) · calibrado: [calibrado] · BQS do avaliador antes das auditorias: [bqs_avaliador]% · faixa: [bqs_faixa_min]–[bqs_faixa_max]% — **a faixa e o BQS do avaliador vão só para o JSON do painel; no relatório e no Slack exiba apenas o BQS 2.0 (um número)**
+  - **Calibração** (auditoria aleatória dos aprovados): [n_cal] tickets lidos, [n_cal_revertidos] aprovações revertidas (taxa [taxa_falso_aprovado_pct]%) · calibrado: [calibrado]
+  - **Calibração dos reprovados** (auditoria aleatória dos reprovados só pela nota): [n_calr] tickets lidos, [n_calr_revertidos] reprovações revertidas para aprovado (taxa [taxa_falso_reprovado_pct]%) · calibrado: [calibrado_r] · BQS do avaliador antes das auditorias: [bqs_avaliador]% · faixa: [bqs_faixa_min]–[bqs_faixa_max]% — **a faixa e o BQS do avaliador vão só para o JSON do painel; no relatório e no Slack exiba apenas o BQS 2.0 (um número)**
   - Divergências do avaliador automático (do resumo dos auditores): [lista curta, sem dados pessoais]
   - TFC: [tfc]% ([n_falha_conducao]/[n_total]) | anterior: [tfc_anterior]%
   - CE: [pct_evitavel]% das classificadas ([n_classificadas] de [n_elegiveis_contencao] elegíveis) | estimativa sobre o total: [ce_pct_do_total]%

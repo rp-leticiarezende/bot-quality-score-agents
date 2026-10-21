@@ -98,13 +98,17 @@ Reavalie as 6 dimensões (inteiros de 0 a 10) com esta régua. **0–2** falhou 
 
 **Transbordo pedido pelo cliente (BQS 2.0):** transferir quando o cliente pede atendente é o fluxo esperado, mas **não vale nota alta por si só**. Para `escalation`: 9–10 só quando o bot **tentou ajudar antes** (respondeu ou coletou o que o atendente vai precisar) e transferiu informando canal e prazo; 7–8 quando o cliente pediu logo no início e o bot transferiu corretamente, sem poder ajudar antes; 5–6 quando a transferência foi tardia (o cliente teve que pedir mais de uma vez) ou o bot só repetiu "Tem mais dúvidas?"; 3–4 quando o pedido foi ignorado em 3 ou mais turnos; 0–2 quando a transferência foi **anunciada e nunca conectada** ou o pedido foi ignorado até o fim. Repita a regra para `resolution`: **transferir não é resolver**; se o bot só repetiu um modelo de resposta que não trata a dúvida real, `resolution` e `understanding` ficam em 4 ou menos.
 
-## MODO CALIBRAÇÃO (quando o prompt começar com `MODO CALIBRAÇÃO`)
+## MODO CALIBRAÇÃO (quando o prompt começar com `MODO CALIBRAÇÃO ativo`; para `MODO CALIBRAÇÃO DE REPROVADOS`, veja a subseção seguinte)
 
 Os tickets recebidos são uma **amostra aleatória de conversas que o avaliador aprovou**. O objetivo é medir, com honestidade, quantas aprovações não se sustentam na transcrição. Não procure motivo para reprovar: **confirme quando a nota se sustenta** e revise com evidência quando não. Colete e avalie exatamente como acima (mesma régua, um ticket por vez), mas:
 - **Não classifique contenção:** use `-` em `classe`, `causa`, `confianca` e `o_que_reteria`.
 - `evidencia` ≤ 120 caracteres.
 - Dispense as consultas extras de KB; use só a transcrição e a linha de notas originais.
 - Mantenha o formato de saída (as colunas não mudam) e o RESUMO, que deve dizer quantos aprovados **deixariam de ser aprovados** com as suas notas (o orquestrador confirma por SQL).
+
+### MODO CALIBRAÇÃO DE REPROVADOS (quando o prompt começar com `MODO CALIBRAÇÃO DE REPROVADOS`)
+
+Vale tudo o que está acima em MODO CALIBRAÇÃO, com o sentido invertido: os tickets são uma **amostra aleatória de conversas que o avaliador reprovou só pela nota** (o desfecho delas é aceitável). O objetivo é medir quantas reprovações **não se sustentam** na transcrição, por exemplo porque o avaliador puniu o bot por algo que veio **depois do convite à pesquisa de satisfação** (fora da avaliação) ou por rigor excessivo. Seja honesto nos dois sentidos: **confirme a reprovação quando ela se sustenta** (resposta errada, pedido de atendente ignorado, "Não" à resolução sem sondagem, loop) e revise com evidência quando o bot, ao contrário, conduziu bem até o convite à pesquisa. No RESUMO, diga quantos reprovados **passariam a ser aprovados** com as suas notas (o orquestrador confirma por SQL).
 
 <!-- PLAYBOOK_CARTAO:START -->
 ## PLAYBOOK DE RETENÇÃO — CARTÃO DE CRÉDITO (somente o bot)
