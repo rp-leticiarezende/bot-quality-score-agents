@@ -235,7 +235,7 @@
                       "effective_vertical":  [
                                                  {
                                                      "valor":  "cartao_credito",
-                                                     "rotulo":  "Agente CC Produção",
+                                                     "rotulo":  "Agente Geral",
                                                      "n":  329,
                                                      "pct_volume":  82.7,
                                                      "bqs":  63.5,
@@ -244,7 +244,7 @@
                                                  },
                                                  {
                                                      "valor":  "cc_anuidade",
-                                                     "rotulo":  "Agente CC Anuidade",
+                                                     "rotulo":  "Agente de Anuidade",
                                                      "n":  69,
                                                      "pct_volume":  17.3,
                                                      "bqs":  69.2,
@@ -496,7 +496,7 @@
                            },
                            {
                                "tipo":  "warn",
-                               "texto":  "TFC 30,4%, abaixo do limiar provisório de 40%. 25,4% dos clientes pediram atendente (limiar provisório de 20%): pedir atendente não é falha do bot, mas mostra demanda por humano que o bot pode tentar reter. Agente CC Produção (n=329) com BQS por agente de 63,5% pela nota do avaliador (ainda sem calibração por recorte)."
+                               "texto":  "TFC 30,4%, abaixo do limiar provisório de 40%. 25,4% dos clientes pediram atendente (limiar provisório de 20%): pedir atendente não é falha do bot, mas mostra demanda por humano que o bot pode tentar reter. Agente Geral (n=329) com BQS por agente de 63,5% pela nota do avaliador (ainda sem calibração por recorte)."
                            },
                            {
                                "tipo":  "info",

@@ -301,6 +301,8 @@ $CTX_HP = @'
 
 **Contexto do fluxo (Cartão de Crédito HP):** todo atendimento de cartão passa pelo fluxo de Hiperpersonalização: o bot atende com o contexto do cliente carregado (status do cartão, limite, fatura, histórico). Há dois agentes especializados no Botmaker — `Agente CC Produção` (bloco `Cartao Recargapay IA`; `effective_vertical = cartao_credito`) e `Agente CC Anuidade` (bloco `Cartao Anuidade IA`; `effective_vertical = cc_anuidade`) — compare sempre os dois nas quebras por dimensão. O eixo diagnóstico central é: **o HP está entregando o que promete — atendimento contextualizado e resolutivo — em todos os temas de cartão, e retendo?**
 
+**Nomes dos agentes (decisão de 22/10/2026):** nos títulos, rótulos, no painel e na mensagem do Slack, `cartao_credito` é o **Agente Geral** (avalia a qualidade do restante do fluxo; no Botmaker o bloco se chama "Agente CC Produção") e `cc_anuidade` é o **Agente de Anuidade** (no Botmaker, "Agente CC Anuidade"). Nunca use "Agente CC Produção" como nome de exibição; no campo "onde mexer" cite também o nome técnico do Botmaker, para o Produto CX achar o nó.
+
 **Indicador em revisão — não é falha confirmada de contexto.** A separação "HP pleno × HP degradado" (`welcome_not_found` e `pages_fetched`) está sendo revisada: medições de 15–20/10/2026 mostram que `pages_fetched` nunca é 0 e cresce com o tamanho da conversa, e que `welcome_not_found = true` marca conversas mais curtas em que, ainda assim, 94% tinham as variáveis do Botmaker carregadas e 41% foram personalizadas. Por isso o relatório trata `welcome_not_found` como **qualidade do dado** (transcrição sem mensagem de boas-vindas), não como "bot sem contexto", e **não gera alerta crítico nem oportunidade** a partir dele. Para saber se o bot usou dados do cliente, use a leitura do resumo e do diagnóstico, citando `ticket_id`.
 '@
 
@@ -325,14 +327,6 @@ $flows = @(
         CTX = $CTX_HP; DIMS = @('effective_vertical','topic'); ELEGIVEL = $ELEGIVEL_STD; ELEGIVEL_B = $ELEGIVEL_STD_B
         HP = $true; ALERTAS_EXTRA = ''
         REGRAS_EXTRA = '- O indicador HP pleno × degradado está **em revisão**: `pct_degradado` é só informação de qualidade do dado (registre como 🔵 se for > 5%, com a frase "indicador em revisão"); nunca como alerta crítico nem como oportunidade.'
-    },
-    @{
-        NAME = 'orch-criticos'; ROTINA = 'Casos Críticos (diário)'; CHAVE = 'criticos-diario'; N_CAL = 6; N_CAL_REP = 4
-        FLOW = 'Conversations n8n_fluxo_generativo_critico'; PERIODICIDADE = 'diária'; WEEKLY = $false
-        DESCRICAO = 'Orquestrador da análise diária de qualidade dos Casos Críticos (CSAT 1 e 2). Ativado todos os dias às 09:40 BRT pela rotina cloud (período: D-1).'
-        CTX = $CTX_CRITICOS; DIMS = @('product','effective_vertical','topic'); ELEGIVEL = 'true'; ELEGIVEL_B = 'true'
-        HP = $false; ALERTAS_EXTRA = ''
-        REGRAS_EXTRA = '- Este fluxo NÃO tem HP — não incluir análise de `welcome_not_found` / `pages_fetched`.' + "`n" + '- São casos críticos (CSAT 1 e 2): BQS baixo é esperado. Foco em padrões e ações imediatas. Dimensões com n < 30 nunca são ranqueadas (volume diário é pequeno) — descreva padrões, não percentuais.'
     },
     @{
         NAME = 'orch-criticos-semanal'; ROTINA = 'Casos Críticos (semanal)'; CHAVE = 'criticos-semanal'; N_CAL = 15; N_CAL_REP = 8

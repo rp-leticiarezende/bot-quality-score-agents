@@ -3,7 +3,7 @@
 O painel (`artifact/painel.html`) é uma página fixa que lê arquivos JSON publicados ao lado dela. Cada rotina publica **dois arquivos próprios** e nunca mexe nos das outras:
 - `data/<chave>/latest.json` — a rodada atual completa;
 - `data/<chave>/history.json` — a série da linha do tempo (array, até 104 itens ≈ 2 anos de semanas).
-Chaves das rotinas: `cartao-hp` (Agente de Cartão de Crédito, semanal), `aleatorio`, `criticos-diario`, `criticos-semanal`. Chaves das visões mensais: `cartao-hp-mensal` (alimentada por `cartao-hp`), `aleatorio-mensal` (por `aleatorio`) e `criticos-mensal` (**só por `criticos-diario`**; a rotina `criticos-semanal` não escreve nela, para não contar o mesmo ticket duas vezes); `periodo.tipo = "mensal"`.
+Chaves das rotinas: `cartao-hp` (Agente de Cartão de Crédito, semanal), `aleatorio`, `criticos-semanal`. Chaves das visões mensais: `cartao-hp-mensal` (alimentada por `cartao-hp`), `aleatorio-mensal` (por `aleatorio`) e `criticos-mensal` (por `criticos-semanal`); `periodo.tipo = "mensal"`.
 **Regra de ouro do histórico: ele só cresce.** Nunca recrie `history.json` do zero: leia o arquivo publicado, acrescente (ou, se já existir um item com o mesmo `fim`, atualize só esse item) e publique o conjunto completo. Se a leitura falhar, tente de novo uma vez; se falhar de novo, **não publique** `history.json` (deixe-o fora de `files`, o publicado se mantém) e avise no resultado da rotina.
 **Painel principal x mensal:** `latest.json` de cada rotina **substitui** o anterior e mostra o resultado mais recente (semana, dia). A visão **mensal acumula**: `data/<chave>-mensal/latest.json` e o seu `history.json` (um ponto por mês, atualizado a cada rodada) consolidam **todas as rodadas do mês até agora** a partir dos pontos do `history.json` da rotina (a rodada pertence ao mês do seu `fim`): `n_total` e `n_avaliaveis` = soma; `bqs` = média de `bqs` ponderada por `n_avaliaveis`; `tfc` e `pct_recontato_24h` = médias ponderadas por `n_total`; `calibracao.n_amostra` e `n_revertidos` = soma, e `taxa_falso_aprovado` = revertidos ÷ amostra (calibrado se a amostra somada for 5 ou mais); `sinalizados` = soma. `periodo`: `inicio` = dia 1 do mês, `fim` = `fim` da última rodada; `cobertura.texto` diz quantas rodadas e dias com dado entraram. A visão mensal não traz oportunidades nem tabelas por tema (essas ficam nas rodadas e no Backlog). Em `sem_artigo_porta`, o mensal soma `n` (do `n_sem_porta` dos itens do histórico), recalcula `pct` sobre `n_total` e junta os `itens` dos `latest.json` do mês (os mais recentes, até 30, sem repetir `ticket_id`).
 O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global e mantido por humanos**: nenhuma rotina escreve nele.
@@ -13,7 +13,7 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 ```
 {
   "schema": "bqs-run/1",
-  "chave": "cartao-hp | aleatorio | criticos-diario | criticos-semanal | cartao-hp-mensal | aleatorio-mensal | criticos-mensal",
+  "chave": "cartao-hp | aleatorio | criticos-semanal | cartao-hp-mensal | aleatorio-mensal | criticos-mensal",
   "rotina": "nome legível da rotina",
   "meta": { "origem": "rotina" },                     // "teste" só em rodadas de validação manual; "nota" opcional
   "periodo": { "tipo": "semanal | diario | mensal", "inicio": "AAAA-MM-DD", "fim": "AAAA-MM-DD", "label": "12/10 a 18/10/2026" },
@@ -35,7 +35,7 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
   },
   "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": ["frase sem dados pessoais"] },
   "dimensoes": {                                        // top 12 do Passo 3.2, valores ORIGINAIS (sem auditoria)
-    "effective_vertical": [ { "valor": "", "rotulo": "nome legível (opcional)", "n": 0, "pct_volume": 0.0, "bqs": 0.0, "tfc": 0.0, "pct_pediu_humano": 0.0 } ],
+    "effective_vertical": [ { "valor": "", "rotulo": "nome legível (opcional; no cartão: cartao_credito = \"Agente Geral\", cc_anuidade = \"Agente de Anuidade\")", "n": 0, "pct_volume": 0.0, "bqs": 0.0, "tfc": 0.0, "pct_pediu_humano": 0.0 } ],
     "topic": [ ... ], "product": [ ... ]                // só as dimensões da rotina
   },
   "contencao": {                                        // do Passo 6.1; omita o objeto se não houve classificação
@@ -65,7 +65,7 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 - `contencao.ce_pct_total` = `pct_evitavel × n_elegiveis / n_total` (vem pronto do SQL do Passo 6.1; copie).
 - Só entram em `oportunidades` itens com dono **Produto CX** ou **Help Design**; nada sobre atendimento humano; nenhum artigo cujo título comece com 🔒 ou 🔍.
 - **Tickets de exemplo (obrigatório para o que o painel mostra):** em cada oportunidade, em cada causa de `contencao.causas` e em cada item de `artigos`, informe até 3 `ticket_id` reais que exemplifiquem o problema (do `output_contencao`, `output_fluxo`, `output_kb`); nunca invente. Em `pontos_atencao` de casos críticos, inclua `tickets` quando o ponto descrever um padrão.
-- **Oportunidades acionáveis (quem revisa precisa saber o que mudar):** `titulo` = onde + o que mudar (ex.: "Prompt do Agente CC Produção: corrigir prazos que contradizem o artigo"), nunca só o sintoma. `proposta` diz o que escrever ou alterar, em texto ou regra; `no` aponta o nó, artigo ou campo (ou "nó a confirmar pelo Produto CX"); `antes` e `depois` mostram a resposta atual e a esperada; `como_medir` diz o indicador que prova o ajuste. O painel exibe esses campos em "Principais ações"; `titulo_curto` (≤ 12 palavras) é o texto da linha do Slack.
+- **Oportunidades acionáveis (quem revisa precisa saber o que mudar):** `titulo` = onde + o que mudar (ex.: "Prompt do Agente Geral: corrigir prazos que contradizem o artigo"), nunca só o sintoma. `proposta` diz o que escrever ou alterar, em texto ou regra; `no` aponta o nó, artigo ou campo (ou "nó a confirmar pelo Produto CX"); `antes` e `depois` mostram a resposta atual e a esperada; `como_medir` diz o indicador que prova o ajuste. O painel exibe esses campos em "Principais ações"; `titulo_curto` (≤ 12 palavras) é o texto da linha do Slack.
 - Em `artigos`, só títulos exatos que vieram do `output_kb`; nunca invente título, ID ou URL (a URL costuma chegar redigida: omita).
 - Nomes internos do prompt → contrato: `bqs_final` → `bqs`, `n_ok_final` → `n_ok`, `pct_recontato_24h` → `pct_recontato_24h`, `n_transbordo_sem_pedido`/`pct_transbordo_sem_pedido`/`sinalizados_transbordo` → `sinalizados.transbordo_sem_pedido`, `n_hp_degradado`/`pct_degradado` → `qualidade_dado.n_sem_boas_vindas`/`pct_sem_boas_vindas`. Não grave `bqs_original`, `bqs_pleno`, `bqs_degradado` nem colunas fora do contrato.
 - `dimensoes`: copie as linhas do SQL (só as colunas do contrato); se `n < 30` mantenha a linha (o painel marca "amostra pequena").
@@ -77,7 +77,7 @@ O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` ent
 
 ### Backlog de ações (`data/backlog/<fluxo>.json`)
 
-Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (as rotinas `criticos-diario` e `criticos-semanal` compartilham o mesmo). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é a Leticia, em conversa; as rotinas nunca o alteram.
+Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (alimentado pela rotina `criticos-semanal`). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é a Leticia, em conversa; as rotinas nunca o alteram.
 
 ```
 {

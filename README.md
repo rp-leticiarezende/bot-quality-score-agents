@@ -12,7 +12,7 @@ Uma conversa conta como boa quando a **conduta** do bot foi boa (nota geral pond
 
 | Caminho | O que é |
 | --- | --- |
-| `.claude/agents/orch-*.md` | Quatro orquestradores (aleatório, agente de cartão de crédito, críticos diário e semanal). **Gerados** por `build.ps1`; não edite à mão. |
+| `.claude/agents/orch-*.md` | Três orquestradores semanais (aleatório, agente de cartão de crédito e casos críticos). **Gerados** por `build.ps1`; não edite à mão. |
 | `.claude/agents/bqs-contencao.md` | Classifica cada conversa em contato evitável × só humano e diz o que teria retido. |
 | `.claude/agents/bqs-auditor.md` | Lê a transcrição dos casos duvidosos e revisa a nota (entra no BQS 2.0). |
 | `.claude/agents/chatbot-*.md`, `zendesk-guide-expert.md` | Especialistas de fluxo, HP, oportunidades, propostas, relatório e KB. |
@@ -32,8 +32,8 @@ Cada rotina clona este repositório e executa o orquestrador correspondente.
 | Rotina | Orquestrador | Agenda (BRT) | Chave do painel |
 | --- | --- | --- | --- |
 | Agente de Cartão de Crédito (semanal) | `orch-cartao-hp` | segunda 10:00 | `cartao-hp` |
-| Casos Críticos (diário) | `orch-criticos` | todo dia 09:40 | `criticos-diario` |
-| Casos Críticos (semanal) | `orch-criticos-semanal` | segunda 15:00 (pausada) | `criticos-semanal` |
+
+| Casos Críticos (semanal) | `orch-criticos-semanal` | segunda 15:00 | `criticos-semanal` |
 | Aleatório (semanal) | `orch-aleatorio` | segunda 14:00 (pausada) | `aleatorio` |
 
 ## Fluxo de cada rotina

@@ -1,137 +1,143 @@
 {
-    "schema":  "bqs-run/1",
-    "chave":  "criticos-mensal",
-    "rotina":  "Casos críticos (mensal)",
-    "meta":  {
-                 "origem":  "teste",
-                 "nota":  "Visão mensal acumulada de outubro: soma das rodadas diárias de 19/10 e 20/10, com médias ponderadas pelo número de conversas. Sem calibração (amostra do diário abaixo do mínimo). Números ainda não oficiais."
-             },
-    "periodo":  {
-                    "tipo":  "mensal",
-                    "inicio":  "2026-10-01",
-                    "fim":  "2026-10-20",
-                    "label":  "Outubro/2026 (até 20/10)"
-                },
-    "gerado_em":  "2026-10-20T14:10:00-03:00",
-    "cobertura":  {
-                      "baixa":  true,
-                      "comparacao_indisponivel":  true,
-                      "texto":  "2 rodadas diárias no mês (19/10 e 20/10), 54 conversas."
-                  },
-    "metricas":  {
-                     "n_total":  54,
-                     "n_avaliaveis":  53,
-                     "n_ok":  25,
-                     "bqs":  47.1,
-                     "bqs_avaliador":  47.1,
-                     "calibracao":  {
-                                        "calibrado":  false,
-                                        "n_amostra":  0,
-                                        "n_revertidos":  0,
-                                        "taxa_falso_aprovado":  null,
-                                        "faixa":  null
-                                    },
-                     "bqs_anterior":  null,
-                     "ultimo_ponto_anterior":  null,
-                     "prompt_version":  "v1",
-                     "pct_recontato_24h":  26.0,
-                     "sinalizados":  {
-                                         "transbordo_sem_pedido":  {
-                                                                       "n":  0,
-                                                                       "pct":  0.0,
-                                                                       "tickets":  [
-
-                                                                                   ]
-                                                                   }
-                                     },
-                     "tfc":  12.9,
-                     "pct_pediu_humano":  9.2,
-                     "pct_transbordo":  3.7,
-                     "n_transbordo_nota_ok":  2,
-                     "labels":  {
-                                    "excelente":  21,
-                                    "bom":  7,
-                                    "regular":  5,
-                                    "ruim":  8,
-                                    "critico":  12
-                                },
-                     "retention":  {
-                                       "resolutiva":  42,
-                                       "abandono":  9,
-                                       "transbordo":  2,
-                                       "loop":  0
-                                   },
-                     "criterios":  {
-                                       "understanding":  6.4,
-                                       "resolution":  5.6,
-                                       "clarity":  6.6,
-                                       "tone":  7.2,
-                                       "efficiency":  5.9,
-                                       "escalation":  5.7
-                                   },
-                     "sem_artigo_porta":  {
-                                              "tag":  "chat-default-instead-form",
-                                              "n":  5,
-                                              "pct":  9.3,
-                                              "pct_aprovadas_avaliador":  0,
-                                              "itens":  [
-                                                            {
-                                                                "ticket_id":  46631797,
-                                                                "tema":  "dúvidas sobre seguro",
-                                                                "vertical":  "assinatura_prime",
-                                                                "desfecho":  "resolutiva",
-                                                                "aprovada_avaliador":  false
-                                                            },
-                                                            {
-                                                                "ticket_id":  46629258,
-                                                                "tema":  "seguro",
-                                                                "vertical":  "n8n_critico",
-                                                                "desfecho":  "resolutiva",
-                                                                "aprovada_avaliador":  false
-                                                            },
-                                                            {
-                                                                "ticket_id":  46628562,
-                                                                "tema":  "seguro-protecao-pix-e-cartoes",
-                                                                "vertical":  "n8n_critico",
-                                                                "desfecho":  "resolutiva",
-                                                                "aprovada_avaliador":  false
-                                                            },
-                                                            {
-                                                                "ticket_id":  46626583,
-                                                                "tema":  "seguro-prestamista",
-                                                                "vertical":  "n8n_critico",
-                                                                "desfecho":  "resolutiva",
-                                                                "aprovada_avaliador":  false
-                                                            },
-                                                            {
-                                                                "ticket_id":  46625622,
-                                                                "tema":  "dúvidas sobre seguro",
-                                                                "vertical":  "n8n_critico",
-                                                                "desfecho":  "resolutiva",
-                                                                "aprovada_avaliador":  false
-                                                            }
-                                                        ]
-                                          }
-                 },
-    "auditoria":  {
-                      "auditados":  0,
-                      "revisados":  0,
-                      "aprovado_para_reprovado":  0,
-                      "reprovado_para_aprovado":  0,
-                      "divergencias":  [
-
-                                       ]
-                  },
-    "pontos_atencao":  [
-                           {
-                               "tipo":  "warn",
-                               "texto":  "40 das 52 conversas terminaram sem transbordo e mesmo assim receberam CSAT 1 ou 2: o cliente não considerou o problema resolvido. A resolução é o critério mais baixo (5,50)."
-                           }
-                       ],
-    "oportunidades":  [
-
-                      ],
-    "artigos":  [
-
-                ]
+  "schema": "bqs-run/1",
+  "chave": "criticos-mensal",
+  "rotina": "Casos críticos (mensal)",
+  "meta": {
+    "origem": "rotina",
+    "nota": "Visão mensal acumulada de outubro: rodadas diárias de 19, 20 e 21/10. BQS 2.0 ponderado pelas conversas avaliáveis; TFC, evitáveis e recontato ponderados pelo total. Sem calibração no mês (nenhuma transcrição auditada)."
+  },
+  "periodo": {
+    "tipo": "mensal",
+    "inicio": "2026-10-01",
+    "fim": "2026-10-21",
+    "label": "Outubro/2026 (até 21/10)"
+  },
+  "gerado_em": "2026-10-22T09:41:13-03:00",
+  "cobertura": {
+    "baixa": true,
+    "comparacao_indisponivel": true,
+    "texto": "3 rodadas diárias no mês (19, 20 e 21/10), 99 conversas; sem dados de 01 a 18/10 nesta série."
+  },
+  "metricas": {
+    "n_total": 99,
+    "n_avaliaveis": 98,
+    "n_ok": 43,
+    "bqs": 43.8,
+    "bqs_avaliador": 43.8,
+    "bqs_anterior": null,
+    "ultimo_ponto_anterior": null,
+    "calibracao": {
+      "calibrado": false,
+      "n_amostra": 0,
+      "n_revertidos": 0,
+      "taxa_falso_aprovado": null,
+      "faixa": null
+    },
+    "prompt_version": "v1",
+    "pct_recontato_24h": 25.5,
+    "sinalizados": {
+      "transbordo_sem_pedido": {
+        "n": 0,
+        "pct": 0.0,
+        "tickets": []
+      }
+    },
+    "tfc": 16.1,
+    "pct_pediu_humano": 8.1,
+    "pct_transbordo": 2.0,
+    "n_transbordo_nota_ok": 2,
+    "labels": {
+      "excelente": 36,
+      "bom": 10,
+      "regular": 10,
+      "ruim": 17,
+      "critico": 25
+    },
+    "retention": {
+      "resolutiva": 78,
+      "abandono": 15,
+      "transbordo": 2,
+      "loop": 3
+    },
+    "criterios": {
+      "understanding": 5.94,
+      "resolution": 5.17,
+      "clarity": 6.33,
+      "tone": 6.97,
+      "efficiency": 5.52,
+      "escalation": 5.38
+    },
+    "sem_artigo_porta": {
+      "tag": "chat-default-instead-form",
+      "n": 7,
+      "pct": 7.1,
+      "pct_aprovadas_avaliador": 0.0,
+      "itens": [
+        {
+          "ticket_id": 46643237,
+          "tema": "seguro-pix-cc",
+          "vertical": "n8n_critico",
+          "desfecho": "resolutiva",
+          "aprovada_avaliador": false
+        },
+        {
+          "ticket_id": 46639911,
+          "tema": "cancelar-pix-por-discordancia-com-taxa",
+          "vertical": "n8n_critico",
+          "desfecho": "resolutiva",
+          "aprovada_avaliador": false
+        },
+        {
+          "ticket_id": 46631797,
+          "tema": "dúvidas sobre seguro",
+          "vertical": "assinatura_prime",
+          "desfecho": "resolutiva",
+          "aprovada_avaliador": false
+        },
+        {
+          "ticket_id": 46629258,
+          "tema": "seguro",
+          "vertical": "n8n_critico",
+          "desfecho": "resolutiva",
+          "aprovada_avaliador": false
+        },
+        {
+          "ticket_id": 46628562,
+          "tema": "seguro-protecao-pix-e-cartoes",
+          "vertical": "n8n_critico",
+          "desfecho": "resolutiva",
+          "aprovada_avaliador": false
+        },
+        {
+          "ticket_id": 46626583,
+          "tema": "seguro-prestamista",
+          "vertical": "n8n_critico",
+          "desfecho": "resolutiva",
+          "aprovada_avaliador": false
+        },
+        {
+          "ticket_id": 46625622,
+          "tema": "dúvidas sobre seguro",
+          "vertical": "n8n_critico",
+          "desfecho": "resolutiva",
+          "aprovada_avaliador": false
+        }
+      ]
+    }
+  },
+  "auditoria": {
+    "auditados": 0,
+    "revisados": 0,
+    "aprovado_para_reprovado": 0,
+    "reprovado_para_aprovado": 0,
+    "divergencias": []
+  },
+  "pontos_atencao": [
+    {
+      "tipo": "warn",
+      "texto": "BQS 2.0 do mês sem calibração: nenhuma transcrição auditada em 19, 20 e 21/10. Resolução é o critério mais baixo do mês."
+    }
+  ],
+  "oportunidades": [],
+  "artigos": []
 }

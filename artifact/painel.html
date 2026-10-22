@@ -196,11 +196,11 @@ code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:
 (function(){
 "use strict";
 var FLUXOS=[
-  {id:"cartao-hp",nome:"Agente de Cartão de Crédito",desc:"Agentes de cartão de crédito com hiperpersonalização (CC Produção e CC Anuidade)",keys:{semanal:"cartao-hp",mensal:"cartao-hp-mensal"}},
+  {id:"cartao-hp",nome:"Agente de Cartão de Crédito",desc:"Agentes de cartão de crédito com hiperpersonalização (Agente Geral e Agente de Anuidade)",keys:{semanal:"cartao-hp",mensal:"cartao-hp-mensal"}},
   {id:"aleatorio",nome:"Aleatório",desc:"Amostra aleatória de conversas (filtro do Zendesk)",keys:{semanal:"aleatorio",mensal:"aleatorio-mensal"}},
-  {id:"criticos",nome:"Casos críticos",desc:"Conversas com CSAT 1 e 2",keys:{semanal:"criticos-semanal",diario:"criticos-diario",mensal:"criticos-mensal"}}
+  {id:"criticos",nome:"Casos críticos",desc:"Conversas com CSAT 1 e 2",keys:{semanal:"criticos-semanal",mensal:"criticos-mensal"}}
 ];
-var PERS=[["semanal","Semanal"],["diario","Diário"],["mensal","Mensal"]];
+var PERS=[["semanal","Semanal"],["mensal","Mensal"]];
 function pers(f){return PERS.filter(function(p){return f.keys[p[0]]})}
 function lim(k){return /mensal$/.test(k)?45*86400000:10*86400000}
 function perPills(f,atual,attr){
@@ -235,6 +235,9 @@ function normRun(d){
   if(m.bqs==null&&m.bqs_final!=null)m.bqs=m.bqs_final;
   if(m.n_ok==null&&m.n_ok_final!=null)m.n_ok=m.n_ok_final;
   if(!m.qualidade_dado&&m.hp)m.qualidade_dado={n_sem_boas_vindas:m.hp.degradado,pct_sem_boas_vindas:m.hp.pct_degradado};
+  /* nomes de exibição dos agentes de cartão (decisão de 22/10/2026) */
+  var ROT={cartao_credito:"Agente Geral",cc_anuidade:"Agente de Anuidade"};
+  if(/^cartao-hp/.test(d.chave||"")&&d.dimensoes)arr(d.dimensoes.effective_vertical).forEach(function(r){if(ROT[r.valor])r.rotulo=ROT[r.valor]});
   return d;
 }
 function normHist(h){return arr(h).map(function(x){if(x.bqs==null&&x.bqs_final!=null)x.bqs=x.bqs_final;return x}).filter(function(x){return x&&x.fim}).sort(function(a,b){return a.fim<b.fim?-1:1})}
@@ -319,7 +322,7 @@ function cardRotina(f){
   h+=retSeg(m);
   h+='<div class="delta">Recontato 24h: <b class="mono">'+(num(m.pct_recontato_24h)?fmt(m.pct_recontato_24h,1)+'%':'—')+'</b> · Sinalizados: <b class="mono">'+int(g(m,"sinalizados.transbordo_sem_pedido.n",0))+'</b></div>';
   if(g(d,"cobertura.baixa"))h+='<div>'+chip("Cobertura baixa","warn")+'</div>';
-  return h+'<button class="linkbtn" data-go="'+f.id+'">Ver evolução, detalhes e o que mudar →</button></div>';
+  return h+'<button class="linkbtn" data-go="'+f.id+'">Ver detalhes do fluxo e o que mudar →</button></div>';
 }
 var FR_ROTULO={artigo:"Artigo da Central",variavel_hp:"Variável / prompt",prompt:"Prompt",fluxo:"Fluxo do bot",politica:"Regra de transbordo",capacidade:"Capacidade nova",handoff:"Handoff"};
 function pesa(f,o,n){
@@ -357,9 +360,6 @@ function visao(){
     }).join("")+'</div>';
   }else h+=empty(mensal?"Visão mensal ainda sem classificação":"Ainda sem classificação",mensal?"A classificação por contato evitável será consolidada a partir das rodadas semanais. Veja a visão semanal.":"A classificação por contato evitável aparece depois da primeira rodada completa.");
   h+='</section>';
-  // linha do tempo
-  var kl=FLUXOS.map(function(f){return f.keys[mensal?"mensal":"semanal"]});
-  h+='<section class="block"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>Evolução '+(mensal?"mês a mês":"semana a semana")+'</h2><button class="linkbtn" data-go="linha">Abrir a linha do tempo completa →</button></div>'+linhaTempo(kl)+'</section>';
   // maiores oportunidades
   var todas=[];
   FLUXOS.forEach(function(f){var d=fluxoDados(f);arr(g(d,"oportunidades")).forEach(function(o){todas.push({f:f,o:o})})});
@@ -372,13 +372,24 @@ function visao(){
   h+='</section>';
   // sinalizados
   var sinal=FLUXOS.map(function(f){var d=fluxoDados(f);var s=g(d,"metricas.sinalizados.transbordo_sem_pedido",null);return s&&s.n>0?{f:f,s:s}:null}).filter(Boolean);
-  h+='<section class="block"><h2>Sinalizados para análise</h2><p class="sub">Transbordo que o cliente não pediu reprova a conversa no BQS 2.0 e é reportado aqui: pode ser erro do bot.</p>';
+  h+='<section class="block"><h2>Sinalizados para análise</h2><p class="sub">Transbordo que o cliente não pediu reprova a conversa no BQS 2.0 e é reportado aqui: pode ser erro do bot. <b>Exige análise humana:</b> o sinal é automático e não confirma falha; só a leitura da conversa por uma pessoa define se houve erro.</p>';
   h+=sinal.length?'<div class="panel">'+sinal.map(function(x){return '<div class="exrow"><span class="lbl"><b>'+esc(x.f.nome)+'</b> · '+int(x.s.n)+' transbordos sem pedido ('+fmt(x.s.pct,1)+'%)</span>'+tix(x.s.tickets,3)+'</div>'}).join("")+'</div>':empty("Nenhum transbordo sem pedido","Neste período não houve transferência que o cliente não tenha pedido.");
   h+='</section>';
-  // entraram sem artigo da Central (tag chat-default-instead-form)
+  main(h);
+}
+/* ---------- aba: contatos que entraram sem artigo ---------- */
+function abaSemArtigo(){
+  var mensal=S.per==="mensal";
+  var h='<div class="pills" role="group" aria-label="Período">'+[["semanal","Semanal"],["mensal","Mensal"]].map(function(p){return '<button class="pill" data-gper="'+p[0]+'" aria-pressed="'+(S.per===p[0])+'">'+p[1]+'</button>'}).join("")+'</div>';
   var DESF={resolutiva:"Resolvida pelo bot",abandono:"Abandono",transbordo:"Transbordo",loop:"Loop"};
   var sp=FLUXOS.map(function(f){var d=fluxoDados(f);var s=g(d,"metricas.sem_artigo_porta",null);return s&&num(s.n)?{f:f,s:s}:null}).filter(Boolean);
-  h+='<section class="block"><h2>Entraram sem artigo da Central</h2><p class="sub">Contatos que abriram o chat sem passar por nenhum artigo da Central de Ajuda (tag <code>chat-default-instead-form</code>): são portas não mapeadas, de telas do app ou MCTs sem artigo associado. Sem o artigo, o bot reconhece pior o assunto. É um indicador para análise manual e não entra na conta do BQS 2.0.</p>';
+  h+='<section class="block"><h2>Contatos que entraram sem artigo da Central</h2>'+
+    '<div class="panel"><dl class="pesa-d">'+
+    '<dt>O que são</dt><dd>Contatos que abriram o chat <b>sem passar por nenhum artigo da Central de Ajuda</b>. O ticket recebe a tag <code>chat-default-instead-form</code>.</dd>'+
+    '<dt>O que significa</dt><dd>É uma <b>porta não mapeada</b>: uma tela do app ou um MCT (motivo de contato) que ainda não leva o cliente a um artigo. Pode ser um erro de configuração ou um caminho que ninguém previu.</dd>'+
+    '<dt>Por que importa</dt><dd>Sem passar por um artigo, o bot não recebe o contexto do assunto e reconhece pior o que o cliente quer. Nas medições de outubro, essas conversas foram aprovadas bem menos que as demais e terminaram mais vezes em abandono e em loop.</dd>'+
+    '<dt>Como usar esta lista</dt><dd>Abra os tickets, veja de onde o cliente veio e qual assunto ele trouxe, e identifique as portas que precisam de artigo ou de mapeamento. Este indicador é para análise manual e <b>não entra na conta do BQS 2.0</b>. O painel ainda não sabe de qual tela o contato saiu; hoje só mostra o tema e o desfecho.</dd>'+
+    '</dl></div>';
   if(sp.length){
     h+='<div class="panel scroll"><table><thead><tr><th>Rotina</th><th class="n">Contatos com a tag</th><th class="n">% das conversas</th><th class="n">Aprovadas pelo avaliador</th></tr></thead><tbody>'+sp.map(function(x){return '<tr><td>'+esc(x.f.nome)+'</td><td class="n">'+int(x.s.n)+'</td><td class="n">'+fmt(x.s.pct,1)+'%</td><td class="n">'+(num(x.s.pct_aprovadas_avaliador)?fmt(x.s.pct_aprovadas_avaliador,1)+'%':'—')+'</td></tr>'}).join("")+'</tbody></table></div>';
     var linhasSp=[];sp.forEach(function(x){arr(x.s.itens).forEach(function(it){linhasSp.push({f:x.f,it:it})})});
@@ -493,7 +504,7 @@ function fluxo(f){
   var per=fluxoPer(f,S.perFluxo[f.id]||"semanal"),d=fluxoDados(f,per),h=pers(f).length>1?perPills(f,per,"fper"):"";
   if(!d){main(h+'<section class="block"><h2>'+esc(f.nome)+'</h2><p class="sub">'+esc(f.desc)+'</p>'+empty("Esta rotina ainda não publicou dados","Quando rodar, esta aba mostra as métricas, os contatos evitáveis e o que mudar.")+'</section>');return}
   var m=g(d,"metricas",{}),c=g(d,"contencao",{}),a=g(d,"auditoria",{});
-  h+='<section class="block"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><p class="sub">'+esc(f.desc)+'</p>';
+  h+='<section class="block"><div class="muted" style="font-size:12px;letter-spacing:.04em;text-transform:uppercase">Detalhe do fluxo</div><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><p class="sub">'+esc(f.desc)+'</p>';
   if(g(d,"meta.origem")==="teste")h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> '+esc(g(d,"meta.nota","Dados de validação."))+'</div></div>';
   h+='<div class="kpis">'+
     kpi("BQS 2.0",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f,per),d))+
@@ -509,7 +520,7 @@ function fluxo(f){
   else pa=pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x});
   if(pa.length)h+='<section class="block"><h2>Pontos de atenção</h2><div class="panel"><ul class="plain">'+pa.map(function(x){return '<li><span class="dot '+esc(x.tipo||"warn")+'"></span><span>'+esc(x.texto)+(arr(x.tickets).length?' '+tix(x.tickets,3):'')+'</span></li>'}).join("")+'</ul></div></section>';
   var sn=g(m,"sinalizados.transbordo_sem_pedido",null);
-  if(sn&&sn.n>0)h+='<section class="block"><h2>Sinalizados para análise</h2><div class="panel"><p><b>'+int(sn.n)+' transbordos sem pedido do cliente</b> ('+fmt(sn.pct,1)+'% das conversas). Reprovam o BQS 2.0 e podem ser erro do bot (regra de transbordo, interpretação, integração). Tickets para conferir:</p>'+tix(sn.tickets,3)+'</div></section>';
+  if(sn&&sn.n>0)h+='<section class="block"><h2>Sinalizados para análise</h2><div class="panel"><p><b>'+int(sn.n)+' transbordos sem pedido do cliente</b> ('+fmt(sn.pct,1)+'% das conversas). Reprovam o BQS 2.0 e podem ser erro do bot (regra de transbordo, interpretação, integração). <b>Análise humana necessária:</b> este número é só um sinal automático, não uma confirmação de falha. Uma pessoa precisa ler cada conversa para decidir se foi erro do bot. Tickets para conferir:</p>'+tix(sn.tickets,3)+'</div></section>';
   // evolução
   var kf=fluxoKey(f,per);
   h+='<section class="block"><h2>Evolução desta rotina</h2>'+linhaTempo([kf])+tabelaPeriodos(kf,8)+'</section>';
@@ -642,7 +653,9 @@ function comoLer(){
   main('<section class="block"><h2>Como ler este painel</h2><div class="panel"><dl class="def">'+
   '<dt>BQS 2.0</dt><dd>É o resultado final da qualidade do atendimento do bot, igual em todos os fluxos. Uma conversa conta como boa quando passa em duas verificações. <b>1. Conduta:</b> a nota geral (resolução 30%, eficiência 20%, transbordo 20%, entendimento 15%, clareza 10%, tom 5%) é 7 ou mais e resolução e transbordo ficam acima de 2; conversas "regular" reprovam. <b>2. Desfecho:</b> resolvida pelo bot; transferida porque o cliente pediu (fluxo esperado, desde que bem conduzida); ou abandonada depois de uma resposta boa (resolução 7 ou mais), porque o cliente pode sair satisfeito. Loop e transbordo que o cliente não pediu reprovam e são sinalizados para análise. O BQS 2.0 é <b>calibrado por auditoria</b>: a cada rodada o auditor lê a transcrição de uma amostra aleatória das conversas aprovadas, e a parcela de aprovações que não se sustenta é descontada do número. Nos tickets auditados vale a nota revisada. O BQS 2.0 é sempre um número só, igual em todos os fluxos. O histórico do BQS 2.0 começa em 20/10/2026.</dd>'+
   '<dt>Recontato em 24h</dt><dd>Percentual de conversas cujo cliente voltou a falar com o atendimento em até 24 horas. É um indicador de acompanhamento e não entra no BQS 2.0.</dd>'+
-  '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 2.0 e vão para análise, porque podem ser erro do bot.</dd>'+
+  '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 2.0 e vão para análise humana, porque podem ser erro do bot: o sinal é automático e só a leitura da conversa por uma pessoa confirma a falha.</dd>'+
+  '<dt>Abas "Detalhe"</dt><dd>Cada aba que começa com "Detalhe ·" mostra um fluxo por inteiro: os números, os contatos evitáveis, o que mudar e a qualidade por agente e por tema. A Visão geral resume todos os fluxos; a aba do fluxo aprofunda.</dd>'+
+  '<dt>Contatos sem artigo</dt><dd>Conversas que abriram o chat sem passar por um artigo da Central (tag <code>chat-default-instead-form</code>): portas do app ou MCTs ainda não mapeados. Lista para análise manual, fora da conta do BQS 2.0.</dd>'+
   '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS 2.0 (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
   '<dt>TFC</dt><dd>Taxa de falha de condução: conversas em loop, em transbordo que o cliente não pediu ou em abandono depois de uma resposta fraca (resolução abaixo de 7). Abandonar não é falha, e pedir atendente também não: o cliente pode sair ou chamar um humano a qualquer momento. Só conta quando o bot errou.</dd>'+
   '<dt>Contatos evitáveis</dt><dd>Entre as conversas classificadas, as que o bot poderia ter resolvido hoje (A), resolveria com ajuste de conteúdo, variável ou roteamento (B) ou exigiria uma capacidade nova (C). A estimativa para o período vem de uma amostra aleatória e traz intervalo de confiança.</dd>'+
@@ -658,13 +671,13 @@ function comoLer(){
 /* ---------- navegação ---------- */
 function main(h){$("#main").innerHTML=h}
 function tabs(){
-  var t=[{id:"visao",n:"Visão geral"},{id:"backlog",n:"Backlog"},{id:"linha",n:"Linha do tempo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
+  var t=[{id:"visao",n:"Visão geral"},{id:"backlog",n:"Backlog"},{id:"linha",n:"Linha do tempo"},{id:"semartigo",n:"Contatos sem artigo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:"Detalhe · "+f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
   $("#tabs").innerHTML=t.map(function(x){return '<button role="tab" data-tab="'+x.id+'" aria-selected="'+(S.tab===x.id)+'">'+esc(x.n)+'</button>'}).join("");
 }
 function render(){
   tabs();
   var f=FLUXOS.filter(function(x){return x.id===S.tab})[0];
-  if(S.tab==="visao")visao();else if(S.tab==="linha")abaLinha();else if(S.tab==="backlog")abaBacklog();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
+  if(S.tab==="visao")visao();else if(S.tab==="linha")abaLinha();else if(S.tab==="backlog")abaBacklog();else if(S.tab==="semartigo")abaSemArtigo();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
   var ult=Object.keys(S.data).map(function(k){return g(S.data[k],"gerado_em")}).filter(Boolean).sort().pop();
   $("#atualizado").textContent=ult?"Atualizado em "+dt(ult):"";
 }
@@ -694,7 +707,7 @@ document.addEventListener("pointermove",function(e){
 document.addEventListener("pointerleave",function(){tip.hidden=true});
 
 /* ---------- boot ---------- */
-var chaves=["cartao-hp","cartao-hp-mensal","aleatorio","aleatorio-mensal","criticos-semanal","criticos-diario","criticos-mensal"];
+var chaves=["cartao-hp","cartao-hp-mensal","aleatorio","aleatorio-mensal","criticos-semanal","criticos-mensal"];
 var salvo=store("bqs-tab");if(salvo)S.tab=salvo;
 Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat(["cartao-hp","aleatorio","criticos"].map(function(k){return load("data/backlog/"+k+".json").then(function(r){S.bk[k]=arr(r)})})).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
 render();
