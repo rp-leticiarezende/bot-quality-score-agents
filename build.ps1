@@ -315,7 +315,7 @@ $flows = @(
     @{
         NAME = 'orch-aleatorio'; ROTINA = 'Aleatório (cross-vertical)'; CHAVE = 'aleatorio'; N_CAL = 15; N_CAL_REP = 6
         FLOW = 'Conversations n8n_fluxo_generativo_aleatorio'; PERIODICIDADE = 'semanal'; WEEKLY = $true
-        DESCRICAO = 'Orquestrador da análise semanal de qualidade do fluxo Aleatório (cross-vertical). Ativado toda segunda-feira às 14:00 BRT pela rotina cloud.'
+        DESCRICAO = 'Orquestrador da análise semanal de qualidade do fluxo Aleatório (cross-vertical). Análise diária (terça a sábado: D-1; segunda: sábado e domingo) e envio semanal na segunda às 14:00 BRT, pela rotina cloud.'
         CTX = $CTX_ALEATORIO; DIMS = @('effective_vertical','topic'); ELEGIVEL = $ELEGIVEL_STD; ELEGIVEL_B = $ELEGIVEL_STD_B
         HP = $false; ALERTAS_EXTRA = ''
         REGRAS_EXTRA = '- Este fluxo NÃO tem HP — não incluir análise de `welcome_not_found` / `pages_fetched`.'
@@ -323,7 +323,7 @@ $flows = @(
     @{
         NAME = 'orch-cartao-hp'; ROTINA = 'Agente de Cartão de Crédito (semanal)'; CHAVE = 'cartao-hp'; N_CAL = 25; N_CAL_REP = 10
         FLOW = 'Conversations fluxo_hp_botmaker'; PERIODICIDADE = 'semanal'; WEEKLY = $true
-        DESCRICAO = 'Orquestrador da análise semanal de qualidade do fluxo Cartão de Crédito HP. Ativado toda segunda-feira às 10:00 BRT pela rotina cloud.'
+        DESCRICAO = 'Orquestrador da análise semanal de qualidade do fluxo Cartão de Crédito HP. Análise diária (terça a sábado: D-1; segunda: sábado e domingo) e envio semanal na segunda às 10:00 BRT, pela rotina cloud.'
         CTX = $CTX_HP; DIMS = @('effective_vertical','topic'); ELEGIVEL = $ELEGIVEL_STD; ELEGIVEL_B = $ELEGIVEL_STD_B
         HP = $true; ALERTAS_EXTRA = ''
         REGRAS_EXTRA = '- O indicador HP pleno × degradado está **em revisão**: `pct_degradado` é só informação de qualidade do dado (registre como 🔵 se for > 5%, com a frase "indicador em revisão"); nunca como alerta crítico nem como oportunidade.'
@@ -331,7 +331,7 @@ $flows = @(
     @{
         NAME = 'orch-criticos-semanal'; ROTINA = 'Casos Críticos (semanal)'; CHAVE = 'criticos-semanal'; N_CAL = 15; N_CAL_REP = 8
         FLOW = 'Conversations n8n_fluxo_generativo_critico'; PERIODICIDADE = 'semanal'; WEEKLY = $true
-        DESCRICAO = 'Orquestrador da análise semanal de qualidade dos Casos Críticos (CSAT 1 e 2). Ativado toda segunda-feira às 15:00 BRT pela rotina cloud.'
+        DESCRICAO = 'Orquestrador da análise semanal de qualidade dos Casos Críticos (CSAT 1 e 2). Análise diária (terça a sábado: D-1; segunda: sábado e domingo) e envio semanal na segunda às 15:00 BRT, pela rotina cloud.'
         CTX = $CTX_CRITICOS; DIMS = @('product','effective_vertical','topic'); ELEGIVEL = 'true'; ELEGIVEL_B = 'true'
         HP = $false; ALERTAS_EXTRA = ''
         REGRAS_EXTRA = '- Este fluxo NÃO tem HP — não incluir análise de `welcome_not_found` / `pages_fetched`.' + "`n" + '- São casos críticos (CSAT 1 e 2): BQS baixo é esperado. Foco em padrões recorrentes e ações imediatas. A análise semanal permite comparação por produto (`product`) — inclua sempre.'
@@ -393,6 +393,10 @@ foreach ($f in $flows) {
     $map['FLOW'] = $f.FLOW
     $map['N_CAL'] = [string]$f.N_CAL
     $map['N_CAL_REP'] = [string]$f.N_CAL_REP
+    $map['N_CAL_DIA'] = [string][math]::Ceiling($f.N_CAL / 7)
+    $map['N_CAL_REP_DIA'] = [string][math]::Ceiling($f.N_CAL_REP / 7)
+    $map['N_CLASS_DIA'] = '22'
+    $map['N_SEL_DIA'] = '2'
 
     $text = $template
     for ($i = 0; $i -lt 6; $i++) {

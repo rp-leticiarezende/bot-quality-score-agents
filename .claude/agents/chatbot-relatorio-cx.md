@@ -425,12 +425,12 @@ Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um or
 
 ### MODO SEM DADOS
 
-Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados no período. Poste **somente** o texto recebido como uma mensagem no Slack `#bot-quality-score` (channel_id `C0BP08WPMLP`, via `slack_send_message`), **não publique artefato** e encerre.
+Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados no período. Poste **somente** o texto recebido como uma mensagem no Slack `#lideres-cx-e-cxm` (channel_id `C052R2X2DEE`, via `slack_send_message`), **não publique artefato** e encerre.
 
 ### O que muda no MODO CURADORIA
 
 - **Não execute as Fases 1–5 do pipeline normal.** Os dados já foram processados.
-- **Consolide os outputs fornecidos** em um relatório executivo adaptado ao fluxo, publique o artefato e poste o resumo no Slack `#bot-quality-score`.
+- **Consolide os outputs fornecidos** em um relatório executivo adaptado ao fluxo, publique o artefato e poste o resumo no Slack `#lideres-cx-e-cxm`.
 - **Não use Zendesk, Confluence ou Amplitude** — apenas consolide o que foi recebido.
 - **Todo número vem do prompt (SQL).** Não recalcule, não reescreva percentuais, não invente comparação. Sem período anterior = "sem base de comparação".
 - **Nunca reproduza nomes de clientes, e-mails, telefones ou números de cartão** (os resumos às vezes os contêm). Identifique conversas por `ticket_id`.
@@ -583,7 +583,7 @@ Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (alimentado pela rot
 
 #### PASSO B — Mensagem única no Slack (curta, profissional, quase sem emojis)
 
-**Antes de postar, o painel (Passo A) já deve estar publicado**: só use "painel indisponível neste ciclo" se a publicação falhar de verdade depois de uma nova tentativa (para publicar o painel você precisa da ferramenta `Read` para ler `artifact/painel.html` inteiro; ela está na sua lista). Poste **uma única mensagem** com `slack_send_message` em `#bot-quality-score` (`channel_id: C0BP08WPMLP`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). **Não há mensagem na thread**: o plano completo, os tickets e o antes/depois ficam no painel. O Slack só renderiza texto: use **negrito com DOIS asteriscos** (`**assim**`; um asterisco só vira itálico neste conector), listas e links; **sem tabelas, sem barras de emoji, sem citações e sem títulos `#`**. A mensagem inteira cabe em cerca de 10 linhas e deve soar profissional, para analistas e lideranças.
+**Antes de postar, o painel (Passo A) já deve estar publicado**: só use "painel indisponível neste ciclo" se a publicação falhar de verdade depois de uma nova tentativa (para publicar o painel você precisa da ferramenta `Read` para ler `artifact/painel.html` inteiro; ela está na sua lista). Poste **uma única mensagem** com `slack_send_message` em `#lideres-cx-e-cxm` (`channel_id: C052R2X2DEE`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). **Não há mensagem na thread**: o plano completo, os tickets e o antes/depois ficam no painel. O Slack só renderiza texto: use **negrito com DOIS asteriscos** (`**assim**`; um asterisco só vira itálico neste conector), listas e links; **sem tabelas, sem barras de emoji, sem citações e sem títulos `#`**. A mensagem inteira cabe em cerca de 10 linhas e deve soar profissional, para analistas e lideranças.
 
 **Emojis: apenas o status do BQS 2.0 (e a sirene nas urgências).** Nada de emoji em títulos de seção, numeração, pontos de atenção ou rodapé.
 

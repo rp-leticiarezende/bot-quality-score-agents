@@ -2,7 +2,7 @@
 
 Agentes Claude para análise automatizada de qualidade do chatbot de CX da RecargaPay (**BQS 2.0**).
 
-Escopo: **somente conversas do bot** e **somente conteúdo externo da Central de Ajuda** (títulos com 🔒 ou 🔍 são internos e ficam fora). Resultados sempre em `#bot-quality-score`. O n8n não é alterado.
+Escopo: **somente conversas do bot** e **somente conteúdo externo da Central de Ajuda** (títulos com 🔒 ou 🔍 são internos e ficam fora). Resultados sempre em `#lideres-cx-e-cxm`. O n8n não é alterado.
 
 ## BQS 2.0 em uma frase
 
