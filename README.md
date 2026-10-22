@@ -31,10 +31,9 @@ Cada rotina clona este repositório e executa o orquestrador correspondente.
 
 | Rotina | Orquestrador | Agenda (BRT) | Chave do painel |
 | --- | --- | --- | --- |
-| Agente de Cartão de Crédito (semanal) | `orch-cartao-hp` | segunda 10:00 | `cartao-hp` |
-
-| Casos Críticos (semanal) | `orch-criticos-semanal` | segunda 15:00 | `criticos-semanal` |
-| Aleatório (semanal) | `orch-aleatorio` | segunda 14:00 (pausada) | `aleatorio` |
+| Agente de Cartão de Crédito (semanal) | `orch-cartao-hp` | segunda a sábado 10:00 (análise diária; envio na segunda) | `cartao-hp` |
+| Casos Críticos (semanal) | `orch-criticos-semanal` | segunda a sábado 15:00 (análise diária; envio na segunda) | `criticos-semanal` |
+| Aleatório (semanal) | `orch-aleatorio` | segunda a sábado 14:00 (análise diária; envio na segunda) | `aleatorio` |
 
 ## Fluxo de cada rotina
 
