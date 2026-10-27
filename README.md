@@ -15,7 +15,7 @@ Uma conversa conta como boa quando a **conduta** do bot foi boa (nota geral pond
 | `.claude/agents/orch-*.md` | Três orquestradores semanais (aleatório, agente de cartão de crédito e casos críticos). **Gerados** por `build.ps1`; não edite à mão. |
 | `.claude/agents/bqs-contencao.md` | Classifica cada conversa em contato evitável × só humano e diz o que teria retido. |
 | `.claude/agents/bqs-auditor.md` | Lê a transcrição dos casos duvidosos e revisa a nota (entra no BQS 2.0). |
-| `.claude/agents/bqs-alertas.md` | Detector de casos críticos (erro técnico do bot, loop, jurídico/órgãos, fraude sem encaminhamento, vulnerabilidade). Não calcula BQS; avisa no `#team_product_cx` só quando há ticket novo. Chamado pelo MODO DIA do `orch-cartao-hp`. |
+| `.claude/agents/bqs-alertas.md` | Detector de casos críticos (erro técnico do bot, loop, jurídico/órgãos, fraude sem encaminhamento, vulnerabilidade). Não calcula BQS; avisa no `#team_product_cx` só quando há ticket novo. Roda numa rotina própria (sem orquestrador), independente dos fluxos. |
 | `.claude/agents/chatbot-*.md`, `zendesk-guide-expert.md` | Especialistas de fluxo, HP, oportunidades, propostas, relatório e KB. |
 | `templates/orch.template.md` | Fonte única dos orquestradores (SQL determinístico, passos, subagentes). |
 | `templates/playbook-cartao.md` | Playbook de retenção do cartão, injetado em `bqs-contencao`, `bqs-auditor` e `chatbot-proposta-ajustes`. |
@@ -36,10 +36,11 @@ Cada rotina clona este repositório e executa o orquestrador correspondente.
 | Agente de Cartão de Crédito (semanal) | `orch-cartao-hp` | segunda a sábado 10:00 (análise diária; envio na segunda) | `cartao-hp` |
 | Casos Críticos (semanal) | `orch-criticos-semanal` | segunda a sábado 15:00 (análise diária; envio na segunda) | `criticos-semanal` |
 | Aleatório (semanal) | `orch-aleatorio` | segunda a sábado 14:00 (análise diária; envio na segunda) | `aleatorio` |
+| Alertas de casos críticos | `bqs-alertas` (sem orquestrador) | segunda a sábado 09:30 (só avisa se houver ticket novo) | artefato próprio "Alertas do BQS" |
 
 ## Alertas de casos críticos (`bqs-alertas`)
 
-Uma vez por dia (segunda a sábado), no fim do MODO DIA do Cartão, o detector varre os últimos 7 dias de **todos os fluxos** da tabela de qualidade e da transcrição (que chega com atraso, por isso a janela). Se houver ticket novo em algum dos 5 temas, envia **uma** mensagem em `#team_product_cx`; se não houver, não envia nada. Os `ticket_id` já avisados e o histórico ficam num artefato privado só de alertas (`artifact/alertas.html`, https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM, arquivo `data/enviados.json`), **fora do painel do BQS**, e nunca são repetidos. Palavras de risco só contam quando ditas pelo cliente e quando o bot não encaminhou para humano. Modo `TESTE`: não posta nem grava. Falha do detector vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
+Uma vez por dia (segunda a sábado, 09:30 BRT), numa **rotina própria** ("Bot Quality — Alertas", independente das rotinas de cada fluxo), o detector varre os últimos 7 dias da transcrição de **todas as conversas do bot** (Cartão, Casos Críticos, Aleatório e qualquer outro fluxo; a transcrição chega com atraso, por isso a janela). Se houver ticket novo em algum dos 5 temas, envia **uma** mensagem em `#team_product_cx`; se não houver, não envia nada. Os `ticket_id` já avisados e o histórico ficam num artefato privado só de alertas (`artifact/alertas.html`, https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM, arquivo `data/enviados.json`), **fora do painel do BQS**, e nunca são repetidos. Palavras de risco só contam quando ditas pelo cliente e quando o bot não encaminhou para humano. Modo `TESTE`: não posta nem grava. Falha do detector vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
 
 ## Fluxo de cada rotina
 

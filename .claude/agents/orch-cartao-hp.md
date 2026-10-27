@@ -68,19 +68,6 @@ par AS (
 
    Depois leia o painel uma vez (`Artifact`, `action: "read"`, `url: https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ`, sem `path`) e publique **só esse arquivo**: `Artifact` com `file_path: "artifact/painel.html"`, `url` do painel e `files: {"data/cartao-hp/dia/AAAA-MM-DD.json": "painel-data/cartao-hp/dia/AAAA-MM-DD.json"}`. Não passe `icon` nem `capabilities` e **não toque em nenhum outro arquivo do painel**. Em caso de conflito, releia o painel e publique de novo uma vez. Reexecutar o mesmo dia **substitui** o arquivo do dia.
 
-7. **Alertas de casos críticos (só esta rotina faz isto; os outros fluxos não).** Depois de gravar e publicar o arquivo do dia, acione **uma vez** o detector `bqs-alertas`. Ele varre os últimos 7 dias de **todos** os fluxos da tabela e, se houver ticket novo dentro dos critérios (erro técnico do bot, loop, jurídico/órgãos, fraude/golpe sem encaminhamento, relato de vulnerabilidade), envia **uma** mensagem no `#team_product_cx` (channel_id `C0A0L3WQSMV`); se não houver caso, não envia nada. Ele não calcula BQS.
-
-```
-subagent_type: bqs-alertas
-prompt: |
-  modo: ENVIO
-  ref: [hoje em BRT, AAAA-MM-DD, da consulta do início]
-  canal_id: C0A0L3WQSMV
-  limiar_loop: 5
-```
-
-   Guarde só a primeira linha da resposta. Se ela começar com `ALERTAS: FALHA` (ou se o agente falhar mesmo depois de uma nova tentativa), trate como erro pela regra abaixo: **nada** vai para o `#lideres-cx-e-cxm` e o alerta vai para o `#tarefas-let` (etapa: "alertas de casos críticos"). Essa falha **não** impede o MODO SEMANA nem o envio semanal. Não cole a resposta do detector em arquivo diário, painel ou relatório.
-
 ### MODO SEMANA (só na segunda, depois do MODO DIA de sábado e domingo)
 
 Execute os Passos 1 a 7 normalmente para a semana anterior (segunda a domingo), com estas diferenças:

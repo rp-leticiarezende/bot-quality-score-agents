@@ -159,7 +159,7 @@ O que quebrou e como ficou:
 
 ## Agente de alertas `bqs-alertas` (27/10/2026)
 
-**O que é:** detector diário de casos críticos nas conversas do bot (não calcula BQS). Chamado uma vez por dia no fim do MODO DIA do `orch-cartao-hp` (bloco `ALERTAS_DIA` do `build.ps1`); os outros orquestradores não o chamam. Se houver ticket novo em algum tema, envia **uma** mensagem em `#team_product_cx` (C0A0L3WQSMV); se não houver, não envia nada. Falha vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
+**O que é:** detector diário de casos críticos nas conversas do bot (não calcula BQS). Roda numa rotina própria, "Bot Quality — Alertas" (segunda a sábado, 09:30 BRT), independente das rotinas de cada fluxo (decisão de 27/10/2026: ele não deve depender do Cartão, e lê todas as conversas do bot). Se houver ticket novo em algum tema, envia **uma** mensagem em `#team_product_cx` (C0A0L3WQSMV); se não houver, não envia nada. Falha vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
 
 **Temas:** erro técnico do bot ("Tente novamente em alguns segundos… volume alto"), loop (mesma mensagem do bot repetida `limiar_loop` vezes), jurídico/órgãos e fraude/golpe (palavras do **cliente** e sem atendente humano), relato de vulnerabilidade de segurança.
 
@@ -182,3 +182,4 @@ O que quebrou e como ficou:
 - **Loop:** limiar 5 mantido. **Fraude:** refinamento ainda pendente (sem "não reconheço"; "cobrança indevida" de seguro pesa muito).
 - **Primeira execução oficial:** 28/10 (MODO DIA de 27/10): só tickets de 27/10 entram na mensagem; os dias anteriores da janela são registrados como `historico`.
 - **Fraude (decisão de 27/10, noite):** só alerta quando o cliente se diz vítima de golpe ou fraude **e** o bot não citou nenhum caminho (contestar, bloquear, cancelar, estornar, reembolsar) **e** não houve atendente humano. Em 20–26/10 deu 8 casos (~1 por dia), contra 186 (~27 por dia) da regra anterior. "Cobrança indevida" sozinha saiu do alerta (38 dos 186; 30 ligadas a seguro/proteção). Limites: "o bot citou um caminho" é busca por palavras e não prova que funcionou; as frases de "se diz vítima" não foram validadas em amostra maior.
+- **Rotina própria (27/10, noite):** o passo de alertas saiu do MODO DIA do Cartão (template e `build.ps1` voltaram ao estado anterior; orquestradores regenerados sem diferença) e virou a rotina "Bot Quality — Alertas", segunda a sábado 09:30 BRT (12:30 UTC), que executa só o `bqs-alertas`. Motivo: o alerta não deve depender do sucesso nem do horário da análise do Cartão, e cobre todas as conversas do bot. Erro da rotina vai só para o `#tarefas-let`.

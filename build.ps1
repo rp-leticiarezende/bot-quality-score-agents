@@ -311,21 +311,6 @@ $CTX_CRITICOS = @'
 **Casos críticos (CSAT 1 e 2):** são os piores atendimentos do período — trate como **censo**, não como amostra. BQS baixo é esperado; destaque o **padrão de falha mais recorrente** e o que teria evitado a insatisfação. Se o volume do período estiver muito abaixo do usual (Passo 2), trate como cobertura baixa — nunca como "melhora".
 '@
 
-$ALERTAS_DIA_BLOCO = @'
-7. **Alertas de casos críticos (só esta rotina faz isto; os outros fluxos não).** Depois de gravar e publicar o arquivo do dia, acione **uma vez** o detector `bqs-alertas`. Ele varre os últimos 7 dias de **todos** os fluxos da tabela e, se houver ticket novo dentro dos critérios (erro técnico do bot, loop, jurídico/órgãos, fraude/golpe sem encaminhamento, relato de vulnerabilidade), envia **uma** mensagem no `#team_product_cx` (channel_id `C0A0L3WQSMV`); se não houver caso, não envia nada. Ele não calcula BQS.
-
-```
-subagent_type: bqs-alertas
-prompt: |
-  modo: ENVIO
-  ref: [hoje em BRT, AAAA-MM-DD, da consulta do início]
-  canal_id: C0A0L3WQSMV
-  limiar_loop: 5
-```
-
-   Guarde só a primeira linha da resposta. Se ela começar com `ALERTAS: FALHA` (ou se o agente falhar mesmo depois de uma nova tentativa), trate como erro pela regra abaixo: **nada** vai para o `#lideres-cx-e-cxm` e o alerta vai para o `#tarefas-let` (etapa: "alertas de casos críticos"). Essa falha **não** impede o MODO SEMANA nem o envio semanal. Não cole a resposta do detector em arquivo diário, painel ou relatório.
-'@
-
 $flows = @(
     @{
         NAME = 'orch-aleatorio'; ROTINA = 'Aleatório (cross-vertical)'; CHAVE = 'aleatorio'; N_CAL = 15; N_CAL_REP = 6
@@ -340,7 +325,7 @@ $flows = @(
         FLOW = 'Conversations fluxo_hp_botmaker'; PERIODICIDADE = 'semanal'; WEEKLY = $true
         DESCRICAO = 'Orquestrador da análise semanal de qualidade do fluxo Cartão de Crédito HP. Análise diária (terça a sábado: D-1; segunda: sábado e domingo) e envio semanal na segunda às 10:00 BRT, pela rotina cloud.'
         CTX = $CTX_HP; DIMS = @('effective_vertical','topic'); ELEGIVEL = $ELEGIVEL_STD; ELEGIVEL_B = $ELEGIVEL_STD_B
-        HP = $true; ALERTAS = $true; ALERTAS_EXTRA = ''
+        HP = $true; ALERTAS_EXTRA = ''
         REGRAS_EXTRA = '- O indicador HP pleno × degradado está **em revisão**: `pct_degradado` é só informação de qualidade do dado (registre como 🔵 se for > 5%, com a frase "indicador em revisão"); nunca como alerta crítico nem como oportunidade.'
     },
     @{
@@ -396,7 +381,6 @@ foreach ($f in $flows) {
     $map['HP_COLS_TOTAIS'] = $(if ($f.HP) { $HP_COLS_TOTAIS.TrimEnd() } else { '' })
     $map['DIM_AGG'] = New-DimAgg $f.DIMS $(if ($f.HP) { $HP_DIM_EXTRA.TrimEnd() } else { '' })
     $map['ALERTAS_EXTRA'] = $f.ALERTAS_EXTRA
-    $map['ALERTAS_DIA'] = $(if ($f.ALERTAS) { $ALERTAS_DIA_BLOCO.TrimEnd() } else { '' })
     $map['PACOTES_TEXTO'] = ($PACOTES_COMUM.TrimEnd() + $(if ($f.HP) { "`n" + $PACOTE_HP.TrimEnd() } else { '' }))
     $map['HP_REF_5'] = $(if ($f.HP) { ', 5.3' } else { '' })
     $map['HP_5_3'] = $(if ($f.HP) { $HP_5_3 } else { "`n" })
