@@ -143,7 +143,14 @@ Cabeçalho:
 _Análise das conversas do bot de DD/MM_            (ou "de DD/MM a DD/MM" se os tickets do alerta vierem de mais de um dia)
 ```
 
-Datas em `dia`. Cada bloco começa com uma linha em branco, o ícone + nome do tema em negrito, e depois os campos abaixo, na ordem, cada um numa linha.
+Datas em `dia`. **Cada bloco tem sempre a mesma estrutura** (é o formato elogiado pela Nats; não mude a ordem, os rótulos nem os nomes): (1) uma linha em branco; (2) ícone + nome do tema em negrito, com **o nome exato** da lista abaixo; (3) só no erro técnico, a citação da fala do bot na linha seguinte; (4) **uma linha em branco**; (5) os campos, um por linha, nesta ordem: Volume, Quando, Possível causa, Termos citados, Exemplos, Sugestão (omita os que não se aplicam ao tema, sem deixar linha vazia no lugar).
+
+Nomes exatos dos temas:
+- `seguranca`: `🔒 **Relato de vulnerabilidade de segurança**`
+- `juridico`: `⚖️ **Jurídico e órgãos**`
+- `fraude`: `🛡️ **Fraude e golpe**`
+- `erro_tecnico`: `🚨 **Erro técnico do bot**`
+- `loop`: `🔁 **Loop do bot**`
 
 - **Volume:** `N conversas` (só tickets novos). Em `erro_tecnico`, acrescente `(normal: cerca de X por dia)`. **Só no tema `erro_tecnico`** (nos outros temas, só `N conversas`): se o **dia de maior volume** tiver 10 tickets novos ou mais **e M for diferente de N**, acrescente também `; em DD/MM: M conversas, P% das conversas do bot do dia` (por exemplo `Volume: 417 conversas (normal: cerca de 2 por dia); em 26/10: 391 conversas, 17% das conversas do bot do dia`). Para o normal, conte as conversas com `erro` nos 14 dias **antes** de `dia_ini` (mesma lógica de `erro`, por `date_created_at`) e divida por 14; se for menor que 1, escreva "menos de 1 por dia"; senão, arredonde. Para P%, conte as conversas do bot (`RLIKE ') RecargaBot:'`) daquele dia e divida; arredonde para inteiro.
 - **Quando:** só em `erro_tecnico`, e só se o **dia de maior volume** tiver **10 tickets novos ou mais**. Use só os tickets desse dia e o campo `hora` (já em Brasília): ache o menor intervalo de horas seguidas que concentra pelo menos 80% deles e escreva `N de M em DD/MM, entre Hh e Hh (horário de Brasília)`, onde o segundo `Hh` é a hora final + 1.
@@ -153,7 +160,7 @@ Datas em `dia`. Cada bloco começa com uma linha em branco, o ícone + nome do t
 - **Sugestão:** frase fixa por tema:
   - erro técnico: `verificar a disponibilidade da Botmaker e da IA`
   - loop: `revisar o ponto do fluxo em que o bot repete a resposta`
-  - jurídico: `avaliar os contatos com prioridade: o cliente citou o termo e não houve atendimento humano`
+  - jurídico: `avaliar os contatos com prioridade: o cliente ameaçou acionar o órgão ou a justiça e não houve atendimento humano`
   - fraude: `avaliar os contatos com prioridade: o cliente se diz vítima e o bot não indicou nenhum caminho (contestar ou bloquear)`
   - segurança: `definir o canal oficial de segurança que o bot deve informar`
 
@@ -172,7 +179,18 @@ Exemplo de bloco completo (erro técnico):
 **Sugestão:** verificar a disponibilidade da Botmaker e da IA
 ```
 
-Sem link de painel na mensagem. Não marque ninguém.
+Exemplo de bloco de outro tema (jurídico), na mesma estrutura:
+
+```
+⚖️ **Jurídico e órgãos**
+
+**Volume:** 2 conversas
+**Termos citados:** Procon (1), advogado (1)
+**Exemplos:** [#46666460](https://recargapay.zendesk.com/agent/tickets/46666460), [#46665859](https://recargapay.zendesk.com/agent/tickets/46665859)
+**Sugestão:** avaliar os contatos com prioridade: o cliente ameaçou acionar o órgão ou a justiça e não houve atendimento humano
+```
+
+Sem link de painel na mensagem. Não marque ninguém. Envie o texto em markdown comum, com `>` literal na citação (nunca `&gt;`) e os blocos separados por uma linha em branco.
 
 ## PASSO 5 — ENVIAR E REGISTRAR (só em `ENVIO`)
 
