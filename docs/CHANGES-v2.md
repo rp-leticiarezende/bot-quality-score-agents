@@ -156,3 +156,28 @@ O que quebrou e como ficou:
 - **`chatbot-relatorio-cx` não conseguiu publicar o painel** (faltava a ferramenta `Read`, e o Artifact exige ler a página inteira): adicionadas `Read`, `Glob`, `Grep` e `Bash`. Nesta rodada o orquestrador publicou o painel (versão 10) depois da mensagem, que saiu com "painel indisponível neste ciclo".
 - **Negrito no Slack:** o conector trata `*texto*` como itálico; o formato agora usa `**texto**`.
 - Instrução nova: o painel é publicado **antes** da mensagem do Slack.
+
+## Agente de alertas `bqs-alertas` (27/10/2026)
+
+**O que é:** detector diário de casos críticos nas conversas do bot (não calcula BQS). Chamado uma vez por dia no fim do MODO DIA do `orch-cartao-hp` (bloco `ALERTAS_DIA` do `build.ps1`); os outros orquestradores não o chamam. Se houver ticket novo em algum tema, envia **uma** mensagem em `#team_product_cx` (C0A0L3WQSMV); se não houver, não envia nada. Falha vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
+
+**Temas:** erro técnico do bot ("Tente novamente em alguns segundos… volume alto"), loop (mesma mensagem do bot repetida `limiar_loop` vezes), jurídico/órgãos e fraude/golpe (palavras do **cliente** e sem atendente humano), relato de vulnerabilidade de segurança.
+
+**Fonte:** `prod.cx.fat_tickets_transcription` (todas as conversas do bot), janela móvel de 7 dias por causa do atraso da transcrição. A tabela de qualidade guarda só uma amostra (~13% das conversas; em 20–26/10: ~500 de ~3.800 por dia) e **não serve** para detectar: em 26/10 o erro atingiu 391 conversas (17% do dia) e só 44 estavam na amostra; o ticket 46549474 (vulnerabilidade) também não estava. A hora do ticket vem de `timestamp_created_at_br` (Brasília); `first_message_timestamp` e `received_timestamp` da tabela de qualidade estão em UTC.
+
+**Controle de repetição:** `data/alertas/enviados.json` no painel (ticket_id → tema, data). Primeira execução: tickets de dias anteriores a D-1 entram como `historico`, sem aviso.
+
+**Testes (modo TESTE, sem postar nem gravar), janela 20–26/10, `limiar_loop` 5:** 23.182 conversas do bot varridas em ~8 s; erro técnico 417 (391 em 26/10; normal ~2/dia), loop 190, jurídico 81, fraude 179, segurança 2; 10 falsos positivos descartados pela leitura do trecho. Medições de loop na semana: ≥3 repetições 1.042 (~150/dia); ≥4: 404; ≥5: 190; ≥6: 117.
+
+**Decisões e pendências:**
+- "Não reconheço a compra" ficou **fora** do tema fraude (78 conversas na semana; é o fluxo normal de contestação).
+- `limiar_loop` padrão 5 a confirmar com a Leticia; jurídico e fraude trazem dezenas de casos por dia: avaliar se a regra "sem atendente humano" basta.
+- Aba "Alertas" no painel (histórico por dia e tema) depende do OK dela; até lá a mensagem não leva link do painel.
+- Alerta do incidente de 26/10 enviado em 27/10 com números da amostra (44 conversas, horas em UTC): corrigir em thread com 391 conversas e horário de Brasília (6h–17h, picos 8h–9h e 14h–17h).
+- Rotinas em nuvem, Confluence e push dependem do OK dela.
+
+### Decisões de 27/10 (tarde)
+- **Controle fora do painel:** nada de alertas vai para o painel do BQS. O controle (`tickets`) e o histórico (`alertas`) ficam em artefato privado próprio, "Alertas do BQS" (`artifact/alertas.html`, arquivo `data/enviados.json`; semeado com o registro do alerta manual de 27/10 e `tickets` vazio, o que marca a primeira execução). Substitui a ideia anterior de `data/alertas/enviados.json` no painel.
+- **Jurídico só com ameaça explícita** (Procon, Banco Central, advogado, processar, ação/processo judicial, juizado). "Ouvidoria" e "Reclame Aqui" saíram da lista; perguntas neutras ("qual o número da ouvidoria") são descartadas na confirmação.
+- **Loop:** limiar 5 mantido. **Fraude:** refinamento ainda pendente (sem "não reconheço"; "cobrança indevida" de seguro pesa muito).
+- **Primeira execução oficial:** 28/10 (MODO DIA de 27/10): só tickets de 27/10 entram na mensagem; os dias anteriores da janela são registrados como `historico`.

@@ -68,6 +68,8 @@ par AS (
 
    Depois leia o painel uma vez (`Artifact`, `action: "read"`, `url: https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ`, sem `path`) e publique **só esse arquivo**: `Artifact` com `file_path: "artifact/painel.html"`, `url` do painel e `files: {"data/criticos-semanal/dia/AAAA-MM-DD.json": "painel-data/criticos-semanal/dia/AAAA-MM-DD.json"}`. Não passe `icon` nem `capabilities` e **não toque em nenhum outro arquivo do painel**. Em caso de conflito, releia o painel e publique de novo uma vez. Reexecutar o mesmo dia **substitui** o arquivo do dia.
 
+
+
 ### MODO SEMANA (só na segunda, depois do MODO DIA de sábado e domingo)
 
 Execute os Passos 1 a 7 normalmente para a semana anterior (segunda a domingo), com estas diferenças:

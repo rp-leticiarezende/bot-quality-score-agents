@@ -1,0 +1,176 @@
+<title>Alertas do BQS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: página de consulta em coluna única, faixa de status no topo, depois temas, histórico e regras de envio. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --fg: #1c2430;
+  --muted: #5d6877;
+  --line: #dfe3e9;
+  --accent: #1f4f8f;
+  --crit: #b4361f;
+  --crit-bg: #fbe9e5;
+  --warn: #8a5a00;
+  --warn-bg: #fbf0d9;
+  --info: #2a5f93;
+  --info-bg: #e5eefa;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d; --surface: #1a212b; --fg: #e6eaf0; --muted: #9aa5b4; --line: #2a3340;
+    --accent: #7fb0ec; --crit: #ff8f78; --crit-bg: #3a1f1a; --warn: #e8b85a; --warn-bg: #352a12;
+    --info: #86b7ee; --info-bg: #1a2a40; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161d; --surface: #1a212b; --fg: #e6eaf0; --muted: #9aa5b4; --line: #2a3340;
+  --accent: #7fb0ec; --crit: #ff8f78; --crit-bg: #3a1f1a; --warn: #e8b85a; --warn-bg: #352a12;
+  --info: #86b7ee; --info-bg: #1a2a40; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+.wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+h1 { font-size: 26px; line-height: 1.2; font-weight: 600; margin: 0 0 6px; text-wrap: balance; }
+h2 { font-size: 17px; font-weight: 600; margin: 0 0 12px; }
+p { margin: 0; }
+.lede { color: var(--muted); max-width: 68ch; }
+.status { display: flex; flex-wrap: wrap; gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; min-width: 150px; flex: 1 1 150px; }
+.stat .n { font-family: var(--font-mono); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 13px; }
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+th { text-align: left; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+.pill { display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.crit { color: var(--crit); background: var(--crit-bg); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); }
+.pill.info { color: var(--info); background: var(--info-bg); }
+.alert { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.alert header { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; justify-content: space-between; }
+.alert .when { font-weight: 600; }
+.alert .meta { color: var(--muted); font-size: 13px; }
+.themes { display: flex; flex-direction: column; gap: 10px; }
+.theme { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: 6px 16px; padding-top: 10px; border-top: 1px solid var(--line); }
+.theme:first-child { border-top: 0; padding-top: 0; }
+.theme .count { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.ids { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.ids a { font-family: var(--font-mono); font-size: 13px; color: var(--accent); text-decoration: none; border: 1px solid var(--line); border-radius: 4px; padding: 1px 7px; }
+.ids a:hover, .ids a:focus-visible { border-color: var(--accent); outline: none; }
+.note { font-size: 13px; color: var(--muted); border-left: 3px solid var(--line); padding-left: 10px; }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 6px; padding: 20px; color: var(--muted); }
+ul.rules { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; max-width: 76ch; }
+code { font-family: var(--font-mono); font-size: 13px; }
+@media (max-width: 560px) { .theme { grid-template-columns: minmax(0, 1fr); } h1 { font-size: 22px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Alertas do BQS</h1>
+    <p class="lede">Registro dos alertas de casos críticos nas conversas do RecargaBot. O agente de alertas varre as conversas do bot todos os dias e avisa no Slack só quando encontra ticket novo em um dos temas abaixo.</p>
+  </header>
+
+  <section class="status" aria-label="Resumo">
+    <div class="stat"><div class="n" id="s-alertas">–</div><div class="l">alertas enviados</div></div>
+    <div class="stat"><div class="n" id="s-tickets">–</div><div class="l">tickets já avisados ou em histórico</div></div>
+    <div class="stat"><div class="n" id="s-ultimo">–</div><div class="l">último alerta</div></div>
+    <div class="stat"><div class="n" id="s-atualizado">–</div><div class="l">controle atualizado em</div></div>
+  </section>
+
+  <section>
+    <h2>Histórico de alertas</h2>
+    <div id="historico"><div class="empty">Carregando o histórico…</div></div>
+  </section>
+
+  <section>
+    <h2>Temas monitorados</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Tema</th><th>O que conta como caso</th><th>Sugestão enviada</th></tr></thead>
+        <tbody id="temas"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Como o envio funciona</h2>
+    <ul class="rules">
+      <li>O agente roda uma vez por dia, de segunda a sábado, no fim da análise diária do fluxo de Cartão, e lê as conversas de <strong>todos os fluxos do bot</strong> na transcrição (não só a amostra avaliada pelo BQS).</li>
+      <li>A janela é de 7 dias, porque a transcrição chega com atraso. Cada ticket é avisado <strong>uma única vez</strong> por tema.</li>
+      <li>Palavras de risco só contam quando ditas pelo <strong>cliente</strong>. Jurídico exige ameaça explícita (Procon, Banco Central, advogado, processar); perguntas neutras, como "qual o número da ouvidoria", não entram. Fraude e jurídico só contam quando não houve atendente humano.</li>
+      <li>Não há mensagem quando não há caso novo. A mensagem vai para o <code>#team_product_cx</code>, sem marcar ninguém, com até 3 tickets de exemplo por tema.</li>
+      <li>Se o agente falhar, o aviso de erro vai só para o <code>#tarefas-let</code>.</li>
+      <li>Datas e horários dos alertas são sempre em horário de Brasília, pela data de criação do ticket.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(function () {
+  var TEMAS = {
+    seguranca: { nome: "Relato de vulnerabilidade", cls: "crit", regra: "O cliente fala de vulnerabilidade, divulgação responsável, bug bounty, falha de segurança ou AppSec. Vale mesmo com atendente humano.", sug: "Definir o canal oficial de segurança que o bot deve informar." },
+    juridico: { nome: "Jurídico e órgãos", cls: "crit", regra: "O cliente ameaça explicitamente acionar Procon, Banco Central/Bacen, advogado, processo ou juizado, e não houve atendente humano. Perguntas neutras não entram.", sug: "Avaliar os contatos com prioridade." },
+    fraude: { nome: "Fraude e golpe", cls: "warn", regra: "O cliente relata fraude, golpe ou cobrança indevida e não houve atendente humano. \"Não reconheço a compra\" não entra.", sug: "Avaliar os contatos." },
+    erro_tecnico: { nome: "Erro técnico do bot", cls: "crit", regra: "O bot respondeu \"Tente novamente em alguns segundos, estou com volume alto no momento\".", sug: "Verificar a disponibilidade da Botmaker e da IA." },
+    loop: { nome: "Loop do bot", cls: "info", regra: "A mesma mensagem do bot (40 caracteres ou mais) se repete 5 vezes ou mais na conversa.", sug: "Revisar o ponto do fluxo em que o bot repete a resposta." }
+  };
+  var ORDEM = ["seguranca", "juridico", "fraude", "erro_tecnico", "loop"];
+  var ZD = "https://recargapay.zendesk.com/agent/tickets/";
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function fmt(d) { if (!d) return "–"; var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d); return m ? m[3] + "/" + m[2] + "/" + m[1] : d; }
+  function fmtDia(d) { if (!d) return "–"; var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d); return m ? m[3] + "/" + m[2] : d; }
+  function pill(t) { var m = TEMAS[t] || { nome: t, cls: "info" }; return el("span", "pill " + m.cls, m.nome); }
+
+  var tb = document.getElementById("temas");
+  ORDEM.forEach(function (k) {
+    var t = TEMAS[k], tr = el("tr"), a = el("td"), b = el("td", null, t.regra), c = el("td", null, t.sug);
+    a.appendChild(pill(k)); tr.appendChild(a); tr.appendChild(b); tr.appendChild(c); tb.appendChild(tr);
+  });
+
+  function render(d) {
+    var alertas = (d.alertas || []).slice().sort(function (a, b) { return (b.enviado_em || "").localeCompare(a.enviado_em || ""); });
+    var tickets = d.tickets ? Object.keys(d.tickets).length : 0;
+    document.getElementById("s-alertas").textContent = alertas.length;
+    document.getElementById("s-tickets").textContent = tickets;
+    document.getElementById("s-ultimo").textContent = alertas.length ? fmtDia(alertas[0].enviado_em) : "–";
+    document.getElementById("s-atualizado").textContent = d.atualizado_em ? fmt(d.atualizado_em) : "–";
+    var box = document.getElementById("historico"); box.textContent = "";
+    if (!alertas.length) { box.appendChild(el("div", "empty", "Nenhum alerta enviado ainda. O primeiro aparece aqui assim que o agente encontrar um ticket novo.")); return; }
+    var list = el("div"); list.style.display = "flex"; list.style.flexDirection = "column"; list.style.gap = "12px";
+    alertas.forEach(function (a) {
+      var card = el("article", "alert"), h = el("header");
+      h.appendChild(el("div", "when", "Alerta de " + fmt(a.enviado_em)));
+      h.appendChild(el("div", "meta", (a.canal || "#team_product_cx") + (a.analise ? " · conversas de " + a.analise : "") + (a.origem ? " · " + a.origem : "")));
+      card.appendChild(h);
+      var th = el("div", "themes");
+      (a.temas || []).forEach(function (t) {
+        var row = el("div", "theme"), left = el("div");
+        left.appendChild(pill(t.tema)); left.appendChild(document.createElement("br"));
+        left.appendChild(el("span", "count", t.n + " conversas"));
+        var right = el("div", "ids");
+        (t.exemplos || []).forEach(function (id) { var l = el("a", null, "#" + id); l.href = ZD + id; l.target = "_blank"; l.rel = "noopener"; right.appendChild(l); });
+        row.appendChild(left); row.appendChild(right); th.appendChild(row);
+      });
+      card.appendChild(th);
+      if (a.observacao) card.appendChild(el("p", "note", a.observacao));
+      list.appendChild(card);
+    });
+    box.appendChild(list);
+  }
+
+  fetch("data/enviados.json").then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(render)
+    .catch(function () { render({ alertas: [] }); document.getElementById("historico").firstChild.textContent = "Não foi possível carregar o histórico. O envio do agente não depende desta página."; });
+})();
+</script>
