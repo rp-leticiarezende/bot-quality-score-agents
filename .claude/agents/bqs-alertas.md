@@ -65,23 +65,28 @@ WITH c AS (
            r'(?m)^\(\d{2}:\d{2}:\d{2}\) (?!RecargaBot:|RecargaPay)[^:\n]{1,80}: ([^\n]*)', 1), ' || ') AS fala_cliente,
          filter(regexp_extract_all(t.ticket_transcription,
            r'(?m)^\(\d{2}:\d{2}:\d{2}\) RecargaBot: ([^\n]{40,})', 1),
-           x -> x NOT RLIKE '(?i)verificando|segundinho|instante') AS fala_bot
+           x -> x NOT RLIKE '(?i)verificando|segundinho|instante') AS fala_bot,
+         ARRAY_JOIN(regexp_extract_all(t.ticket_transcription,
+           r'(?m)^\(\d{2}:\d{2}:\d{2}\) RecargaBot: ([^\n]*)', 1), ' || ') AS bot_texto
   FROM prod.cx.fat_tickets_transcription t
   WHERE t.date_created_at >= DATE '[dia_ini]' AND t.date_created_at < DATE '[dia_fim_excl]'
     AND t.ticket_transcription RLIKE r'\) RecargaBot:'
 ), f AS (
-  SELECT ticket_id, dia, hora, tem_humano, fala_cliente,
+  SELECT ticket_id, dia, hora, tem_humano, fala_cliente, bot_texto,
          COALESCE(array_max(transform(array_distinct(fala_bot), x -> size(filter(fala_bot, y -> y = x)))), 0) AS max_rep,
          tr RLIKE '(?i)volume alto no momento|tente novamente em alguns segundos' AS erro,
          (NOT tem_humano AND fala_cliente RLIKE '(?i)procon|banco central|bacen|advogad|a[cç][aã]o judicial|juizado|vou (te |lhe |os )?processar|processo judicial') AS juridico,
-         (NOT tem_humano AND fala_cliente RLIKE '(?i)fraude|golp(e|ista)|cobran[cç]a indevida') AS fraude,
+         (NOT tem_humano
+           AND fala_cliente RLIKE '(?i)fraude|golp(e|ista)'
+           AND fala_cliente RLIKE '(?i)ca[ií] (em|num|n[oa]) (um |uma )?(golpe|fraude)|fui (v[ií]tima|enganad|roubad|clonad|hackead)|me (roubaram|enganaram|clonaram|hackearam)|invadiram|clonaram|n[aã]o (fui eu|fiz|autorizei|reconhe[cç]o)|sem (minha )?autoriza[cç][aã]o'
+           AND NOT bot_texto RLIKE '(?i)contest|bloque|cancel|reembols|estorn') AS fraude,
          fala_cliente RLIKE '(?i)vulnerabilidade|divulga[cç][aã]o respons[aá]vel|bug bounty|falha de seguran[cç]a|appsec' AS seguranca
   FROM c
 )
 SELECT ticket_id, CAST(dia AS STRING) AS dia, hora, tem_humano, max_rep, erro, juridico, fraude, seguranca,
        (max_rep >= [limiar_loop] AND NOT erro) AS loop,
        regexp_extract(fala_cliente, '(?i)(procon|banco central|bacen|advogad|a[cç][aã]o judicial|juizado|processar|processo judicial)', 1) AS termo_jur,
-       regexp_extract(fala_cliente, '(?i)(fraude|golp(e|ista)|cobran[cç]a indevida)', 1) AS termo_fraude
+       regexp_extract(fala_cliente, '(?i)(fraude|golp(e|ista))', 1) AS termo_fraude
 FROM f
 WHERE erro OR juridico OR fraude OR seguranca OR (max_rep >= [limiar_loop] AND NOT erro)
 ORDER BY dia, ticket_id
@@ -101,7 +106,7 @@ WITH c AS (
 )
 SELECT ticket_id,
        SUBSTR(regexp_extract(fala_cliente, '(?i)(.{0,80}(procon|banco central|bacen|advogad|a[cç][aã]o judicial|juizado|processar|processo judicial).{0,80})', 1), 1, 200) AS trecho_jur,
-       SUBSTR(regexp_extract(fala_cliente, '(?i)(.{0,80}(fraude|golp(e|ista)|cobran[cç]a indevida).{0,80})', 1), 1, 200) AS trecho_fraude,
+       SUBSTR(regexp_extract(fala_cliente, '(?i)(.{0,80}(fraude|golp(e|ista)).{0,80})', 1), 1, 200) AS trecho_fraude,
        SUBSTR(regexp_extract(fala_cliente, '(?i)(.{0,80}(vulnerabilidade|divulga[cç][aã]o respons[aá]vel|bug bounty|falha de seguran[cç]a|appsec).{0,80})', 1), 1, 200) AS trecho_seg
 FROM c
 ```
@@ -113,7 +118,7 @@ FROM c
 | `erro_tecnico` | O bot mandou "Tente novamente em alguns segundos… estou com volume alto no momento". |
 | `loop` | A mesma mensagem do bot (40 caracteres ou mais, sem contar "Já estou verificando…") repetida `limiar_loop` vezes ou mais, mesmo que o bot tenha transferido depois. Conversa com a mensagem de erro técnico **não** conta como loop (a mensagem de erro se repete e já tem tema próprio). |
 | `juridico` | O **cliente ameaça explicitamente** acionar Procon, Banco Central/Bacen, advogado, ação/processo judicial, juizado ou "vou processar" **e** não houve atendente humano na conversa. Perguntas neutras (por exemplo "qual o número da ouvidoria", "meu nome consta no Bacen?", "ativar proteções no banco central") **não** contam. Regra definida pela Leticia em 27/10/2026. |
-| `fraude` | O **cliente** disse fraude, golpe/golpista ou cobrança indevida **e** não houve atendente humano. ("Não reconheço a compra" **não** entra: é o fluxo normal de contestação e geraria dezenas de casos por dia.) |
+| `fraude` | O **cliente se diz vítima** de golpe ou fraude (disse fraude/golpe/golpista e usou expressões como "caí num golpe", "fui roubado/enganado/clonado", "invadiram", "não fui eu", "não reconheço", "sem autorização") **e** o bot **não citou nenhum caminho** (contestar, bloquear, cancelar, estornar ou reembolsar) **e** não houve atendente humano. Regra definida pela Leticia em 27/10/2026 (cerca de 1 caso por dia em 20–26/10). "Cobrança indevida" sozinha não entra (é, em sua maioria, disputa de seguro/anuidade) e o cliente que só pergunta ou comenta não conta. "O bot citou um caminho" é busca por palavras: não prova que o caminho funcionou. |
 | `seguranca` | Relato de vulnerabilidade: o cliente fala de vulnerabilidade, divulgação responsável, bug bounty, falha de segurança ou AppSec. Vale mesmo com atendente humano. Referência: ticket 46549474 (o bot mandou o cliente ao "suporte oficial" em círculo). |
 
 Palavras soltas como "processo" (de contratação etc.) **não** contam: só as formas da tabela.
@@ -149,7 +154,7 @@ Datas em `dia`. Cada bloco começa com uma linha em branco, o ícone + nome do t
   - erro técnico: `verificar a disponibilidade da Botmaker e da IA`
   - loop: `revisar o ponto do fluxo em que o bot repete a resposta`
   - jurídico: `avaliar os contatos com prioridade: o cliente citou o termo e não houve atendimento humano`
-  - fraude: `avaliar os contatos: o cliente citou o termo e não houve atendimento humano`
+  - fraude: `avaliar os contatos com prioridade: o cliente se diz vítima e o bot não indicou nenhum caminho (contestar ou bloquear)`
   - segurança: `definir o canal oficial de segurança que o bot deve informar`
 
 O bloco de `erro_tecnico` traz, logo abaixo do nome do tema, a citação da fala do bot: `> Tente novamente em alguns segundos ⏱️, estou com volume alto no momento 🫠` (esses dois emojis fazem parte do texto do bot).
