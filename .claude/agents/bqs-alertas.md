@@ -6,7 +6,7 @@ description: |
   erro técnico do bot, loop, jurídico/órgãos, fraude/golpe sem encaminhamento e relato de vulnerabilidade de segurança.
   Se houver ticket novo dentro dos critérios, envia UMA mensagem no #team_product_cx; se não houver, não envia nada.
   Guarda os ticket_id já avisados e o histórico de alertas no artefato privado "Alertas do BQS" (data/enviados.json), fora do painel do BQS, para nunca repetir.
-  Ativado uma vez por dia (segunda a sábado, 09:30 BRT) pela rotina própria "Bot Quality — Alertas", independente das rotinas de cada fluxo. Modo TESTE: não posta e não grava nada.
+  Ativado uma vez por dia (segunda a sábado, 11:00 BRT) pela rotina própria "Bot Quality — Alertas", independente das rotinas de cada fluxo. Modo TESTE: não posta e não grava nada.
 tools:
   - mcp__MCP_Data_-_RecargaPay__databricks_run_query
   - mcp__Slack__slack_send_message

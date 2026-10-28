@@ -36,11 +36,11 @@ Cada rotina clona este repositório e executa o orquestrador correspondente.
 | Agente de Cartão de Crédito (semanal) | `orch-cartao-hp` | segunda a sábado 10:00 (análise diária; envio na segunda) | `cartao-hp` |
 | Casos Críticos (semanal) | `orch-criticos-semanal` | segunda a sábado 15:00 (análise diária; envio na segunda) | `criticos-semanal` |
 | Aleatório (semanal) | `orch-aleatorio` | segunda a sábado 14:00 (análise diária; envio na segunda) | `aleatorio` |
-| Alertas de casos críticos | `bqs-alertas` (sem orquestrador) | segunda a sábado 09:30 (só avisa se houver ticket novo) | artefato próprio "Alertas do BQS" |
+| Alertas de casos críticos | `bqs-alertas` (sem orquestrador) | segunda a sábado 11:00 (14:00 UTC; só avisa se houver ticket novo) | artefato próprio "Alertas do BQS" |
 
 ## Alertas de casos críticos (`bqs-alertas`)
 
-Uma vez por dia (segunda a sábado, 09:30 BRT), numa **rotina própria** ("Bot Quality — Alertas", independente das rotinas de cada fluxo), o detector varre os últimos 7 dias da transcrição de **todas as conversas do bot** (Cartão, Casos Críticos, Aleatório e qualquer outro fluxo; a transcrição chega com atraso, por isso a janela). Se houver ticket novo em algum dos 5 temas, envia **uma** mensagem em `#team_product_cx`; se não houver, não envia nada. Os `ticket_id` já avisados e o histórico ficam num artefato privado só de alertas (`artifact/alertas.html`, https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM, arquivo `data/enviados.json`), **fora do painel do BQS**, e nunca são repetidos. Palavras de risco só contam quando ditas pelo cliente e quando o bot não encaminhou para humano. Modo `TESTE`: não posta nem grava. Falha do detector vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
+Uma vez por dia (segunda a sábado, 11:00 BRT, 14:00 UTC), numa **rotina própria** ("Bot Quality — Alertas", independente das rotinas de cada fluxo), o detector varre os últimos 7 dias da transcrição de **todas as conversas do bot** (Cartão, Casos Críticos, Aleatório e qualquer outro fluxo; a transcrição chega com atraso, por isso a janela). Se houver ticket novo em algum dos 5 temas, envia **uma** mensagem em `#team_product_cx`; se não houver, não envia nada. Os `ticket_id` já avisados e o histórico ficam num artefato privado só de alertas (`artifact/alertas.html`, https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM, arquivo `data/enviados.json`), **fora do painel do BQS**, e nunca são repetidos. Palavras de risco só contam quando ditas pelo cliente e quando o bot não encaminhou para humano. Modo `TESTE`: não posta nem grava. Falha do detector vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
 
 ## Fluxo de cada rotina
 
