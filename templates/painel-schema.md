@@ -77,7 +77,7 @@ O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` ent
 
 ### Backlog de ações (`data/backlog/<fluxo>.json`)
 
-Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (alimentado pela rotina `criticos-semanal`). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é a Leticia, em conversa; as rotinas nunca o alteram.
+Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (alimentado pela rotina `criticos-semanal`). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é quem pode editar o painel, direto na caixinha de cada tarefa (Não iniciado, Em andamento, Concluído ou Cancelado, com nota opcional): ele fica no banco de dados do próprio artefato (coleção `backlog_status`, um documento por `id` do item, com `status`, `status_em`, `nota`, `por` e `atualizado_em`; escrita só para quem edita) e vale por cima do `status` deste arquivo. As rotinas nunca o alteram nem o leem.
 
 ```
 {

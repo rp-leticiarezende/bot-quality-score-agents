@@ -23,28 +23,28 @@
 @media (prefers-color-scheme:light){
   :root:not([data-theme="dark"]){
     color-scheme:light;
-    --bg:#F1F5F9; --surface:#FFFFFF; --surface-2:#EAF0F6; --line:#D3DDE8; --line-soft:#E3EAF2;
-    --ink:#0B1F33; --ink-2:#3C546B; --muted:#617A91;
-    --brand:#F5A623; --brand-ink:#0A2540; --blue:#1A66CC;
+    --bg:#FFFFFF; --surface:#F0F2F5; --surface-2:#E4E9F0; --line:#E2E8F0; --line-soft:#E9EEF4;
+    --ink:#0A2540; --ink-2:#334155; --muted:#64748B;
+    --brand:#F5A623; --brand-ink:#0A2540; --blue:#1A73E8;
     --good:#0A7A33; --good-bg:rgba(10,122,51,.10);
     --warn:#8A5B00; --warn-bg:rgba(245,166,35,.16);
     --crit:#C0302D; --crit-bg:rgba(192,48,45,.10);
-    --info:#1A66CC; --info-bg:rgba(26,102,204,.10);
+    --info:#1A73E8; --info-bg:rgba(26,115,232,.10);
     --cA:#E0541F; --cB:#C98F00; --cC:#6250D6; --cD:#2A78D6; --cR:#12946A; --cE:#7B8794;
-    --track:#E3EAF2; --gap:#FFFFFF;
+    --track:#E4E9F0; --gap:#F0F2F5;
   }
 }
 :root[data-theme="light"]{
   color-scheme:light;
-  --bg:#F1F5F9; --surface:#FFFFFF; --surface-2:#EAF0F6; --line:#D3DDE8; --line-soft:#E3EAF2;
-  --ink:#0B1F33; --ink-2:#3C546B; --muted:#617A91;
-  --brand:#F5A623; --brand-ink:#0A2540; --blue:#1A66CC;
+  --bg:#FFFFFF; --surface:#F0F2F5; --surface-2:#E4E9F0; --line:#E2E8F0; --line-soft:#E9EEF4;
+  --ink:#0A2540; --ink-2:#334155; --muted:#64748B;
+  --brand:#F5A623; --brand-ink:#0A2540; --blue:#1A73E8;
   --good:#0A7A33; --good-bg:rgba(10,122,51,.10);
   --warn:#8A5B00; --warn-bg:rgba(245,166,35,.16);
   --crit:#C0302D; --crit-bg:rgba(192,48,45,.10);
-  --info:#1A66CC; --info-bg:rgba(26,102,204,.10);
+  --info:#1A73E8; --info-bg:rgba(26,115,232,.10);
   --cA:#E0541F; --cB:#C98F00; --cC:#6250D6; --cD:#2A78D6; --cR:#12946A; --cE:#7B8794;
-  --track:#E3EAF2; --gap:#FFFFFF;
+  --track:#E4E9F0; --gap:#F0F2F5;
 }
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -180,10 +180,29 @@ code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:
   details.opo summary{grid-template-columns:1fr auto}
   .def{grid-template-columns:1fr}
 }
+/* backlog: caixinha de status e nota (só para quem edita o painel) */
+.bkst{font:inherit;font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);cursor:pointer;max-width:100%}
+.bkst.warn{color:var(--warn);background:var(--warn-bg);border-color:transparent}
+.bkst.good{color:var(--good);background:var(--good-bg);border-color:transparent}
+.bkst.info{color:var(--info);background:var(--info-bg);border-color:transparent}
+.bkst:focus-visible,.bknota textarea:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.bknota{display:flex;flex-direction:column;gap:6px;padding-top:12px}
+.bknota label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.bknota textarea{font:inherit;font-size:13px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical;width:100%;min-width:0}
+.bkrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* identidade RecargaPay: cabeçalho azul-marinho com os quatro pontos da marca */
+.brandbar{background:#0A2540;color:#5BA7F5;font-weight:600;padding-block:9px}
+header.top{background:#0A2540;padding-block:4px 20px}
+header.top h1{color:#FFFFFF}
+header.top p{color:#A9C1D8}
+nav.tabs{margin-top:0}
+.dots{display:inline-flex;gap:6px;align-items:center;margin-right:12px;vertical-align:middle}
+.dots i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dots i:nth-child(1){background:#5BA7F5}.dots i:nth-child(2){background:#1A73E8}.dots i:nth-child(3){background:#F5A623}.dots i:nth-child(4){background:#F5C842}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
-<div class="brandbar"><div class="wrap"><span>RecargaPay · Bot Quality Score</span><span id="atualizado"></span></div></div>
+<div class="brandbar"><div class="wrap"><span><span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>RecargaPay · Bot Quality Score</span><span id="atualizado"></span></div></div>
 <header class="top"><div class="wrap">
   <h1>BQS 2.0 · Qualidade do RecargaBot</h1>
   <p>Quanto o bot conduziu bem cada conversa e quantos contatos humanos ele poderia ter evitado. Só conversas do bot; só conteúdo externo da Central de Ajuda.</p>
@@ -196,9 +215,9 @@ code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:
 (function(){
 "use strict";
 var FLUXOS=[
-  {id:"cartao-hp",nome:"Agente de Cartão de Crédito",desc:"Agentes de cartão de crédito com hiperpersonalização (Agente Geral e Agente de Anuidade)",keys:{semanal:"cartao-hp",mensal:"cartao-hp-mensal"}},
-  {id:"aleatorio",nome:"Aleatório",desc:"Amostra aleatória de conversas (filtro do Zendesk)",keys:{semanal:"aleatorio",mensal:"aleatorio-mensal"}},
-  {id:"criticos",nome:"Casos críticos",desc:"Conversas com CSAT 1 e 2",keys:{semanal:"criticos-semanal",mensal:"criticos-mensal"}}
+  {id:"cartao-hp",nome:"Agente de Cartão de Crédito",aba:"Detalhe - Agente CC RP",sobre:"Conversas atendidas pelos agentes de cartão de crédito do RecargaBot no fluxo de hiperpersonalização (HP): o bot responde já com o contexto do cliente carregado (status do cartão, limite, fatura). São dois agentes: o <b>Agente Geral</b>, que cuida da maior parte do fluxo (fatura, limite, bloqueio, contestação, entrega do cartão), e o <b>Agente de Anuidade</b>, que trata das dúvidas e do cancelamento ligados à anuidade. Entram todas as conversas do período que passaram por esse fluxo; o BQS 2.0 mede como o bot conduziu cada uma até resolver, transferir ou o cliente sair.",desc:"Agentes de cartão de crédito com hiperpersonalização (Agente Geral e Agente de Anuidade)",keys:{semanal:"cartao-hp",mensal:"cartao-hp-mensal"}},
+  {id:"aleatorio",nome:"Aleatório",aba:"Detalhe - Amostra Aleatória",sobre:"Amostra aleatória de conversas do bot, de todos os produtos, sorteada por um filtro do Zendesk. Serve para ter uma visão do bot fora dos casos críticos. Quase toda a amostra termina em transbordo pedido pelo cliente, então aqui o BQS 2.0 mede a <b>conduta do bot até o transbordo</b>, e não a qualidade geral do atendimento.",desc:"Amostra aleatória de conversas (filtro do Zendesk)",keys:{semanal:"aleatorio",mensal:"aleatorio-mensal"}},
+  {id:"criticos",nome:"Casos críticos",aba:"Detalhe - Casos Críticos",sobre:"Conversas do bot em que o cliente deu <b>nota 1 ou 2</b> na pesquisa de satisfação (CSAT), de todos os produtos. É onde o bot mais decepcionou na percepção do cliente, por isso o BQS 2.0 costuma ser baixo e o foco é entender o que o bot fez e o que teria evitado a nota ruim.",desc:"Conversas com CSAT 1 e 2",keys:{semanal:"criticos-semanal",mensal:"criticos-mensal"}}
 ];
 var PERS=[["semanal","Semanal"],["mensal","Mensal"]];
 function pers(f){return PERS.filter(function(p){return f.keys[p[0]]})}
@@ -213,7 +232,7 @@ var CLASSES={
 };
 var FRENTES={artigo:"Artigos",variavel_hp:"Variáveis e prompts",prompt:"Variáveis e prompts",fluxo:"Fluxo e regras",politica:"Fluxo e regras",capacidade:"Capacidades novas",handoff:"Handoff"};
 var GRUPOS=["Todos","Artigos","Variáveis e prompts","Fluxo e regras","Capacidades novas","Handoff"];
-var S={data:{},hist:{},bk:{},eventos:[],tab:"visao",per:"semanal",perFluxo:{},filtro:{},metric:"bqs",linhaFluxo:"cartao-hp",linhaPer:"semanal"};
+var S={data:{},hist:{},bk:{},bkDb:{},bkQ:{},bkErro:"",canEdit:false,db:null,meId:null,eventos:[],tab:"visao",per:"semanal",perFluxo:{},filtro:{},metric:"bqs",linhaFluxo:"cartao-hp",linhaPer:"semanal"};
 var $=function(s){return document.querySelector(s)};
 
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -504,7 +523,7 @@ function fluxo(f){
   var per=fluxoPer(f,S.perFluxo[f.id]||"semanal"),d=fluxoDados(f,per),h=pers(f).length>1?perPills(f,per,"fper"):"";
   if(!d){main(h+'<section class="block"><h2>'+esc(f.nome)+'</h2><p class="sub">'+esc(f.desc)+'</p>'+empty("Esta rotina ainda não publicou dados","Quando rodar, esta aba mostra as métricas, os contatos evitáveis e o que mudar.")+'</section>');return}
   var m=g(d,"metricas",{}),c=g(d,"contencao",{}),a=g(d,"auditoria",{});
-  h+='<section class="block"><div class="muted" style="font-size:12px;letter-spacing:.04em;text-transform:uppercase">Detalhe do fluxo</div><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><p class="sub">'+esc(f.desc)+'</p>';
+  h+='<section class="block"><div class="muted" style="font-size:12px;letter-spacing:.04em;text-transform:uppercase">Detalhe do fluxo</div><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><div class="panel"><dl class="pesa-d"><dt>O que é este fluxo</dt><dd>'+f.sobre+'</dd></dl></div>';
   if(g(d,"meta.origem")==="teste")h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> '+esc(g(d,"meta.nota","Dados de validação."))+'</div></div>';
   h+='<div class="kpis">'+
     kpi("BQS 2.0",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f,per),d))+
@@ -601,23 +620,43 @@ function opo(o){
 
 /* ---------- backlog ---------- */
 var BK_FLUXOS=[["cartao-hp","Agente de Cartão de Crédito"],["aleatorio","Aleatório"],["criticos","Casos críticos"]];
-var BK_STATUS={aberta:["Aberta","warn"],em_andamento:["Em andamento","info"],concluida:["Concluída","good"],cancelada:["Cancelada",""]};
+var BK_STATUS={aberta:["Não iniciado","warn"],em_andamento:["Em andamento","info"],concluida:["Concluído","good"],cancelada:["Cancelado",""]};
+var BK_ORDEM=["aberta","em_andamento","concluida","cancelada"];
+function hoje(){return new Date(Date.now()-3*3600000).toISOString().slice(0,10)}
 function dataBr(s){return s?String(s).slice(8,10)+"/"+String(s).slice(5,7)+"/"+String(s).slice(0,4):"—"}
-function bkItens(){
+function bkBase(){
   var l=[];
   BK_FLUXOS.forEach(function(f){arr(S.bk[f[0]]).forEach(function(it){l.push(it)})});
   return l;
 }
+/* o status escolhido na página (db, coleção backlog_status) vale por cima do que vem no arquivo da rotina */
+function bkEf(it){
+  var o=S.bkDb[it.id];
+  if(!o||!BK_STATUS[o.status])return it;
+  var c={};for(var k in it)c[k]=it[k];
+  c.status=o.status;c.status_em=o.status_em||it.status_em;c.nota=o.nota!=null?o.nota:it.nota;
+  var rep=[];
+  if(c.status==="concluida"||c.status==="cancelada")arr(it.ocorrencias).forEach(function(x){var d=x&&x.fim;if(d&&c.status_em&&String(d)>String(c.status_em)&&rep.indexOf(d)<0)rep.push(d)});
+  c.reapareceu_em=rep;
+  return c;
+}
+function bkItens(){return bkBase().map(bkEf)}
+function bkSelect(it){
+  var st=BK_STATUS[it.status]||BK_STATUS.aberta;
+  return '<span data-bkctl><select class="bkst '+st[1]+'" data-bkid="'+esc(it.id)+'" aria-label="Status de '+esc(it.id)+'">'+BK_ORDEM.map(function(k){return '<option value="'+k+'"'+(k===it.status?' selected':'')+'>'+BK_STATUS[k][0]+'</option>'}).join("")+'</select></span>';
+}
 function bkItem(it){
   var st=BK_STATUS[it.status]||BK_STATUS.aberta,oc=arr(it.ocorrencias),ult=oc[oc.length-1]||{};
   var fl=BK_FLUXOS.filter(function(f){return f[0]===it.fluxo})[0];
-  var h='<details class="opo"><summary>'+prioChip(it.prioridade)+'<div><div class="ttl">'+esc(it.id?it.id+" · ":"")+esc(it.titulo)+'</div><div class="meta">'+chip(st[0],st[1])+'<span class="chip">'+esc(fl?fl[1]:it.fluxo)+'</span><span class="chip">'+esc(FR_ROTULO[it.frente]||it.frente||"Ajuste")+'</span><span class="chip">'+esc(it.dono||"—")+'</span>'+
+  var pode=!!(S.canEdit&&S.db&&it.id);
+  var h='<details class="opo" data-id="'+esc(it.id||"")+'"><summary>'+prioChip(it.prioridade)+'<div><div class="ttl">'+esc(it.id?it.id+" · ":"")+esc(it.titulo)+'</div><div class="meta">'+(pode?bkSelect(it):chip(st[0],st[1]))+'<span class="chip">'+esc(fl?fl[1]:it.fluxo)+'</span><span class="chip">'+esc(FR_ROTULO[it.frente]||it.frente||"Ajuste")+'</span><span class="chip">'+esc(it.dono||"—")+'</span>'+
     '<span class="chip">'+oc.length+(oc.length===1?' ocorrência':' ocorrências')+'</span><span class="chip muted">1ª vez '+esc(dataBr(it.criada_em))+' · última '+esc(dataBr(it.ultima_vez))+'</span>'+
     (arr(it.reapareceu_em).length?'<span class="chip crit">Reapareceu depois de '+(it.status==="cancelada"?"cancelada":"concluída")+'</span>':'')+
     (it.origem==="teste"?'<span class="chip info">rodada de teste</span>':'')+'</div></div><span class="mono" style="text-align:right;white-space:nowrap">'+(num(ult.contatos_estimados)?'≈ '+int(ult.contatos_estimados)+'<br><span class="muted" style="font-size:11px">contatos na última</span>':'')+'</span></summary><div class="body">';
-  if(it.status==="concluida"||it.status==="cancelada"||it.status==="em_andamento"){
-    h+='<div class="banner '+(it.status==="concluida"?"info":"")+'"><span class="dot '+(it.status==="concluida"?"good":"info")+'"></span><div><b>'+esc(st[0])+(it.status_em?' em '+esc(dataBr(it.status_em)):'')+'.</b> '+esc(it.nota||"Sem nota.")+(arr(it.reapareceu_em).length?' <b>Voltou a aparecer em '+arr(it.reapareceu_em).map(dataBr).join(", ")+'.</b>':(it.status==="concluida"?' Sem reaparecer nas rodadas seguintes até agora.':''))+'</div></div>';
+  if(it.status!=="aberta"||it.nota){
+    h+='<div class="banner '+(it.status==="concluida"?"info":"")+'"><span class="dot '+(it.status==="concluida"?"good":"info")+'"></span><div><b>'+esc(st[0])+(it.status!=="aberta"&&it.status_em?' em '+esc(dataBr(it.status_em)):'')+'.</b> '+esc(it.nota?(/[.!?…]$/.test(String(it.nota).trim())?String(it.nota).trim():String(it.nota).trim()+"."):"Sem nota.")+(arr(it.reapareceu_em).length?' <b>Voltou a aparecer em '+arr(it.reapareceu_em).map(dataBr).join(", ")+'.</b>':(it.status==="concluida"?' Sem reaparecer nas rodadas seguintes até agora.':''))+'</div></div>';
   }
+  if(pode)h+='<div class="bknota"><label for="nt-'+esc(it.id)+'">Nota (opcional)</label><textarea id="nt-'+esc(it.id)+'" data-bknota="'+esc(it.id)+'" rows="2" maxlength="500" placeholder="Ex.: ajuste publicado em 30/10">'+esc(it.nota||"")+'</textarea><div class="bkrow"><button type="button" class="pill" data-bksave="'+esc(it.id)+'">Salvar nota</button><span class="muted" style="font-size:12px">O status e a nota só podem ser alterados por quem edita o painel.</span></div></div>';
   if(it.antes||it.depois)h+='<div class="ba"><div class="antes"><b>Hoje</b>'+esc(it.antes||"—")+'</div><div class="depois"><b>Deveria ser</b>'+esc(it.depois||"—")+'</div></div>';
   h+='<dl>';
   if(it.problema)h+='<dt>O que acontece</dt><dd>'+esc(it.problema)+'</dd>';
@@ -630,13 +669,15 @@ function bkItem(it){
   return h+'</div></details>';
 }
 function abaBacklog(){
+  var abertos={};Array.prototype.forEach.call(document.querySelectorAll("details.opo[open][data-id]"),function(d){abertos[d.getAttribute("data-id")]=1});
   var todos=bkItens(),f=S.bkF||{fluxo:"todos",status:"abertas"};
   var cont={aberta:0,em_andamento:0,concluida:0,cancelada:0};
   todos.forEach(function(it){cont[it.status]=(cont[it.status]||0)+1});
-  var h='<section class="block"><h2>Backlog de ações</h2><p class="sub">Tudo o que as rotinas já levantaram, em ordem de última aparição. O que é novo entra sozinho a cada rodada; quando o mesmo problema reaparece, ele ganha uma ocorrência em vez de virar item novo. O status (aberta, em andamento, concluída ou cancelada) é atualizado a pedido, com data e nota. Se um item concluído ou cancelado voltar a aparecer, o painel avisa.</p>';
-  h+='<div class="kpis">'+kpi("Abertas",int(cont.aberta),"aguardando ajuste")+kpi("Em andamento",int(cont.em_andamento),"em análise ou ajuste")+kpi("Concluídas",int(cont.concluida),"ajuste publicado")+kpi("Canceladas",int(cont.cancelada),"não serão feitas")+'</div>';
+  var h='<section class="block"><h2>Backlog de ações</h2><p class="sub">Tudo o que as rotinas já levantaram, em ordem de última aparição. O que é novo entra sozinho a cada rodada; quando o mesmo problema reaparece, ele ganha uma ocorrência em vez de virar item novo. O status (Não iniciado, Em andamento, Concluído ou Cancelado) é alterado aqui mesmo, na caixinha de cada tarefa, por quem pode editar o painel, com data automática e nota opcional; ao mudar, a tarefa passa sozinha para a subárea correspondente. Se um item concluído ou cancelado voltar a aparecer, o painel avisa.</p>';
+  if(S.bkErro)h+='<div class="banner warn" role="alert"><span class="dot warn"></span><div>'+esc(S.bkErro)+'</div></div>';
+  h+='<div class="kpis">'+kpi("Não iniciadas",int(cont.aberta),"aguardando ajuste")+kpi("Em andamento",int(cont.em_andamento),"em análise ou ajuste")+kpi("Concluídas",int(cont.concluida),"ajuste publicado")+kpi("Canceladas",int(cont.cancelada),"não serão feitas")+'</div>';
   h+='<div class="pills" role="group" aria-label="Fluxo">'+[["todos","Todos os fluxos"]].concat(BK_FLUXOS).map(function(x){return '<button class="pill" data-bkf="'+x[0]+'" aria-pressed="'+(f.fluxo===x[0])+'">'+esc(x[1])+'</button>'}).join("")+'</div>';
-  h+='<div class="pills" role="group" aria-label="Status">'+[["abertas","Em aberto"],["aberta","Abertas"],["em_andamento","Em andamento"],["concluida","Concluídas"],["cancelada","Canceladas"],["todas","Todas"]].map(function(x){return '<button class="pill" data-bks="'+x[0]+'" aria-pressed="'+(f.status===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>';
+  h+='<div class="pills" role="group" aria-label="Status">'+[["abertas","Em aberto"],["aberta","Não iniciadas"],["em_andamento","Em andamento"],["concluida","Concluídas"],["cancelada","Canceladas"],["todas","Todas"]].map(function(x){return '<button class="pill" data-bks="'+x[0]+'" aria-pressed="'+(f.status===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>';
   var ra={alta:0,media:1,baixa:2};
   var lista=todos.filter(function(it){
     if(f.fluxo!=="todos"&&it.fluxo!==f.fluxo)return false;
@@ -646,6 +687,7 @@ function abaBacklog(){
   }).sort(function(a,b){return (a.ultima_vez<b.ultima_vez?1:a.ultima_vez>b.ultima_vez?-1:0)||((ra[a.prioridade]==null?3:ra[a.prioridade])-(ra[b.prioridade]==null?3:ra[b.prioridade]))||(String(a.id)<String(b.id)?-1:1)});
   h+=lista.length?'<div class="opos">'+lista.map(bkItem).join("")+'</div>':empty("Nenhum item neste filtro","Troque o fluxo ou o status para ver os demais.");
   main(h+'</section>');
+  Array.prototype.forEach.call(document.querySelectorAll("details.opo[data-id]"),function(d){if(abertos[d.getAttribute("data-id")])d.open=true});
 }
 
 /* ---------- como ler ---------- */
@@ -654,7 +696,8 @@ function comoLer(){
   '<dt>BQS 2.0</dt><dd>É o resultado final da qualidade do atendimento do bot, igual em todos os fluxos. Uma conversa conta como boa quando passa em duas verificações. <b>1. Conduta:</b> a nota geral (resolução 30%, eficiência 20%, transbordo 20%, entendimento 15%, clareza 10%, tom 5%) é 7 ou mais e resolução e transbordo ficam acima de 2; conversas "regular" reprovam. <b>2. Desfecho:</b> resolvida pelo bot; transferida porque o cliente pediu (fluxo esperado, desde que bem conduzida); ou abandonada depois de uma resposta boa (resolução 7 ou mais), porque o cliente pode sair satisfeito. Loop e transbordo que o cliente não pediu reprovam e são sinalizados para análise. O BQS 2.0 é <b>calibrado por auditoria</b>: a cada rodada o auditor lê a transcrição de uma amostra aleatória das conversas aprovadas, e a parcela de aprovações que não se sustenta é descontada do número. Nos tickets auditados vale a nota revisada. O BQS 2.0 é sempre um número só, igual em todos os fluxos. O histórico do BQS 2.0 começa em 20/10/2026.</dd>'+
   '<dt>Recontato em 24h</dt><dd>Percentual de conversas cujo cliente voltou a falar com o atendimento em até 24 horas. É um indicador de acompanhamento e não entra no BQS 2.0.</dd>'+
   '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 2.0 e vão para análise humana, porque podem ser erro do bot: o sinal é automático e só a leitura da conversa por uma pessoa confirma a falha.</dd>'+
-  '<dt>Abas "Detalhe"</dt><dd>Cada aba que começa com "Detalhe ·" mostra um fluxo por inteiro: os números, os contatos evitáveis, o que mudar e a qualidade por agente e por tema. A Visão geral resume todos os fluxos; a aba do fluxo aprofunda.</dd>'+
+  '<dt>Abas "Detalhe"</dt><dd>Cada aba que começa com "Detalhe -" mostra um fluxo por inteiro: os números, os contatos evitáveis, o que mudar e a qualidade por agente e por tema. A Visão geral resume todos os fluxos; a aba do fluxo aprofunda.</dd>'+
+  '<dt>Backlog</dt><dd>Lista de tudo o que as rotinas levantaram para ajustar. Quem pode editar o painel muda o status de cada tarefa na caixinha ao lado dela (Não iniciado, Em andamento, Concluído ou Cancelado) e pode deixar uma nota; a tarefa passa sozinha para a subárea correspondente. As rotinas só acrescentam itens e ocorrências, nunca mudam o status.</dd>'+
   '<dt>Contatos sem artigo</dt><dd>Conversas que abriram o chat sem passar por um artigo da Central (tag <code>chat-default-instead-form</code>): portas do app ou MCTs ainda não mapeados. Lista para análise manual, fora da conta do BQS 2.0.</dd>'+
   '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS 2.0 (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
   '<dt>TFC</dt><dd>Taxa de falha de condução: conversas em loop, em transbordo que o cliente não pediu ou em abandono depois de uma resposta fraca (resolução abaixo de 7). Abandonar não é falha, e pedir atendente também não: o cliente pode sair ou chamar um humano a qualquer momento. Só conta quando o bot errou.</dd>'+
@@ -664,14 +707,14 @@ function comoLer(){
   '<dt>Cobertura</dt><dd>Quando há poucos dias com dados, a semana é uma amostra reduzida. O painel avisa e não calcula variação sem período anterior.</dd>'+
   '<dt>Escopo</dt><dd>Só conversas do bot, até a primeira fala de um atendente. Só artigos públicos da Central de Ajuda: o que começa com cadeado ou lupa é interno e o bot não consulta.</dd>'+
   '<dt>Limiares</dt><dd>BQS 2.0 abaixo de 60% é crítico e 80% ou mais é saudável. Os limiares de TFC e de pedido de atendente são provisórios até haver 4 períodos de série.</dd>'+
-  '<dt>Atualização</dt><dd>As rotinas semanais rodam às segundas (Agente de Cartão de Crédito 10h, Aleatório 14h, Casos críticos 15h) e a rotina diária de críticos às 9h40. Cada rodada atualiza a sua parte do painel.</dd>'+
+  '<dt>Atualização</dt><dd>As rotinas rodam de segunda a sábado (Agente de Cartão de Crédito 10h, Aleatório 14h, Casos críticos 15h). De terça a sábado analisam o dia anterior e guardam o resultado; na segunda consolidam a semana e atualizam os números do painel. Os alertas de casos críticos vão para o Slack, não para o painel.</dd>'+
   '</dl></div></section>');
 }
 
 /* ---------- navegação ---------- */
 function main(h){$("#main").innerHTML=h}
 function tabs(){
-  var t=[{id:"visao",n:"Visão geral"},{id:"backlog",n:"Backlog"},{id:"linha",n:"Linha do tempo"},{id:"semartigo",n:"Contatos sem artigo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:"Detalhe · "+f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
+  var t=[{id:"visao",n:"Visão geral"},{id:"backlog",n:"Backlog"},{id:"linha",n:"Linha do tempo"},{id:"semartigo",n:"Contatos sem artigo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.aba||f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
   $("#tabs").innerHTML=t.map(function(x){return '<button role="tab" data-tab="'+x.id+'" aria-selected="'+(S.tab===x.id)+'">'+esc(x.n)+'</button>'}).join("");
 }
 function render(){
@@ -705,6 +748,59 @@ document.addEventListener("pointermove",function(e){
   tip.style.left=Math.max(8,x)+"px";tip.style.top=y+"px";
 });
 document.addEventListener("pointerleave",function(){tip.hidden=true});
+
+/* ---------- backlog: status editável (db, coleção backlog_status) ---------- */
+function bkRender(){
+  var a=document.activeElement;
+  if(a&&a.tagName==="TEXTAREA"&&a.hasAttribute("data-bknota")){S.bkPend=true;return}
+  S.bkPend=false;render();
+}
+function bkSalvar(id,patch){
+  if(!S.db||!S.canEdit||!id)return;
+  var base=bkBase().filter(function(x){return x.id===id})[0];if(!base)return;
+  var cur=bkEf(base),novo=patch.status||cur.status;
+  var doc={status:novo,status_em:novo!==cur.status?hoje():(cur.status_em||hoje()),nota:patch.nota!=null?String(patch.nota).slice(0,500):(cur.nota||""),fluxo:base.fluxo||"",por:S.meId||null,atualizado_em:new Date().toISOString()};
+  var antes=S.bkDb[id];S.bkErro="";
+  S.bkDb[id]=doc;bkRender();
+  S.bkQ[id]=(S.bkQ[id]||Promise.resolve()).then(function(){return S.db.doc("backlog_status/"+id).set(doc)}).catch(function(e){
+    if(antes)S.bkDb[id]=antes;else delete S.bkDb[id];
+    S.bkErro="Não foi possível salvar o status de "+id+(e&&e.code==="invalid_argument"?": você não tem permissão de edição neste painel.":". Tente de novo em instantes.");
+    bkRender();
+  });
+}
+document.addEventListener("click",function(e){
+  var t=e.target;if(!t||!t.closest)return;
+  var b=t.closest("[data-bksave]");
+  if(b){var id=b.getAttribute("data-bksave"),ta=document.getElementById("nt-"+id);if(ta)bkSalvar(id,{nota:ta.value});return}
+  if(t.closest("[data-bkctl]")&&t.closest("summary"))e.preventDefault();
+},true);
+document.addEventListener("change",function(e){
+  var el=e.target;
+  if(el&&el.matches&&el.matches("select[data-bkid]"))bkSalvar(el.getAttribute("data-bkid"),{status:el.value});
+});
+document.addEventListener("focusout",function(){
+  if(!S.bkPend)return;
+  setTimeout(function(){var a=document.activeElement;if(!(a&&a.tagName==="TEXTAREA"))bkRender()},0);
+});
+function bkDbInit(){
+  if(!window.claude||typeof window.claude.use!=="function")return;
+  Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(r){
+    var db=r[0],user=r[1];
+    if(user){
+      user.canEdit().then(function(v){S.canEdit=!!v;if(S.tab==="backlog")bkRender()});
+      user.id().then(function(i){S.meId=i});
+    }
+    if(!db)return;
+    S.db=db;
+    db.collection("backlog_status").onSnapshot(function(snap){
+      var m={};snap.docs.forEach(function(d){var x=d.data();if(x)m[d.id]=x});
+      S.bkDb=m;
+      if(S.tab==="backlog")bkRender();
+    },function(){});
+    if(S.tab==="backlog")bkRender();
+  }).catch(function(){});
+}
+bkDbInit();
 
 /* ---------- boot ---------- */
 var chaves=["cartao-hp","cartao-hp-mensal","aleatorio","aleatorio-mensal","criticos-semanal","criticos-mensal"];
