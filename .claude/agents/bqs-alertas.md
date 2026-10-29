@@ -132,6 +132,31 @@ Palavras soltas como "processo" (de contratação etc.) **não** contam: só as 
 3. `erro_tecnico` e `loop` não precisam de confirmação (são mensagens do bot).
 4. Se nada restar, vá ao Passo 6 sem enviar nada.
 
+## PASSO 3B — ONDE (só `erro_tecnico`, só se houver ticket novo desse tema)
+
+Para dizer **em quais fluxos** o erro aconteceu, cruze os tickets novos de `erro_tecnico` com o **stage** do Botmaker (`prod.cx.fat_botmaker_metrics.stage`, a última etapa do fluxo na sessão; a chave é `id_ticket`) e, para os que ainda não têm stage, com o **motivo de contato** do Zendesk (tag `knowledge-base-reason` em `prod.cx.fat_zendesk_tickets`, que chega no mesmo dia). Rode **uma consulta por lote de até 500 tickets** (some as contagens dos lotes). Troque `[lista]` pelos `ticket_id` entre aspas e simples, separados por vírgula, e `[dia_min]` e `[dia_max]` pelo menor e pelo maior `dia` desses tickets:
+
+```sql
+WITH ids AS (SELECT explode(array([lista])) AS ticket_id),
+m AS (
+  SELECT id_ticket, stage FROM prod.cx.fat_botmaker_metrics
+  WHERE creation_date >= DATE '[dia_min]' - INTERVAL 1 DAY AND creation_date <= DATE '[dia_max]' + INTERVAL 1 DAY
+    AND id_ticket IN (SELECT ticket_id FROM ids) AND stage IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY creation_ts DESC) = 1
+), z AS (
+  SELECT CAST(id_ticket AS STRING) AS id_ticket,
+         NULLIF(REGEXP_EXTRACT(CAST(tags AS STRING), 'knowledge-base-reason:([^,"\\] ]+)', 1), '') AS motivo
+  FROM prod.cx.fat_zendesk_tickets
+  WHERE created_at_br >= TIMESTAMP '[dia_min]' - INTERVAL 1 DAY AND created_at_br < TIMESTAMP '[dia_max]' + INTERVAL 2 DAYS
+    AND CAST(id_ticket AS STRING) IN (SELECT ticket_id FROM ids)
+)
+SELECT m.stage, CASE WHEN m.stage IS NULL THEN z.motivo END AS motivo_sem_stage, COUNT(*) AS n
+FROM ids i LEFT JOIN m ON m.id_ticket = i.ticket_id LEFT JOIN z ON z.id_ticket = i.ticket_id
+GROUP BY 1, 2 ORDER BY n DESC
+```
+
+Com o resultado: **Onde** = as linhas com `stage` (agrupe por stage já limpo); **Sem stage** = soma das linhas com `stage` nulo, com os motivos mais comuns. Não devolva `ticket_id` por stage; só contagens. Se a consulta falhar **mesmo depois de uma nova tentativa**, não derrube o alerta: envie a mensagem **sem** as linhas `Onde` e `Sem stage` e registre `onde: indisponivel` na resposta (Passo 6). Limites: o stage é a **última** etapa da sessão, que pode diferir do ponto exato do erro, e a tabela de métricas costuma carregar com 3 dias de atraso (por isso a linha `Sem stage`).
+
 ## PASSO 4 — MENSAGEM (uma só, só com os temas que tiveram ticket novo)
 
 Formato aprovado pela Leticia e pela Nats em 27/10/2026. Ordem dos blocos por urgência: 🔒 segurança, ⚖️ jurídico, 🛡️ fraude, 🚨 erro técnico, 🔁 loop. Markdown do Slack: `**negrito**`, `_itálico_`, `>` literal para citação (nunca `&gt;`), links `[#id](url)`. Sem outros emojis, sem nomes, sem dados pessoais.
@@ -143,7 +168,7 @@ Cabeçalho:
 _Análise das conversas do bot de DD/MM_            (ou "de DD/MM a DD/MM" se os tickets do alerta vierem de mais de um dia)
 ```
 
-Datas em `dia`. **Cada bloco tem sempre a mesma estrutura** (é o formato elogiado pela Nats; não mude a ordem, os rótulos nem os nomes): (1) uma linha em branco; (2) ícone + nome do tema em negrito, com **o nome exato** da lista abaixo; (3) só no erro técnico, a citação da fala do bot na linha seguinte; (4) **uma linha em branco**; (5) os campos, um por linha, nesta ordem: Volume, Quando, Possível causa, Termos citados, Exemplos, Sugestão (omita os que não se aplicam ao tema, sem deixar linha vazia no lugar).
+Datas em `dia`. **Cada bloco tem sempre a mesma estrutura** (é o formato elogiado pela Nats; não mude a ordem, os rótulos nem os nomes): (1) uma linha em branco; (2) ícone + nome do tema em negrito, com **o nome exato** da lista abaixo; (3) só no erro técnico, a citação da fala do bot na linha seguinte; (4) **uma linha em branco**; (5) os campos, um por linha, nesta ordem: Volume, Quando, Onde, Sem stage, Possível causa, Termos citados, Exemplos, Sugestão (omita os que não se aplicam ao tema, sem deixar linha vazia no lugar).
 
 Nomes exatos dos temas:
 - `seguranca`: `🔒 **Relato de vulnerabilidade de segurança**`
@@ -154,6 +179,8 @@ Nomes exatos dos temas:
 
 - **Volume:** `N conversas` (só tickets novos). Em `erro_tecnico`, acrescente `(normal: cerca de X por dia)`. **Só no tema `erro_tecnico`** (nos outros temas, só `N conversas`): se o **dia de maior volume** tiver 10 tickets novos ou mais **e M for diferente de N**, acrescente também `; em DD/MM: M conversas, P% das conversas do bot do dia` (por exemplo `Volume: 417 conversas (normal: cerca de 2 por dia); em 26/10: 391 conversas, 17% das conversas do bot do dia`). Para o normal, conte as conversas com `erro` nos 14 dias **antes** de `dia_ini` (mesma lógica de `erro`, por `date_created_at`) e divida por 14; se for menor que 1, escreva "menos de 1 por dia"; senão, arredonde. Para P%, conte as conversas do bot (`RLIKE ') RecargaBot:'`) daquele dia e divida; arredonde para inteiro.
 - **Quando:** só em `erro_tecnico`, e só se o **dia de maior volume** tiver **10 tickets novos ou mais**. Use só os tickets desse dia e o campo `hora` (já em Brasília): ache o menor intervalo de horas seguidas que concentra pelo menos 80% deles e escreva `N de M em DD/MM, entre Hh e Hh (horário de Brasília)`, onde o segundo `Hh` é a hora final + 1.
+- **Onde:** só em `erro_tecnico`, a partir da **Consulta 3** (Passo 3B). Mostre os 5 stages com mais conversas, em ordem decrescente, no formato `Stage (N), Stage (N)…`, e acrescente `e mais K fluxos (M conversas)` se houver outros. Nome do stage, em qualquer posição do texto: tire ` - fluxo generativo`, troque ` - hiperpersonalização` por ` (HP)` e ` - fluxo estático` por ` (estático)`, e ponha a primeira letra em maiúscula (`pix - fluxo generativo` vira `Pix`). Stages diferentes continuam separados, mesmo que o nome limpo fique parecido. Em empate de contagem, desempate pelo nome, em ordem alfabética. Se nenhum ticket tiver stage, omita a linha.
+- **Sem stage:** só em `erro_tecnico`, e só se houver conversas sem stage: `N conversas (stage ainda não carregado)`, onde N inclui também as que não têm nem motivo, e, se houver, `; motivo de contato: nome (n), nome (n), nome (n)` com os 3 motivos mais comuns (desempate pelo nome; troque hífens por espaços; `chat-default-instead-form` escreva `chat default`). O stage da tabela de métricas costuma chegar com atraso de dias; o motivo de contato (tag do Zendesk) chega no mesmo dia.
 - **Possível causa:** só em `erro_tecnico`: `falha na Botmaker ou na IA (não confirmada)`.
 - **Termos citados:** em `juridico` e `fraude`: as palavras-chave com a contagem (`termo_jur`/`termo_fraude`, o primeiro termo de cada ticket), por exemplo `Procon (2), advogado (1)`. Em `seguranca`, escreva `relato de vulnerabilidade de segurança`.
 - **Exemplos:** até 3 tickets, os do dia mais recente e, no empate, os de maior `ticket_id`, no formato `[#46664913](https://recargapay.zendesk.com/agent/tickets/46664913)`, separados por vírgula.
@@ -174,6 +201,8 @@ Exemplo de bloco completo (erro técnico):
 
 **Volume:** 417 conversas (normal: cerca de 2 por dia); em 26/10: 391 conversas, 17% das conversas do bot do dia
 **Quando:** 323 de 391 em 26/10, entre 8h e 18h (horário de Brasília)
+**Onde:** Pix (57), Seguro pix e cc (57), Cartão de crédito (HP) (37), Empréstimo (37), Investimentos (28) e mais 7 fluxos (81 conversas)
+**Sem stage:** 70 conversas (stage ainda não carregado); motivo de contato: chat default (31), pix (9), cartao recargapay (7)
 **Possível causa:** falha na Botmaker ou na IA (não confirmada)
 **Exemplos:** [#46664913](https://recargapay.zendesk.com/agent/tickets/46664913), [#46665082](https://recargapay.zendesk.com/agent/tickets/46665082), [#46665428](https://recargapay.zendesk.com/agent/tickets/46665428)
 **Sugestão:** verificar a disponibilidade da Botmaker e da IA
@@ -209,6 +238,7 @@ ALERTAS: [ENVIADO | NADA_A_AVISAR | TESTE | FALHA]
 janela: AAAA-MM-DD a AAAA-MM-DD | conversas do bot varridas: N
 novos por tema: seguranca=N, juridico=N, fraude=N, erro_tecnico=N, loop=N
 descartados na confirmação: N
+onde (erro técnico): [ok | indisponivel | sem_ticket_novo]
 message_ts: <ts ou "-">
 tickets: <tema>: id, id, ...   (todos os avisados)
 mensagem: <texto completo da mensagem, só em TESTE>
