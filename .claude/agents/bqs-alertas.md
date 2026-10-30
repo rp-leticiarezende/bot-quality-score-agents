@@ -34,6 +34,7 @@ A rotina envia:
 - `modo`: `ENVIO` (posta no Slack e grava o controle) ou `TESTE` (**não posta e não grava nada**: devolve o texto da mensagem e a lista de tickets).
 - `ref`: data de referência (`AAAA-MM-DD`, o "hoje" em BRT). Janela de varredura: `dia_ini = ref − 7 dias`, `dia_fim_excl = ref` (o dia de hoje fica de fora, por estar incompleto).
 - `canal_id`: canal do alerta. Padrão `C0A0L3WQSMV` (`#team_product_cx`).
+- `limiar_erro`: padrão **20**. O erro técnico só entra na mensagem se houver **mais de 20** tickets novos (21 ou mais); com 20 ou menos, não é reportado (os tickets ficam registrados como `abaixo_do_limiar`).
 - `limiar_loop`: padrão **5** (a mesma mensagem do bot repetida 5 vezes ou mais). Com 3 seriam cerca de 150 conversas por dia; com 4, cerca de 58; com 5, cerca de 27; com 6, cerca de 17 (medido em 20–26/10/2026). Quem define o valor é a Leticia.
 
 A janela de 7 dias existe porque a transcrição chega com atraso de dias: uma conversa de ontem pode só ser lida hoje. O controle de enviados evita avisar duas vezes.
@@ -125,12 +126,17 @@ Palavras soltas como "processo" (de contratação etc.) **não** contam: só as 
 
 ## PASSO 3 — FILTRAR
 
-1. Descarte tickets que já estão em `tickets` do controle **para aquele tema**. Um ticket pode ser avisado de novo em outro tema.
+1. **Dedupe: um ticket nunca é avisado duas vezes (regra definida pela Leticia em 30/10/2026).**
+   - Descarte todo ticket que já esteja em `tickets` do controle, **em qualquer tema e com qualquer `avisado_em`** (uma data, `"historico"` ou `"abaixo_do_limiar"`). Um ticket já avisado em `loop` não volta em `juridico`, e vice-versa.
+   - Faça essa diferença de conjuntos **por código** (Python ou Bash, com o JSON do controle e os ids do resultado da consulta), nunca "de olho". Registre quantos tickets foram descartados por já estarem no controle (`duplicados_descartados` no Passo 6).
+   - **Cada ticket aparece em um único bloco da mensagem.** Se o mesmo ticket cair em mais de um tema nesta execução, deixe-o só no tema mais urgente (ordem: segurança, jurídico, fraude, erro técnico, loop) e conte-o só ali; os outros temas dele vão para `temas_extra` no controle (Passo 5), sem aviso.
+   - **Ordem das regras:** (1) dedupe contra o controle; (2) confirmação pelo trecho (item 2); (3) atribuição ao tema mais urgente, **só entre os temas em que o ticket foi confirmado** (um ticket recusado em jurídico segue como erro técnico ou loop, se for o caso); (4) limiar do erro técnico, contando só os tickets que ficaram em `erro_tecnico`.
    **Primeira execução (`tickets` vazio no controle):** só os tickets com `dia` igual a `ref − 1 dia` entram na mensagem. Os de dias anteriores da janela são histórico: **não os avise**, mas registre todos no controle (Passo 5) com `avisado_em: "historico"`, para não aparecerem como novos no dia seguinte.
-2. **Confirme só os tickets que vão entrar na mensagem** (não os `historico`). **Em `juridico`, mantenha só a ameaça explícita:** o cliente diz que vai acionar/denunciar/processar (Procon, Banco Central, advogado, justiça), ou informa que já acionou. Descarte pergunta neutra, informação ("meu nome consta no Bacen?"), pedido de contato de órgão e menção a advogado/processo dentro da descrição de um golpe. Em dúvida entre ameaça e pergunta neutra, **descarte**.
+2. **Confirme só os tickets que vão entrar na mensagem** (não os `historico`). Os tickets descartados na confirmação **não são gravados no controle**: são reavaliados nas execuções seguintes de propósito (a conversa pode mudar), sem nunca serem avisados enquanto não forem confirmados. **Em `juridico`, mantenha só a ameaça explícita:** o cliente diz que vai acionar/denunciar/processar (Procon, Banco Central, advogado, justiça), ou informa que já acionou. Descarte pergunta neutra, informação ("meu nome consta no Bacen?"), pedido de contato de órgão e menção a advogado/processo dentro da descrição de um golpe. Em dúvida entre ameaça e pergunta neutra, **descarte**.
    **Confirme `juridico`, `fraude` e `seguranca` pelo trecho** (Consulta 2: `trecho_jur`, `trecho_fraude`, `trecho_seg`): descarte o ticket quando o contexto mostrar que não é o caso (por exemplo "não foi golpe, foi engano meu", "vulnerabilidade" no sentido de fragilidade financeira do cliente, "processar a conta/o pagamento", ou o termo dito sobre outro assunto). Em dúvida, **mantenha**. Não copie o trecho para lugar nenhum.
 3. `erro_tecnico` e `loop` não precisam de confirmação (são mensagens do bot).
-4. Se nada restar, vá ao Passo 6 sem enviar nada.
+   **Limiar do erro técnico (regra definida pela Leticia em 30/10/2026):** só avise `erro_tecnico` se, depois do dedupe do item 1, restarem **mais de `limiar_erro` tickets** (padrão 20; ou seja, 21 ou mais). Com `limiar_erro` ou menos, **não inclua o bloco de erro técnico e não rode o Passo 3B**; registre todos esses tickets no controle com `avisado_em: "abaixo_do_limiar"` (e `tema: "erro_tecnico"`), para que não reapareçam depois nem se somem aos de outros dias. Isso também absorve os tickets que chegam atrasados de um dia de incidente que já foi avisado. Informe `erro_tecnico abaixo do limiar: N` no Passo 6.
+4. Se nada restar, vá ao Passo 6 sem enviar nada (mas ainda grave no controle os tickets `abaixo_do_limiar` e `historico`, Passo 5).
 
 ## PASSO 3B — ONDE (só `erro_tecnico`, só se houver ticket novo desse tema)
 
@@ -223,8 +229,9 @@ Sem link de painel na mensagem. Não marque ninguém. Envie o texto em markdown 
 
 ## PASSO 5 — ENVIAR E REGISTRAR (só em `ENVIO`)
 
+0. **Conferência antes de enviar (por código, obrigatória):** (a) nenhum ticket da mensagem está no `tickets` do controle lido no Passo 1; (b) nenhum ticket aparece em dois blocos da mensagem; (c) a soma dos `Volume` bate com a quantidade de tickets distintos. Se qualquer item falhar, **não envie**: corrija a lista ou responda `FALHA: dedupe falhou (<o que repetiu>)`.
 1. Envie **uma** mensagem em `canal_id` com `slack_send_message`. Guarde o `message_ts`. Nunca envie para `#lideres-cx-e-cxm`.
-2. Atualize o controle: (a) acrescente em `alertas` **um registro** deste envio (`enviado_em` = `ref`, `canal`, `analise` = o texto do cabeçalho sem "Análise das conversas do bot de", `origem: "agente"`, e em `temas` cada tema enviado com `n` e os `exemplos`, só os ids); (b) acrescente em `tickets` **todos** os tickets avisados (inclusive os que ficaram fora dos 3 exemplos), com `tema` e `avisado_em` = `ref` (ou `"historico"`, na primeira execução, para os tickets de dias anteriores a `ref − 1`; um ticket em dois temas fica com a chave `<id>` e o `tema` do primeiro, e os outros em `temas_extra`); (c) atualize `atualizado_em`. Com `Write`, salve `./painel-data/alertas/enviados.json` (o conteúdo lido no Passo 1 mais as novidades). Depois publique no **artefato de alertas** (nunca no painel do BQS): primeiro `Artifact` `action: "read"` desse artefato (sem `path`), depois `Artifact` com `file_path: "artifact/alertas.html"`, `url: https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM` e `files: {"data/enviados.json": "painel-data/alertas/enviados.json"}`. Não passe `icon` nem `capabilities`. Em caso de conflito, releia e publique de novo **uma vez**. Na execução em que nada foi avisado (`NADA_A_AVISAR`), só grave o controle se houver tickets `historico` a registrar (primeira execução).
+2. Atualize o controle: (a) acrescente em `alertas` **um registro** deste envio (`enviado_em` = `ref`, `canal`, `analise` = o texto do cabeçalho sem "Análise das conversas do bot de", `origem: "agente"`, e em `temas` cada tema enviado com `n` e os `exemplos`, só os ids); (b) acrescente em `tickets` **todos** os tickets avisados (inclusive os que ficaram fora dos 3 exemplos), com `tema` e `avisado_em` = `ref` (ou `"historico"`, na primeira execução, para os tickets de dias anteriores a `ref − 1`; ou `"abaixo_do_limiar"` para os de erro técnico que não foram reportados; um ticket em dois temas fica com a chave `<id>` e o `tema` do mais urgente, e os outros em `temas_extra`). **Nunca sobrescreva uma entrada que já exista em `tickets`:** só acrescente chaves novas; (c) atualize `atualizado_em`. Com `Write`, salve `./painel-data/alertas/enviados.json` (o conteúdo lido no Passo 1 mais as novidades). Depois publique no **artefato de alertas** (nunca no painel do BQS): primeiro `Artifact` `action: "read"` desse artefato (sem `path`), depois `Artifact` com `file_path: "artifact/alertas.html"`, `url: https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM` e `files: {"data/enviados.json": "painel-data/alertas/enviados.json"}`. Não passe `icon` nem `capabilities`. Em caso de conflito, releia e publique de novo **uma vez**. Na execução em que nada foi avisado (`NADA_A_AVISAR`), grave o controle se houver tickets `historico` ou `abaixo_do_limiar` a registrar (sem acrescentar registro em `alertas`).
 3. Se a mensagem foi enviada mas o controle não pôde ser gravado, responda `FALHA: mensagem enviada em <message_ts>, mas o controle não foi gravado; tickets: <lista>` (a rotina avisa o `#tarefas-let` e o controle é corrigido à mão para não repetir o aviso).
 
 Em `TESTE`: não envie, não grave arquivo e não publique nada.
@@ -237,8 +244,9 @@ Responda **apenas** com este bloco (sem dados pessoais):
 ALERTAS: [ENVIADO | NADA_A_AVISAR | TESTE | FALHA]
 janela: AAAA-MM-DD a AAAA-MM-DD | conversas do bot varridas: N
 novos por tema: seguranca=N, juridico=N, fraude=N, erro_tecnico=N, loop=N
-descartados na confirmação: N
-onde (erro técnico): [ok | indisponivel | sem_ticket_novo]
+descartados na confirmação: N | duplicados descartados (já no controle): N
+erro técnico abaixo do limiar (não reportado): N
+onde (erro técnico): [ok | indisponivel | sem_ticket_novo | nao_reportado]
 message_ts: <ts ou "-">
 tickets: <tema>: id, id, ...   (todos os avisados)
 mensagem: <texto completo da mensagem, só em TESTE>
