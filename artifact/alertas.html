@@ -105,7 +105,7 @@ code { font-family: var(--font-mono); font-size: 13px; }
   <section>
     <h2>Como o envio funciona</h2>
     <ul class="rules">
-      <li>O agente roda uma vez por dia, de segunda a sábado, no fim da análise diária do fluxo de Cartão, e lê as conversas de <strong>todos os fluxos do bot</strong> na transcrição (não só a amostra avaliada pelo BQS).</li>
+      <li>O agente roda uma vez por dia, de segunda a sábado, às 11:00 (Brasília), numa rotina própria, e lê as conversas de <strong>todos os fluxos do bot</strong> na transcrição (não só a amostra avaliada pelo BQS).</li>
       <li>A janela é de 7 dias, porque a transcrição chega com atraso. Cada ticket é avisado <strong>uma única vez</strong>, em um único bloco, mesmo que se encaixe em mais de um tema (fica no mais urgente).</li>
       <li>O <strong>erro técnico do bot só é reportado com mais de 20 conversas novas</strong>. Com 20 ou menos, não entra na mensagem e os tickets ficam registrados como "abaixo do limiar", para não reaparecerem depois.</li>
       <li>Palavras de risco só contam quando ditas pelo <strong>cliente</strong>. Jurídico exige ameaça explícita (Procon, Banco Central, advogado, processar); perguntas neutras, como "qual o número da ouvidoria", não entram. Fraude e jurídico só contam quando não houve atendente humano; fraude também exige que o cliente se diga vítima e que o bot não tenha indicado nenhum caminho.</li>
