@@ -16,6 +16,7 @@ Uma conversa conta como boa quando a **conduta** do bot foi boa (nota geral pond
 | `.claude/agents/bqs-contencao.md` | Classifica cada conversa em contato evitável × só humano e diz o que teria retido. |
 | `.claude/agents/bqs-auditor.md` | Lê a transcrição dos casos duvidosos e revisa a nota (entra no BQS 2.0). |
 | `.claude/agents/bqs-alertas.md` | Detector de casos críticos (erro técnico do bot, loop, jurídico/órgãos, fraude sem encaminhamento, vulnerabilidade). Não calcula BQS; avisa no `#team_product_cx` só quando há ticket novo. Roda numa rotina própria (sem orquestrador), independente dos fluxos. |
+| `.claude/agents/bqs-abandono.md` | Abandono ativo do bot (quem conversa e sai), recontato em 7 dias e no mesmo tema, por semana e `entry_theme`; alimenta a aba "Abandono" do painel (`artifact/data/abandono/`, SQL em `sql/abandono.sql`). Não calcula BQS nem envia Slack. |
 | `.claude/agents/chatbot-*.md`, `zendesk-guide-expert.md` | Especialistas de fluxo, HP, oportunidades, propostas, relatório e KB. |
 | `templates/orch.template.md` | Fonte única dos orquestradores (SQL determinístico, passos, subagentes). |
 | `templates/playbook-cartao.md` | Playbook de retenção do cartão, injetado em `bqs-contencao`, `bqs-auditor` e `chatbot-proposta-ajustes`. |

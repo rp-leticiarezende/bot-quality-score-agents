@@ -570,6 +570,8 @@ O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` ent
 
 **Um único arquivo para os três fluxos** (`cartao-hp`, `aleatorio` e `criticos`, este alimentado pela rotina `criticos-semanal`). Cada tarefa é uma **mudança concreta**, não um fluxo: o mesmo insight visto em mais de um fluxo é UMA tarefa, que lista de quais fluxos ele veio (`fluxos`). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é quem pode editar o painel, direto na caixinha de cada tarefa (Não iniciado, Em andamento, Concluído ou Cancelado, com nota opcional): ele fica no banco de dados do próprio artefato (coleção `backlog_status`, um documento por `id` do item, com `status`, `status_em`, `nota`, `por` e `atualizado_em`; escrita só para quem edita) e vale por cima do `status` deste arquivo. As rotinas nunca o alteram nem o leem.
 
+**Formato de gravação (economia de tokens, decidido em 03/11/2026):** grave `backlog.json` (e `arquivo.json`) **compactos**, em uma linha, sem indentação nem espaços entre `:` e `,` (o arquivo indentado pesava 322 KB; compacto, 182 KB). O conteúdo é o mesmo e o painel lê igual. Não peça nem imprima o arquivo inteiro: leia só o que precisa, altere os itens e regrave.
+
 ```
 {
   "id": "CC-001 (tarefas antigas) ou BK-NNN (novas)", "fluxos": ["cartao-hp", "aleatorio", "criticos"],   // um ou mais fluxos de onde o insight veio

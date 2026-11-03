@@ -225,3 +225,17 @@ O que quebrou e como ficou:
 **Painel (`artifact/painel.html`):** lê `data/backlog/backlog.json`; um chip por fluxo de origem; chip "Reúne N tarefas" com a lista das absorvidas e seus status; tabela de ocorrências com coluna de fluxo; ordem por gravidade, depois contatos da última janela (maior fluxo), depois aparição mais recente; seção recolhida "Em observação" no fim (sem filtro novo); tarefa em observação que alguém move na caixinha (em andamento, concluída ou cancelada) passa para a lista principal; classe D mostra "risco / handoff" no lugar do número de contatos. Testado em servidor local com os dados reais: sem erro de console, filtros de fluxo, equipe e status funcionando.
 
 **Limites conhecidos:** o "gravidade alta" usa o campo `prioridade` como aproximação, e "correção trivial" não é detectada automaticamente (o agente decide pelo texto); os contatos de grupos com janelas diferentes são aproximados; as tarefas de uma ocorrência só e baixo volume ficam em observação mas ainda aparecem no arquivo do painel.
+
+## Abandono do bot: agente `bqs-abandono` e aba "Abandono" (03/11/2026, local, ainda não publicado)
+
+- **Pergunta do CTO:** quantos usuários falam com o bot e abandonam, e quantos voltam em 7 dias. Só abandono **ativo** (`flg_active_abandonment=1`); o passivo fica fora. Fonte: `prod.cx.fat_botmaker_metrics`.
+- **SQL:** `sql/abandono.sql` (semana seg-dom x `entry_theme`, mais total do período; só coortes completas, hoje menos 8 dias). Recontato em 7 dias = nova sessão do mesmo usuário em até 7 dias; "mesmo tema" = mesmo `entry_theme` (sinal de "não resolveu", não prova). Nota média só da amostra de `prod.cx.fat_botmaker_conversations_quality` (junção `chat_id = botmaker_chat_id`, cerca de 6% dos abandonos ativos), sempre com N.
+- **Agente:** `.claude/agents/bqs-abandono.md` (modelo barato, sem Slack, erro só no #tarefas-let). Grava `artifact/data/abandono/latest.json` e `history.json` (contrato em `templates/painel-schema.md`).
+- **Painel:** nova aba "Abandono" (4 números, tendência semanal, 10 maiores temas, "O que melhorar", rodapé com definições). Nome "Recontato em 7 dias (novo)", diferente do "recontato no dia" (100% menos FCR) do dashboard Bot & IA Agent.
+- **Primeira rodada (manual, 31/08 a 25/10):** semana de 19/10: 11.641 abandonos ativos, 11,6% voltam em 7 dias, 6,3% no mesmo tema, 88,4% não voltam. Rotina agendada: não criada.
+
+## 03/11/2026 — backlog compacto (passo 1 do enxugamento)
+`backlog.json` e `arquivo.json` passam a ser gravados compactos (uma linha, sem indentação): 322.699 → 185.224 bytes e 180.399 → 86.305 bytes, mesmo conteúdo (78 e 44 itens, conferido por comparação). Regra adicionada em `chatbot-relatorio-cx.md` e `templates/painel-schema.md`. Cópias compactas em `migracao-backlog-03-11/compacto/` (ainda não publicadas). Passos 2 (separar ativas e observação) e 3 (gravar só mudanças) adiados até ver a rodada de 04/11.
+
+## 03/11/2026 — aba "Contatos sem artigo" removida do painel
+A aba (tag `chat-default-instead-form`) saiu de `artifact/painel.html` (botão, função e texto do "Como ler"); o assunto fica com os agentes `chat-default-*`. O campo opcional `metricas.sem_artigo_porta` do esquema deixou de ser lido pelo painel.

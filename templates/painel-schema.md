@@ -30,7 +30,7 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
     "criterios": { "understanding": 0.0, "resolution": 0.0, "clarity": 0.0, "tone": 0.0, "efficiency": 0.0, "escalation": 0.0 },
     "pct_recontato_24h": 0.0,                        // indicador de acompanhamento; NÃO entra no BQS 2.0
     "sinalizados": { "transbordo_sem_pedido": { "n": 0, "pct": 0.0, "tickets": ["até 3 ticket_id de exemplo"] } },   // reprovam o BQS 2.0 e vão para análise
-    "sem_artigo_porta": { "tag": "chat-default-instead-form", "n": 0, "pct": 0.0, "pct_aprovadas_avaliador": 0.0, "itens": [ { "ticket_id": 0, "tema": "topic ou null", "vertical": "effective_vertical ou null", "desfecho": "resolutiva|abandono|transbordo|loop", "aprovada_avaliador": true } ] },   // conversas que entraram sem passar por artigo da Central (porta não mapeada); até 25 itens, os mais recentes; só análise manual, fora do BQS; `n`, `pct` e `pct_aprovadas_avaliador` vêm do passo 3.5
+    "sem_artigo_porta" /* não é mais exibido pelo painel */ : { "tag": "chat-default-instead-form", "n": 0, "pct": 0.0, "pct_aprovadas_avaliador": 0.0, "itens": [ { "ticket_id": 0, "tema": "topic ou null", "vertical": "effective_vertical ou null", "desfecho": "resolutiva|abandono|transbordo|loop", "aprovada_avaliador": true } ] },   // conversas que entraram sem passar por artigo da Central (porta não mapeada); até 25 itens, os mais recentes; só análise manual, fora do BQS; `n`, `pct` e `pct_aprovadas_avaliador` vêm do passo 3.5
     "qualidade_dado": { "n_sem_boas_vindas": 0, "pct_sem_boas_vindas": 0.0 }   // só no cartao-hp; indicador em revisão, informativo
   },
   "auditoria": { "auditados": 0, "revisados": 0, "aprovado_para_reprovado": 0, "reprovado_para_aprovado": 0, "divergencias": ["frase sem dados pessoais"] },
@@ -79,6 +79,8 @@ O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` ent
 
 **Um único arquivo para os três fluxos** (`cartao-hp`, `aleatorio` e `criticos`, este alimentado pela rotina `criticos-semanal`). Cada tarefa é uma **mudança concreta**, não um fluxo: o mesmo insight visto em mais de um fluxo é UMA tarefa, que lista de quais fluxos ele veio (`fluxos`). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é quem pode editar o painel, direto na caixinha de cada tarefa (Não iniciado, Em andamento, Concluído ou Cancelado, com nota opcional): ele fica no banco de dados do próprio artefato (coleção `backlog_status`, um documento por `id` do item, com `status`, `status_em`, `nota`, `por` e `atualizado_em`; escrita só para quem edita) e vale por cima do `status` deste arquivo. As rotinas nunca o alteram nem o leem.
 
+**Formato de gravação (economia de tokens, decidido em 03/11/2026):** grave `backlog.json` (e `arquivo.json`) **compactos**, em uma linha, sem indentação nem espaços entre `:` e `,` (o arquivo indentado pesava 322 KB; compacto, 182 KB). O conteúdo é o mesmo e o painel lê igual. Não peça nem imprima o arquivo inteiro: leia só o que precisa, altere os itens e regrave.
+
 ```
 {
   "id": "CC-001 (tarefas antigas) ou BK-NNN (novas)", "fluxos": ["cartao-hp", "aleatorio", "criticos"],   // um ou mais fluxos de onde o insight veio
@@ -104,3 +106,11 @@ O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` ent
 - **Status:** **nunca** mude `status`, `status_em` ou `nota`; item `concluida` ou `cancelada` que reaparece só ganha a data em `reapareceu_em`, e nunca é fundido com tarefa aberta.
 - **Dono e entrega:** uma equipe por tarefa; artigo (Help Design) e prompt ou fluxo (Produto CX) viram duas tarefas ligadas. Trecho repetido em 3 ou mais tarefas vira uma tarefa central.
 - **Política de transbordo (decidida):** pediu atendente, transfere; só não vale depois do CSAT, que é campo livre. Nenhuma tarefa propõe sondagem antes de transferir nesse caso.
+
+### Abandono (`data/abandono/`)
+
+Chave fora do contrato `bqs-run/1`: não tem BQS. O agente `bqs-abandono` grava `latest.json` (`schema:"abandono/1"`) e acrescenta a semana em `history.json` (array por `fim`, só cresce, até 104).
+
+- **`latest.json`:** `gerado_em`; `periodo{inicio,fim,semanas}`; `semana_atual` e `periodo_total` com `abandonos`, `usuarios`, `pct_sessoes`, `recontato_7d`, `pct_recontato_7d`, `recontato_mesmo_tema_7d`, `pct_mesmo_tema_7d`, `nunca_voltam_pct`, `nota_amostra`, `n_amostra`; `temas[]` (10 maiores, com `entry_theme`, `pct_abandono_no_tema`); `melhorar[]` (`entry_theme`, `pct_mesmo_tema_7d`, `abandonos`, `assunto`, `causa`, `acao`, `dono` = Produto CX ou Help Design, `amostra`); `notas{}` (definições exibidas no rodapé).
+- **`history.json`:** por semana, `inicio`, `fim`, `abandonos`, `usuarios`, `pct_sessoes`, `pct_recontato_7d`, `pct_mesmo_tema_7d`, `nunca_voltam_pct`.
+- **Regras:** só abandono ativo; só semanas completas (domingo até hoje menos 8 dias); mesmo tema = mesmo `entry_theme` em até 7 dias, sinal e não prova; nota média só da amostra, sempre com N. A métrica se chama "Recontato em 7 dias (novo)", diferente do "recontato no dia" do dashboard Bot & IA Agent.

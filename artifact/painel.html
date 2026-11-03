@@ -176,6 +176,30 @@ ul.plain li{display:flex;gap:10px;align-items:flex-start}
 .pesa-d dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .pesa-d dd b{font-weight:600}
 @media(max-width:640px){.pesa-d{grid-template-columns:1fr}.pesa-h{flex-direction:column}.pesa-c{text-align:left}}
+.ab-fn{display:flex;height:30px;border-radius:6px;overflow:hidden;gap:2px;background:var(--gap)}
+.ab-fn>span{display:flex;align-items:center;justify-content:center;min-width:3px;height:100%;font-size:12px;font-weight:700;font-family:var(--mono);color:#fff;overflow:hidden;white-space:nowrap}
+.ab-fl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 16px;font-size:13px}
+.ab-fl>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.ab-fl i{width:10px;height:10px;border-radius:2px;display:inline-block;flex:none}
+.ab-fl .p{color:var(--muted);font-size:12px}
+.ab-chart{display:block;width:100%;height:auto}
+.ab-chart text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.ab-rk{display:flex;flex-direction:column;gap:12px}
+.ab-rk-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px;min-width:0}
+.ab-rk-h .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.ab-rk-h .v{font-family:var(--mono);font-weight:600;flex:none}
+.ab-rk .bar{height:10px;background:var(--track);border-radius:3px;overflow:hidden;margin:4px 0 2px}
+.ab-rk .bar>span{display:block;height:100%;border-radius:0 3px 3px 0}
+.ab-rk-s{font-size:11px;color:var(--muted)}
+.ab-mel{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.ab-c{background:var(--surface);border:1px solid var(--line);border-left-width:4px;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ab-c-h{display:flex;gap:10px;align-items:center;min-width:0}
+.ab-ic{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--surface-2);color:var(--ink)}
+.ab-c .ttl{font-weight:600;overflow-wrap:anywhere}
+.ab-c .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.ab-c p{margin:0;font-size:13px;color:var(--ink-2);overflow-wrap:anywhere}
+.ab-c p b{color:var(--ink);font-weight:600}
+.ab-c .k{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .evlist{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink-2)}
 .evlist b{color:var(--ink);font-family:var(--mono);font-weight:500}
 .def{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:6px 16px}
@@ -403,27 +427,122 @@ function visao(){
   h+='</section>';
   main(h);
 }
-/* ---------- aba: contatos que entraram sem artigo ---------- */
-function abaSemArtigo(){
-  var mensal=S.per==="mensal";
-  var h='<div class="pills" role="group" aria-label="Período">'+[["semanal","Semanal"],["mensal","Mensal"]].map(function(p){return '<button class="pill" data-gper="'+p[0]+'" aria-pressed="'+(S.per===p[0])+'">'+p[1]+'</button>'}).join("")+'</div>';
-  var DESF={resolutiva:"Resolvida pelo bot",abandono:"Abandono",transbordo:"Transbordo",loop:"Loop"};
-  var sp=FLUXOS.map(function(f){var d=fluxoDados(f);var s=g(d,"metricas.sem_artigo_porta",null);return s&&num(s.n)?{f:f,s:s}:null}).filter(Boolean);
-  h+='<section class="block"><h2>Contatos que entraram sem artigo da Central</h2>'+
-    '<div class="panel"><dl class="pesa-d">'+
-    '<dt>O que são</dt><dd>Contatos que abriram o chat <b>sem passar por nenhum artigo da Central de Ajuda</b>. O ticket recebe a tag <code>chat-default-instead-form</code>.</dd>'+
-    '<dt>O que significa</dt><dd>É uma <b>porta não mapeada</b>: uma tela do app ou um MCT (motivo de contato) que ainda não leva o cliente a um artigo. Pode ser um erro de configuração ou um caminho que ninguém previu.</dd>'+
-    '<dt>Por que importa</dt><dd>Sem passar por um artigo, o bot não recebe o contexto do assunto e reconhece pior o que o cliente quer. Nas medições de outubro, essas conversas foram aprovadas bem menos que as demais e terminaram mais vezes em abandono e em loop.</dd>'+
-    '<dt>Como usar esta lista</dt><dd>Abra os tickets, veja de onde o cliente veio e qual assunto ele trouxe, e identifique as portas que precisam de artigo ou de mapeamento. Este indicador é para análise manual e <b>não entra na conta do BQS 2.0</b>. O painel ainda não sabe de qual tela o contato saiu; hoje só mostra o tema e o desfecho.</dd>'+
-    '</dl></div>';
-  if(sp.length){
-    h+='<div class="panel scroll"><table><thead><tr><th>Rotina</th><th class="n">Contatos com a tag</th><th class="n">% das conversas</th><th class="n">Aprovadas pelo avaliador</th></tr></thead><tbody>'+sp.map(function(x){return '<tr><td>'+esc(x.f.nome)+'</td><td class="n">'+int(x.s.n)+'</td><td class="n">'+fmt(x.s.pct,1)+'%</td><td class="n">'+(num(x.s.pct_aprovadas_avaliador)?fmt(x.s.pct_aprovadas_avaliador,1)+'%':'—')+'</td></tr>'}).join("")+'</tbody></table></div>';
-    var linhasSp=[];sp.forEach(function(x){arr(x.s.itens).forEach(function(it){linhasSp.push({f:x.f,it:it})})});
-    if(linhasSp.length)h+='<div class="panel scroll"><h3>Tickets para analisar ('+linhasSp.length+')</h3><table><thead><tr><th>Rotina</th><th>Ticket</th><th>Tema</th><th>Vertical</th><th>Desfecho</th><th>Avaliador</th></tr></thead><tbody>'+linhasSp.map(function(r){var it=r.it;return '<tr><td>'+esc(r.f.nome)+'</td><td><code>'+esc(it.ticket_id)+'</code></td><td>'+esc(it.tema||"—")+'</td><td>'+esc(it.vertical||"—")+'</td><td>'+esc(DESF[it.desfecho]||it.desfecho||"—")+'</td><td>'+(it.aprovada_avaliador?chip("Aprovada","good"):chip("Reprovada","warn"))+'</td></tr>'}).join("")+'</tbody></table></div>';
-  }else h+=empty("Sem dados ainda","A tabela aparece quando uma rotina publicar o indicador de contatos que entraram sem artigo.");
+/* ---------- aba: abandono ---------- */
+function abPrev(h5,w){for(var i=0;i<h5.length;i++){if(h5[i].fim===w.fim)return i>0?h5[i-1]:null}return h5.length?h5[h5.length-1]:null}
+function abDelta(c,p,goodDown,rel){
+  if(!num(c)||!num(p))return '<span class="delta">sem semana anterior</span>';
+  var df=c-p,d=rel?(p?100*df/p:0):df;
+  if(Math.abs(d)<0.05)return '<span class="delta">igual à semana anterior</span>';
+  var good=(df<0)===goodDown;
+  return '<span class="delta '+(good?'up':'down')+'">'+(df>0?'▲':'▼')+' '+(d>0?'+':'−')+fmt(Math.abs(d),1)+(rel?'%':' p.p.')+' vs semana anterior</span>';
+}
+function abFunil(w){
+  var tot=w.abandonos||0;if(!tot||!num(w.recontato_7d)||!num(w.recontato_mesmo_tema_7d))return '';
+  var it=[{nome:"Nunca volta em 7 dias",n:tot-w.recontato_7d,cor:"var(--cR)"},{nome:"Volta em 7 dias em outro tema",n:w.recontato_7d-w.recontato_mesmo_tema_7d,cor:"var(--cB)"},{nome:"Volta no mesmo tema",n:w.recontato_mesmo_tema_7d,cor:"var(--crit)"}];
+  var b='<div class="ab-fn" role="img" aria-label="Funil dos abandonos da semana">',l='<div class="ab-fl">';
+  it.forEach(function(x){
+    var p=100*x.n/tot;
+    b+='<span style="width:'+p+'%;background:'+x.cor+(x.cor==="var(--cB)"?';color:var(--brand-ink)':'')+'" data-tip="'+esc(x.nome+": "+int(x.n)+" ("+fmt(p,1)+"%)")+'">'+(p>=9?fmt(p,1)+'%':'')+'</span>';
+    l+='<div><i style="background:'+x.cor+'"></i><span>'+esc(x.nome)+'</span><b class="mono">'+int(x.n)+'</b><span class="p">'+fmt(p,1)+'%</span></div>';
+  });
+  return '<div class="panel"><div class="sub" style="margin:0"><b>Funil da semana:</b> 100% = '+int(tot)+' abandonos ativos</div>'+b+'</div>'+l+'</div></div>';
+}
+function abGrafico(h5){
+  if(!h5.length)return empty("Sem histórico ainda","Cada rodada acrescenta uma semana.");
+  var W=480,H=250,L=46,R=36,T=14,B=36,iw=W-L-R,ih=H-T-B,n=h5.length,st=iw/n;
+  var mx=Math.max.apply(null,h5.map(function(x){return x.abandonos||0}).concat([1]));
+  var raw=mx/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),stp=mag;
+  [1,2,2.5,5,10].some(function(k){stp=k*mag;return stp>=raw});
+  var vmax=4*stp;
+  var mp=Math.max.apply(null,h5.map(function(x){return Math.max(x.pct_recontato_7d||0,x.pct_mesmo_tema_7d||0)}).concat([1]));
+  var pmax=Math.ceil(mp/4)*4;
+  function Y(v){return T+ih*(1-v/vmax)}
+  function YP(p){return T+ih*(1-p/pmax)}
+  var s='<svg class="ab-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Abandonos ativos por semana, com recontato em 7 dias e mesmo tema">';
+  for(var i=0;i<=4;i++){
+    var y=T+ih*(1-i/4);
+    s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>';
+    s+='<text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end">'+(i*stp).toLocaleString("pt-BR")+'</text>';
+    s+='<text x="'+(W-R+6)+'" y="'+(y+4)+'">'+fmt(i*pmax/4,0)+'%</text>';
+  }
+  var lin1=[],lin2=[],pts='';
+  h5.forEach(function(x,i){
+    var cx=L+st*i+st/2,bw=st*0.5,yb=Y(x.abandonos||0);
+    s+='<rect x="'+(cx-bw/2)+'" y="'+yb+'" width="'+bw+'" height="'+(T+ih-yb)+'" rx="2" fill="var(--blue)" opacity=".55"/>';
+    s+='<text x="'+cx+'" y="'+(H-B+14)+'" text-anchor="middle">'+esc(ddmm(x.inicio))+'</text>';
+    lin1.push(cx+','+YP(x.pct_recontato_7d||0));lin2.push(cx+','+YP(x.pct_mesmo_tema_7d||0));
+    var tip=ddmm(x.inicio)+" a "+ddmm(x.fim)+": "+int(x.abandonos)+" abandonos · "+fmt(x.pct_recontato_7d,1)+"% voltam em 7d · "+fmt(x.pct_mesmo_tema_7d,1)+"% mesmo tema";
+    pts+='<circle cx="'+cx+'" cy="'+YP(x.pct_recontato_7d||0)+'" r="3.5" fill="var(--cC)"/><circle cx="'+cx+'" cy="'+YP(x.pct_mesmo_tema_7d||0)+'" r="3.5" fill="var(--cA)"/>';
+    pts+='<rect x="'+(L+st*i)+'" y="'+T+'" width="'+st+'" height="'+ih+'" fill="transparent" data-tip="'+esc(tip)+'"/>';
+  });
+  s+='<polyline points="'+lin1.join(" ")+'" fill="none" stroke="var(--cC)" stroke-width="2.5" stroke-linejoin="round"/>';
+  s+='<polyline points="'+lin2.join(" ")+'" fill="none" stroke="var(--cA)" stroke-width="2.5" stroke-linejoin="round"/>'+pts+'</svg>';
+  return '<div class="panel">'+s+'<div class="legend"><span><i style="background:var(--blue);opacity:.55"></i>Abandonos ativos (eixo esquerdo)</span><span><i style="background:var(--cC)"></i>% voltam em 7 dias (eixo direito)</span><span><i style="background:var(--cA)"></i>% voltam no mesmo tema (eixo direito)</span></div><div class="sub" style="margin:0">Eixo horizontal: início de cada semana (segunda-feira). Passe o mouse ou toque numa semana para ver os valores.</div></div>';
+}
+function abCor(p){return p>15?"var(--crit)":p>=8?"var(--cB)":"var(--cR)"}
+function abRanking(ms){
+  var r=ms.filter(function(o){return num(o.pct_mesmo_tema_7d)&&(o.abandonos||0)>=100}).sort(function(a,b){return b.pct_mesmo_tema_7d-a.pct_mesmo_tema_7d}).slice(0,10);
+  if(!r.length)return empty("Sem temas acima do mínimo","Nenhum tema teve 100 abandonos na janela.");
+  var mx=Math.max.apply(null,r.map(function(o){return o.pct_mesmo_tema_7d}).concat([1]));
+  return '<div class="panel"><div class="ab-rk">'+r.map(function(o){
+    var c=abCor(o.pct_mesmo_tema_7d);
+    return '<div><div class="ab-rk-h"><span class="lbl" title="'+esc(o.entry_theme)+'">'+esc(o.entry_theme)+'</span><span class="v" style="color:'+c+'">'+fmt(o.pct_mesmo_tema_7d,1)+'%</span></div><div class="bar"><span style="width:'+Math.max(1,100*o.pct_mesmo_tema_7d/mx)+'%;background:'+c+'" data-tip="'+esc(o.entry_theme+": "+fmt(o.pct_mesmo_tema_7d,1)+"% voltam no mesmo tema · "+int(o.abandonos)+" abandonos")+'"></span></div><div class="ab-rk-s">'+int(o.abandonos)+' abandonos no período</div></div>';
+  }).join("")+'</div><div class="legend"><span><i style="background:var(--crit)"></i>acima de 15%</span><span><i style="background:var(--cB)"></i>de 8% a 15%</span><span><i style="background:var(--cR)"></i>abaixo de 8%</span></div></div>';
+}
+function abMelhorar(ms){
+  if(!ms.length)return empty("Sem temas acima do mínimo","Nenhum tema teve 100 abandonos na janela.");
+  return '<div class="ab-mel">'+ms.map(function(o){
+    var hd=o.dono==="Help Design",c=abCor(o.pct_mesmo_tema_7d),cz=String(o.causa||""),i=cz.search(/[.;] /);
+    return '<article class="ab-c" style="border-left-color:'+c+'"><div class="ab-c-h"><span class="ab-ic" aria-hidden="true">'+(hd?'✎':'⚙')+'</span><div style="min-width:0"><div class="ttl">'+esc(o.entry_theme)+'</div><div class="meta"><span class="chip '+(hd?'warn':'info')+'">'+esc(o.dono||"—")+'</span><span class="chip muted">'+fmt(o.pct_mesmo_tema_7d,1)+'% mesmo tema</span><span class="chip muted">'+int(o.abandonos)+' abandonos</span></div></div></div>'+
+      '<p title="'+esc(o.assunto)+'"><span class="k">Assunto</span>'+esc(o.assunto)+'</p>'+
+      '<p title="'+esc(cz)+'"><span class="k">Causa provável</span>'+esc(i>0?cz.slice(0,i+1):cz)+'</p>'+
+      '<p><span class="k">Ação sugerida</span><b>'+esc(o.acao)+'</b></p></article>';
+  }).join("")+'</div>';
+}
+function abaAbandono(){
+  var d=S.ab,h5=arr(S.abHist);
+  if(!d){main('<section class="block"><h2>Abandono</h2>'+empty("Ainda sem dados","A análise de abandono (agente bqs-abandono) ainda não publicou data/abandono/latest.json.")+'</section>');return}
+  var w=d.semana_atual||{},n=d.notas||{},tot=d.periodo_total||{};
+  var h='<section class="block"><h2>Abandono do bot · semana de '+esc(ddmm(w.inicio))+' a '+esc(ddmm(w.fim))+'</h2><p class="sub">Quantos usuários conversam com o bot e saem sem resolver, e quantos deles voltam em 7 dias. Só abandono ativo: o usuário escreveu para o bot (em geral cerca de 4 mensagens) e saiu. Quem nunca escreveu não entra.</p>';
+  var pv=abPrev(h5,w);pv=pv||{};
+  h+=abFunil(w);
+  h+='<div class="kpis" style="margin-top:12px">'+
+    kpi("Abandonos ativos na semana",int(w.abandonos),int(w.usuarios)+" usuários · "+fmt(w.pct_sessoes,1)+"% das sessões da semana<br>"+abDelta(w.abandonos,pv.abandonos,true,true))+
+    kpi("Voltam em 7 dias",fmt(w.pct_recontato_7d,1)+"%",int(w.recontato_7d)+" usuários · Recontato em 7 dias (novo)<br>"+abDelta(w.pct_recontato_7d,pv.pct_recontato_7d,true,false))+
+    kpi("Voltam no mesmo tema",fmt(w.pct_mesmo_tema_7d,1)+"%",int(w.recontato_mesmo_tema_7d)+" usuários · sinal de \"não resolveu\"<br>"+abDelta(w.pct_mesmo_tema_7d,pv.pct_mesmo_tema_7d,true,false))+
+    kpi("Nunca voltam em 7 dias",fmt(w.nunca_voltam_pct,1)+"%","100% menos quem voltou em 7 dias<br>"+abDelta(w.nunca_voltam_pct,pv.nunca_voltam_pct,false,false))+'</div>';
+  h+='<div class="banner info"><span class="dot info"></span><div><b>Não é o "recontato no dia".</b> O dashboard Bot &amp; IA Agent mede recontato como 100% menos FCR no mesmo dia. Esta aba mede em 7 dias, por isso o nome "Recontato em 7 dias (novo)" e os números não são comparáveis.</div></div></section>';
+  // tendência
+  var mx=Math.max.apply(null,h5.map(function(x){return x.abandonos||0}).concat([1]));
+  h+='<section class="block"><h2>Tendência semanal</h2>';
+  h+=abGrafico(h5);
+  if(h5.length){
+    h+='<details style="margin-top:10px"><summary class="linkbtn" style="cursor:pointer">Ver tabela semanal</summary><div class="panel scroll" style="margin-top:8px"><table><thead><tr><th>Semana</th><th>Abandonos ativos</th><th class="n">% das sessões</th><th class="n">Voltam em 7d</th><th class="n">Mesmo tema</th><th class="n">Nunca voltam</th></tr></thead><tbody>'+h5.slice().reverse().map(function(x){
+      return '<tr><td>'+esc(ddmm(x.inicio)+" a "+ddmm(x.fim))+'</td><td><div class="inbar"><span class="bar"><span style="width:'+(100*(x.abandonos||0)/mx)+'%"></span></span><span class="mono">'+int(x.abandonos)+'</span></div></td><td class="n">'+fmt(x.pct_sessoes,1)+'%</td><td class="n">'+fmt(x.pct_recontato_7d,1)+'%</td><td class="n">'+fmt(x.pct_mesmo_tema_7d,1)+'%</td><td class="n">'+fmt(x.nunca_voltam_pct,1)+'%</td></tr>';
+    }).join("")+'</tbody></table></div></details>';
+  }
   h+='</section>';
+  // por tema
+  var ts=arr(d.temas);
+  h+='<section class="block"><h2>Por tema de entrada · '+esc(ddmm(g(d,"periodo.inicio"))+" a "+ddmm(g(d,"periodo.fim")))+' ('+int(g(d,"periodo.semanas"))+' semanas)</h2><p class="sub">Os 10 temas com mais abandonos ativos. Total do período: '+int(tot.abandonos)+' abandonos, '+fmt(tot.pct_recontato_7d,1)+'% voltam em 7 dias e '+fmt(tot.pct_mesmo_tema_7d,1)+'% voltam no mesmo tema.</p>';
+  h+='<h3 style="font-size:14px;margin:6px 0">Ranking: quem mais volta no mesmo tema (mínimo de 100 abandonos)</h3>'+abRanking(arr(d.melhorar));
+  h+='<details style="margin-top:10px"><summary class="linkbtn" style="cursor:pointer">Ver tabela dos 10 temas com mais abandonos</summary><div class="panel scroll" style="margin-top:8px"><table><thead><tr><th>Tema (entry_theme)</th><th class="n">Abandonos</th><th class="n">Usuários</th><th class="n">Voltam em 7d</th><th class="n">Mesmo tema</th><th class="n">Nota na amostra</th></tr></thead><tbody>'+ts.map(function(t){
+    return '<tr><td>'+esc(t.entry_theme)+'</td><td class="n">'+int(t.abandonos)+'</td><td class="n">'+int(t.usuarios)+'</td><td class="n">'+fmt(t.pct_recontato_7d,1)+'%</td><td class="n">'+(t.pct_mesmo_tema_7d>=10?'<b>'+fmt(t.pct_mesmo_tema_7d,1)+'%</b>':fmt(t.pct_mesmo_tema_7d,1)+'%')+'</td><td class="n">'+(num(t.nota_amostra)?fmt(t.nota_amostra,1)+' (N='+int(t.n_amostra)+')':'—')+'</td></tr>';
+  }).join("")+'</tbody></table></div></details></section>';
+  // o que melhorar
+  var ms=arr(d.melhorar);
+  h+='<section class="block"><h2>O que melhorar</h2><p class="sub">Temas com mais recontato no mesmo tema (mínimo de 100 abandonos). A leitura vem de até 3 conversas da amostra de qualidade por tema, então é uma pista e não um diagnóstico. Escopo: só o bot e só artigos externos da Central.</p>';
+  h+=abMelhorar(ms);
+  h+='</section>';
+  h+='<section class="block"><h2>Como ler</h2><div class="panel"><dl class="def">'+
+    '<dt>Abandono ativo</dt><dd>'+esc(n.definicao||"")+'</dd>'+
+    '<dt>Voltam em 7 dias</dt><dd>'+esc(n.recontato||"")+'</dd>'+
+    '<dt>Mesmo tema</dt><dd>'+esc(n.mesmo_tema||"")+'</dd>'+
+    '<dt>Nota na amostra</dt><dd>'+esc(n.nota||"")+'</dd>'+
+    '<dt>Período</dt><dd>'+esc(n.coorte||"")+' Gerado em '+esc(dt(d.gerado_em))+'.</dd></dl></div></section>';
   main(h);
 }
+
 /* ---------- linha do tempo ---------- */
 var CORES={"cartao-hp":"var(--cD)","aleatorio":"var(--cA)","criticos-semanal":"var(--cR)","criticos-diario":"var(--cC)","cartao-hp-mensal":"var(--cD)","aleatorio-mensal":"var(--cA)","criticos-mensal":"var(--cR)"};
 var NOMES={"cartao-hp":"Agente de Cartão de Crédito (semanal)","aleatorio":"Aleatório (semanal)","criticos-semanal":"Casos críticos (semanal)","criticos-diario":"Casos críticos (diário)","cartao-hp-mensal":"Agente de Cartão de Crédito (mensal)","aleatorio-mensal":"Aleatório (mensal)","criticos-mensal":"Casos críticos (mensal)"};
@@ -730,7 +849,6 @@ function comoLer(){
   '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 2.0 e vão para análise humana, porque podem ser erro do bot: o sinal é automático e só a leitura da conversa por uma pessoa confirma a falha.</dd>'+
   '<dt>Abas "Detalhe"</dt><dd>Cada aba que começa com "Detalhe -" mostra um fluxo por inteiro: os números, os contatos evitáveis, o que mudar e a qualidade por agente e por tema. A Visão geral resume todos os fluxos; a aba do fluxo aprofunda.</dd>'+
   '<dt>Backlog</dt><dd>Lista de tudo o que as rotinas levantaram para ajustar. Quem pode editar o painel muda o status de cada tarefa na caixinha ao lado dela (Não iniciado, Em andamento, Concluído ou Cancelado) e pode deixar uma nota; a tarefa passa sozinha para a subárea correspondente. As rotinas só acrescentam itens e ocorrências, nunca mudam o status.</dd>'+
-  '<dt>Contatos sem artigo</dt><dd>Conversas que abriram o chat sem passar por um artigo da Central (tag <code>chat-default-instead-form</code>): portas do app ou MCTs ainda não mapeados. Lista para análise manual, fora da conta do BQS 2.0.</dd>'+
   '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS 2.0 (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
   '<dt>TFC</dt><dd>Taxa de falha de condução: conversas em loop, em transbordo que o cliente não pediu ou em abandono depois de uma resposta fraca (resolução abaixo de 7). Abandonar não é falha, e pedir atendente também não: o cliente pode sair ou chamar um humano a qualquer momento. Só conta quando o bot errou.</dd>'+
   '<dt>Contatos evitáveis</dt><dd>Entre as conversas classificadas, as que o bot poderia ter resolvido hoje (A), resolveria com ajuste de conteúdo, variável ou roteamento (B) ou exigiria uma capacidade nova (C). A estimativa para o período vem de uma amostra aleatória e traz intervalo de confiança.</dd>'+
@@ -746,13 +864,13 @@ function comoLer(){
 /* ---------- navegação ---------- */
 function main(h){$("#main").innerHTML=h}
 function tabs(){
-  var t=[{id:"visao",n:"Visão geral"},{id:"backlog",n:"Backlog"},{id:"linha",n:"Linha do tempo"},{id:"semartigo",n:"Contatos sem artigo"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.aba||f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
+  var t=[{id:"visao",n:"Visão geral"},{id:"backlog",n:"Backlog"},{id:"linha",n:"Linha do tempo"},{id:"abandono",n:"Abandono"}].concat(FLUXOS.map(function(f){return {id:f.id,n:f.aba||f.nome}})).concat([{id:"como-ler",n:"Como ler"}]);
   $("#tabs").innerHTML=t.map(function(x){return '<button role="tab" data-tab="'+x.id+'" aria-selected="'+(S.tab===x.id)+'">'+esc(x.n)+'</button>'}).join("");
 }
 function render(){
   tabs();
   var f=FLUXOS.filter(function(x){return x.id===S.tab})[0];
-  if(S.tab==="visao")visao();else if(S.tab==="linha")abaLinha();else if(S.tab==="backlog")abaBacklog();else if(S.tab==="semartigo")abaSemArtigo();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
+  if(S.tab==="visao")visao();else if(S.tab==="linha")abaLinha();else if(S.tab==="backlog")abaBacklog();else if(S.tab==="abandono")abaAbandono();else if(S.tab==="como-ler")comoLer();else if(f)fluxo(f);else visao();
   var ult=Object.keys(S.data).map(function(k){return g(S.data[k],"gerado_em")}).filter(Boolean).sort().pop();
   $("#atualizado").textContent=ult?"Atualizado em "+dt(ult):"";
 }
@@ -838,7 +956,7 @@ bkDbInit();
 /* ---------- boot ---------- */
 var chaves=["cartao-hp","cartao-hp-mensal","aleatorio","aleatorio-mensal","criticos-semanal","criticos-mensal"];
 var salvo=store("bqs-tab");if(salvo)S.tab=salvo;
-Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat([load("data/backlog/backlog.json").then(function(r){S.bk.todos=arr(r)})]).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
+Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat([load("data/abandono/latest.json").then(function(r){S.ab=r}),load("data/abandono/history.json").then(function(r){S.abHist=normHist(r)})]).concat([load("data/backlog/backlog.json").then(function(r){S.bk.todos=arr(r)})]).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
 render();
 })();
 </script>
