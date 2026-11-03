@@ -128,6 +128,13 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 .pill{background:var(--surface);border:1px solid var(--line);border-radius:999px;color:var(--ink-2);font:inherit;font-size:12px;font-weight:600;padding:5px 12px;cursor:pointer}
 .pill[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .opos{display:flex;flex-direction:column;gap:8px}
+details.opo .ba>div,details.opo dl dd{white-space:pre-line}
+details.bkobs{margin-top:22px}
+details.bkobs>summary{cursor:pointer;padding:10px 2px;list-style:none;line-height:1.45}
+details.bkobs>summary::-webkit-details-marker{display:none}
+details.bkobs>summary::before{content:"›";display:inline-block;margin-right:8px;color:var(--brand);transition:transform .15s}
+details.bkobs[open]>summary::before{transform:rotate(90deg)}
+details.bkobs>.opos{margin-top:8px}
 details.opo{background:var(--surface);border:1px solid var(--line);border-radius:10px}
 details.opo summary{list-style:none;cursor:pointer;padding:13px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
 details.opo summary::-webkit-details-marker{display:none}
@@ -627,11 +634,19 @@ var BK_STATUS={aberta:["Não iniciado","warn"],em_andamento:["Em andamento","inf
 var BK_ORDEM=["aberta","em_andamento","concluida","cancelada"];
 function hoje(){return new Date(Date.now()-3*3600000).toISOString().slice(0,10)}
 function dataBr(s){return s?String(s).slice(8,10)+"/"+String(s).slice(5,7)+"/"+String(s).slice(0,4):"—"}
-function bkBase(){
-  var l=[];
-  BK_FLUXOS.forEach(function(f){arr(S.bk[f[0]]).forEach(function(it){l.push(it)})});
-  return l;
+/* backlog unificado: um único arquivo (data/backlog/backlog.json); cada tarefa é uma mudança concreta e lista os fluxos de onde o insight veio (fluxos) */
+function bkBase(){return arr(S.bk.todos)}
+function bkNoFluxo(it,fl){return fl==="todos"||arr(it.fluxos).indexOf(fl)>=0}
+function bkRotuloFluxo(k){var f=BK_FLUXOS.filter(function(x){return x[0]===k})[0];return f?f[1]:k}
+/* aparece na lista principal: tarefa ativa, ou qualquer tarefa que alguém já moveu na caixinha (em andamento, concluída ou cancelada); o resto fica em "Em observação" */
+function bkVisivel(it){return !it.situacao||it.situacao==="ativa"||it.status!=="aberta"}
+/* contatos da última janela de cada fluxo (sem somar entre fluxos: as amostras podem repetir conversas); o maior valor serve de impacto */
+function bkContatos(it){
+  var u={};arr(it.ocorrencias).forEach(function(o){if(!o||!o.fluxo||!num(o.contatos_estimados))return;var a=u[o.fluxo];if(!a||String(o.fim)>String(a.fim)||(o.fim===a.fim&&o.contatos_estimados>a.contatos_estimados))u[o.fluxo]=o});
+  var r=[];Object.keys(u).forEach(function(k){r.push([k,u[k].contatos_estimados])});
+  return r;
 }
+function bkImpacto(it){var m=0;bkContatos(it).forEach(function(x){if(x[1]>m)m=x[1]});return m}
 /* o status escolhido na página (db, coleção backlog_status) vale por cima do que vem no arquivo da rotina */
 function bkEf(it){
   var o=S.bkDb[it.id];
@@ -650,12 +665,14 @@ function bkSelect(it){
 }
 function bkItem(it){
   var st=BK_STATUS[it.status]||BK_STATUS.aberta,oc=arr(it.ocorrencias),ult=oc[oc.length-1]||{};
-  var fl=BK_FLUXOS.filter(function(f){return f[0]===it.fluxo})[0];
+  var fls=arr(it.fluxos).length?arr(it.fluxos):(it.fluxo?[it.fluxo]:[]),imp=bkImpacto(it),cons=arr(it.consolida);
   var pode=!!(S.canEdit&&S.db&&it.id);
-  var h='<details class="opo" data-id="'+esc(it.id||"")+'"><summary>'+prioChip(it.prioridade)+'<div><div class="ttl">'+esc(it.id?it.id+" · ":"")+esc(it.titulo)+'</div><div class="meta">'+(pode?bkSelect(it):chip(st[0],st[1]))+'<span class="chip">'+esc(fl?fl[1]:it.fluxo)+'</span><span class="chip">'+esc(FR_ROTULO[it.frente]||it.frente||"Ajuste")+'</span><span class="chip">'+esc(it.dono||"—")+'</span>'+
+  var h='<details class="opo" data-id="'+esc(it.id||"")+'"><summary>'+prioChip(it.prioridade)+'<div><div class="ttl">'+esc(it.id?it.id+" · ":"")+esc(it.titulo)+'</div><div class="meta">'+(pode?bkSelect(it):chip(st[0],st[1]))+fls.map(function(k){return '<span class="chip">'+esc(bkRotuloFluxo(k))+'</span>'}).join("")+'<span class="chip">'+esc(FR_ROTULO[it.frente]||it.frente||"Ajuste")+'</span><span class="chip">'+esc(it.dono||"—")+'</span>'+
+    (cons.length?'<span class="chip info">Reúne '+(cons.length+1)+' tarefas</span>':'')+
+    (it.situacao==="observacao"?'<span class="chip muted">Em observação</span>':'')+
     '<span class="chip">'+oc.length+(oc.length===1?' ocorrência':' ocorrências')+'</span><span class="chip muted">1ª vez '+esc(dataBr(it.criada_em))+' · última '+esc(dataBr(it.ultima_vez))+'</span>'+
     (arr(it.reapareceu_em).length?'<span class="chip crit">Reapareceu depois de '+(it.status==="cancelada"?"cancelada":"concluída")+'</span>':'')+
-    (it.origem==="teste"?'<span class="chip info">rodada de teste</span>':'')+'</div></div><span class="mono" style="text-align:right;white-space:nowrap">'+(num(ult.contatos_estimados)?'≈ '+int(ult.contatos_estimados)+'<br><span class="muted" style="font-size:11px">contatos na última</span>':'')+'</span></summary><div class="body">';
+    (it.origem==="teste"?'<span class="chip info">rodada de teste</span>':'')+'</div></div><span class="mono" style="text-align:right;white-space:nowrap">'+(it.classe==="D"?'<span class="muted" style="font-size:11px">risco / handoff</span>':(imp?'≈ '+int(imp)+'<br><span class="muted" style="font-size:11px">contatos na última'+(fls.length>1?' (maior fluxo)':'')+'</span>':''))+'</span></summary><div class="body">';
   if(it.status!=="aberta"||it.nota){
     h+='<div class="banner '+(it.status==="concluida"?"info":"")+'"><span class="dot '+(it.status==="concluida"?"good":"info")+'"></span><div><b>'+esc(st[0])+(it.status!=="aberta"&&it.status_em?' em '+esc(dataBr(it.status_em)):'')+'.</b> '+esc(it.nota?(/[.!?…]$/.test(String(it.nota).trim())?String(it.nota).trim():String(it.nota).trim()+"."):"Sem nota.")+(arr(it.reapareceu_em).length?' <b>Voltou a aparecer em '+arr(it.reapareceu_em).map(dataBr).join(", ")+'.</b>':(it.status==="concluida"?' Sem reaparecer nas rodadas seguintes até agora.':''))+'</div></div>';
   }
@@ -667,33 +684,40 @@ function bkItem(it){
   if(it.no)h+='<dt>Onde mexer</dt><dd>'+esc(it.no)+'</dd>';
   if(it.dependencias&&it.dependencias!=="—")h+='<dt>Depende de</dt><dd>'+esc(it.dependencias)+'</dd>';
   if(it.como_medir)h+='<dt>Como saber que funcionou</dt><dd>'+esc(it.como_medir)+'</dd>';
+  if(cons.length)h+='<dt>Tarefas reunidas</dt><dd>'+arr(it.consolida_status).map(function(c){var s=BK_STATUS[c.status]||BK_STATUS.aberta;return '<div>'+esc(c.id)+' · '+esc(bkRotuloFluxo(c.fluxo))+' · '+esc(s[0])+(c.status_em&&c.status!=="aberta"?' em '+esc(dataBr(c.status_em)):'')+(c.titulo?' · '+esc(c.titulo):'')+'</div>'}).join("")+'</dd>';
+  if(arr(it.relacionadas).length)h+='<dt>Relacionadas</dt><dd>'+arr(it.relacionadas).map(esc).join(", ")+'</dd>';
   h+='</dl>';
-  h+='<div class="panel scroll"><h3>Ocorrências</h3><table><thead><tr><th>Período</th><th>Rotina</th><th class="n">Contatos (est.)</th><th>Tickets de exemplo</th></tr></thead><tbody>'+oc.slice().reverse().map(function(o){return '<tr><td>'+esc(o.periodo_label||dataBr(o.fim))+'</td><td>'+esc(o.rotina||"—")+'</td><td class="n">'+(num(o.contatos_estimados)?int(o.contatos_estimados):"—")+'</td><td>'+(tix(o.tickets,3)||'<span class="muted">—</span>')+'</td></tr>'}).join("")+'</tbody></table></div>';
+  h+='<div class="panel scroll"><h3>Ocorrências</h3><table><thead><tr><th>Fluxo</th><th>Período</th><th>Rotina</th><th class="n">Contatos (est.)</th><th>Tickets de exemplo</th></tr></thead><tbody>'+oc.slice().sort(function(a,b){return String(b.fim).localeCompare(String(a.fim))||String(a.fluxo).localeCompare(String(b.fluxo))}).map(function(o){return '<tr><td>'+esc(o.fluxo?bkRotuloFluxo(o.fluxo):"—")+'</td><td>'+esc(o.periodo_label||dataBr(o.fim))+'</td><td>'+esc(o.rotina||"—")+'</td><td class="n">'+(num(o.contatos_estimados)?int(o.contatos_estimados):"—")+'</td><td>'+(tix(o.tickets,3)||'<span class="muted">—</span>')+'</td></tr>'}).join("")+'</tbody></table></div>';
   return h+'</div></details>';
 }
 function abaBacklog(){
   var abertos={};Array.prototype.forEach.call(document.querySelectorAll("details.opo[open][data-id]"),function(d){abertos[d.getAttribute("data-id")]=1});
   var todos=bkItens(),f=S.bkF||{fluxo:"todos",status:"abertas",equipe:"todas"};
   if(!f.equipe)f.equipe="todas";
-  var cont={aberta:0,em_andamento:0,concluida:0,cancelada:0};
-  todos.forEach(function(it){cont[it.status]=(cont[it.status]||0)+1});
-  var h='<section class="block"><h2>Backlog de ações</h2><p class="sub">Tudo o que as rotinas já levantaram, em ordem de última aparição. O que é novo entra sozinho a cada rodada; quando o mesmo problema reaparece, ele ganha uma ocorrência em vez de virar item novo. O status (Não iniciado, Em andamento, Concluído ou Cancelado) é alterado aqui mesmo, na caixinha de cada tarefa, por quem pode editar o painel, com data automática e nota opcional; ao mudar, a tarefa passa sozinha para a subárea correspondente. Se um item concluído ou cancelado voltar a aparecer, o painel avisa.</p>';
+  var cont={aberta:0,em_andamento:0,concluida:0,cancelada:0},obs=[];
+  todos.forEach(function(it){if(bkVisivel(it))cont[it.status]=(cont[it.status]||0)+1;else obs.push(it)});
+  var h='<section class="block"><h2>Backlog de ações</h2><p class="sub">Cada tarefa é uma mudança concreta: se o mesmo problema aparece em mais de um fluxo, ele vira uma tarefa só e mostra de quais fluxos veio. Entram na lista as tarefas com 10 ou mais contatos por semana em algum fluxo, as que apareceram em mais de um fluxo ou em mais de um período, e as de gravidade alta (regulatório, fraude, segurança ou perda financeira); o resto fica em observação, no fim da página, até ganhar volume. Em cada fluxo, os contatos são os da última janela e não são somados entre fluxos. Os casos de risco e transbordo (classe D) são priorizados por gravidade, não por volume. O que é novo entra sozinho a cada rodada; quando o mesmo problema reaparece, ele ganha uma ocorrência em vez de virar item novo. O status (Não iniciado, Em andamento, Concluído ou Cancelado) é alterado aqui mesmo, na caixinha de cada tarefa, por quem pode editar o painel, com data automática e nota opcional; ao mudar, a tarefa passa sozinha para a subárea correspondente. Se um item concluído ou cancelado voltar a aparecer, o painel avisa.</p>';
   if(S.bkErro)h+='<div class="banner warn" role="alert"><span class="dot warn"></span><div>'+esc(S.bkErro)+'</div></div>';
   h+='<div class="kpis">'+kpi("Não iniciadas",int(cont.aberta),"aguardando ajuste")+kpi("Em andamento",int(cont.em_andamento),"em análise ou ajuste")+kpi("Concluídas",int(cont.concluida),"ajuste publicado")+kpi("Canceladas",int(cont.cancelada),"não serão feitas")+'</div>';
   h+='<div class="pills" role="group" aria-label="Fluxo">'+[["todos","Todos os fluxos"]].concat(BK_FLUXOS).map(function(x){return '<button class="pill" data-bkf="'+x[0]+'" aria-pressed="'+(f.fluxo===x[0])+'">'+esc(x[1])+'</button>'}).join("")+'</div>';
   h+='<div class="pills" role="group" aria-label="Equipe">'+BK_EQUIPES.map(function(x){
-    var n=todos.filter(function(it){return (f.fluxo==="todos"||it.fluxo===f.fluxo)&&(x[0]==="todas"||bkEquipe(it)===x[0])&&(f.status==="todas"?true:f.status==="abertas"?(it.status==="aberta"||it.status==="em_andamento"):it.status===f.status)}).length;
+    var n=todos.filter(function(it){return bkVisivel(it)&&bkNoFluxo(it,f.fluxo)&&(x[0]==="todas"||bkEquipe(it)===x[0])&&(f.status==="todas"?true:f.status==="abertas"?(it.status==="aberta"||it.status==="em_andamento"):it.status===f.status)}).length;
     return '<button class="pill" data-bke="'+esc(x[0])+'" aria-pressed="'+(f.equipe===x[0])+'">'+esc(x[1])+' ('+int(n)+')</button>'}).join("")+'</div>';
   h+='<div class="pills" role="group" aria-label="Status">'+[["abertas","Em aberto"],["aberta","Não iniciadas"],["em_andamento","Em andamento"],["concluida","Concluídas"],["cancelada","Canceladas"],["todas","Todas"]].map(function(x){return '<button class="pill" data-bks="'+x[0]+'" aria-pressed="'+(f.status===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>';
   var ra={alta:0,media:1,baixa:2};
-  var lista=todos.filter(function(it){
-    if(f.fluxo!=="todos"&&it.fluxo!==f.fluxo)return false;
+  var passa=function(it){
+    if(!bkNoFluxo(it,f.fluxo))return false;
     if(f.equipe!=="todas"&&bkEquipe(it)!==f.equipe)return false;
     if(f.status==="todas")return true;
     if(f.status==="abertas")return it.status==="aberta"||it.status==="em_andamento";
     return it.status===f.status;
-  }).sort(function(a,b){return (a.ultima_vez<b.ultima_vez?1:a.ultima_vez>b.ultima_vez?-1:0)||((ra[a.prioridade]==null?3:ra[a.prioridade])-(ra[b.prioridade]==null?3:ra[b.prioridade]))||(String(a.id)<String(b.id)?-1:1)});
+  };
+  /* ordem por impacto: gravidade (prioridade) primeiro, depois contatos da última janela (maior fluxo), depois a aparição mais recente */
+  var ordem=function(a,b){return ((ra[a.prioridade]==null?3:ra[a.prioridade])-(ra[b.prioridade]==null?3:ra[b.prioridade]))||(bkImpacto(b)-bkImpacto(a))||(a.ultima_vez<b.ultima_vez?1:a.ultima_vez>b.ultima_vez?-1:0)||(String(a.id)<String(b.id)?-1:1)};
+  var lista=todos.filter(function(it){return bkVisivel(it)&&passa(it)}).sort(ordem);
   h+=lista.length?'<div class="opos">'+lista.map(bkItem).join("")+'</div>':empty("Nenhum item neste filtro","Troque o fluxo, a equipe ou o status para ver os demais.");
+  var lobs=obs.filter(passa).sort(ordem);
+  if(lobs.length)h+='<details class="bkobs"><summary><b>Em observação ('+lobs.length+')</b> <span class="muted">ainda sem volume ou recorrência suficientes para entrar na lista; reavaliadas a cada rodada e arquivadas se ficarem 4 semanas sem aparecer</span></summary><div class="opos">'+lobs.map(bkItem).join("")+'</div></details>';
   main(h+'</section>');
   Array.prototype.forEach.call(document.querySelectorAll("details.opo[data-id]"),function(d){if(abertos[d.getAttribute("data-id")])d.open=true});
 }
@@ -768,7 +792,7 @@ function bkSalvar(id,patch){
   if(!S.db||!S.canEdit||!id)return;
   var base=bkBase().filter(function(x){return x.id===id})[0];if(!base)return;
   var cur=bkEf(base),novo=patch.status||cur.status;
-  var doc={status:novo,status_em:novo!==cur.status?hoje():(cur.status_em||hoje()),nota:patch.nota!=null?String(patch.nota).slice(0,500):(cur.nota||""),fluxo:base.fluxo||"",por:S.meId||null,atualizado_em:new Date().toISOString()};
+  var doc={status:novo,status_em:novo!==cur.status?hoje():(cur.status_em||hoje()),nota:patch.nota!=null?String(patch.nota).slice(0,500):(cur.nota||""),fluxo:arr(base.fluxos).join(",")||base.fluxo||"",por:S.meId||null,atualizado_em:new Date().toISOString()};
   var antes=S.bkDb[id];S.bkErro="";
   S.bkDb[id]=doc;bkRender();
   S.bkQ[id]=(S.bkQ[id]||Promise.resolve()).then(function(){return S.db.doc("backlog_status/"+id).set(doc)}).catch(function(e){
@@ -814,7 +838,7 @@ bkDbInit();
 /* ---------- boot ---------- */
 var chaves=["cartao-hp","cartao-hp-mensal","aleatorio","aleatorio-mensal","criticos-semanal","criticos-mensal"];
 var salvo=store("bqs-tab");if(salvo)S.tab=salvo;
-Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat(["cartao-hp","aleatorio","criticos"].map(function(k){return load("data/backlog/"+k+".json").then(function(r){S.bk[k]=arr(r)})})).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
+Promise.all(chaves.map(function(k){return Promise.all([load("data/"+k+"/latest.json"),load("data/"+k+"/history.json")]).then(function(r){S.data[k]=normRun(r[0]);S.hist[k]=normHist(r[1])})}).concat([load("data/backlog/backlog.json").then(function(r){S.bk.todos=arr(r)})]).concat([load("data/eventos.json").then(function(r){S.eventos=arr(r)})])).then(render);
 render();
 })();
 </script>

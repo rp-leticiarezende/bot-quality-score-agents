@@ -75,22 +75,32 @@ O arquivo `data/eventos.json` (marcos manuais, como o hiato do BQS) é **global 
 Os campos `n_avaliaveis`, `calibracao_amostra`, `calibracao_revertidos` e `n_sinalizados` alimentam a visão mensal acumulada (itens antigos sem eles usam `n_total` e ficam fora da calibração somada).
 O painel marca na linha do tempo, sozinho, toda mudança de `prompt_version` entre pontos seguidos. Itens antigos sem `prompt_version` ou com a chave `bqs_final` continuam válidos.
 
-### Backlog de ações (`data/backlog/<fluxo>.json`)
+### Backlog de ações (`data/backlog/backlog.json`)
 
-Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (alimentado pela rotina `criticos-semanal`). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é quem pode editar o painel, direto na caixinha de cada tarefa (Não iniciado, Em andamento, Concluído ou Cancelado, com nota opcional): ele fica no banco de dados do próprio artefato (coleção `backlog_status`, um documento por `id` do item, com `status`, `status_em`, `nota`, `por` e `atualizado_em`; escrita só para quem edita) e vale por cima do `status` deste arquivo. As rotinas nunca o alteram nem o leem.
+**Um único arquivo para os três fluxos** (`cartao-hp`, `aleatorio` e `criticos`, este alimentado pela rotina `criticos-semanal`). Cada tarefa é uma **mudança concreta**, não um fluxo: o mesmo insight visto em mais de um fluxo é UMA tarefa, que lista de quais fluxos ele veio (`fluxos`). É um array de itens que **acumula todas as rodadas** (as demais abas mostram só a rodada mais recente). Quem define o status é quem pode editar o painel, direto na caixinha de cada tarefa (Não iniciado, Em andamento, Concluído ou Cancelado, com nota opcional): ele fica no banco de dados do próprio artefato (coleção `backlog_status`, um documento por `id` do item, com `status`, `status_em`, `nota`, `por` e `atualizado_em`; escrita só para quem edita) e vale por cima do `status` deste arquivo. As rotinas nunca o alteram nem o leem.
 
 ```
 {
-  "id": "CC-001", "fluxo": "cartao-hp | aleatorio | criticos",
+  "id": "CC-001 (tarefas antigas) ou BK-NNN (novas)", "fluxos": ["cartao-hp", "aleatorio", "criticos"],   // um ou mais fluxos de onde o insight veio
+  "consolida": ["ids antigos que esta tarefa absorveu"],
+  "situacao": "ativa | observacao | arquivada",    // regra de entrada: ver "Regras de atualização"
   "titulo": "…", "frente": "…", "causa": "…", "classe": "A|B|C|D", "dono": "Produto CX | Help Design", "prioridade": "alta | media | baixa",
   "problema": "…", "proposta": "…", "no": "…", "antes": "…", "depois": "…", "como_medir": "…", "dependencias": "…",
   "criada_em": "AAAA-MM-DD", "ultima_vez": "AAAA-MM-DD", "origem": "rotina | teste",
   "status": "aberta | em_andamento | concluida | cancelada", "status_em": "AAAA-MM-DD ou null", "nota": "texto livre (motivo, link do ajuste)",
   "reapareceu_em": ["AAAA-MM-DD"],                 // datas em que o problema voltou depois de concluído ou cancelado
-  "ocorrencias": [ { "fim": "AAAA-MM-DD", "periodo_label": "…", "rotina": "chave da rotina", "contatos_estimados": 0, "tickets": ["ticket_id", "até 3"] } ]
+  "ocorrencias": [ { "fluxo": "cartao-hp | aleatorio | criticos", "fim": "AAAA-MM-DD", "periodo_label": "…", "rotina": "chave da rotina", "contatos_estimados": 0, "tickets": ["ticket_id", "até 3"] } ]
 }
 ```
 
 **Filtro por equipe (aba Backlog, 03/11/2026):** a página agrupa as tarefas pelo campo `dono`, em uma linha de botões entre o filtro de fluxo e o de status: **Todas as equipes**, **Produto CX**, **Help Design** e **Tarefas compartilhadas**. Cada tarefa cai em um só grupo, para os números somarem o total: `dono` igual a `Produto CX` ou `Help Design` vai para a equipe; `dono` que cita as duas (separadas por `|`, por exemplo `Produto CX | Help Design`) vai para "Tarefas compartilhadas". Por isso, as rotinas devem preencher `dono` com **uma** equipe sempre que um lado só resolve, e com as duas somente quando as duas equipes precisam agir. Valor vazio ou diferente aparece só em "Todas as equipes". O filtro é feito na página; não há campo novo nos JSON.
 
-**Regras de atualização (a cada rodada):** problema já existente (mesmo fluxo, causa e tema/nó, comparado pelo sentido) ganha uma `ocorrencia` e a descrição mais recente; problema novo vira item `aberta`; **nunca** mude `status`, `status_em` ou `nota`; item `concluida` ou `cancelada` que reaparece só ganha a data em `reapareceu_em`; nada é apagado.
+**Regras de atualização (a cada rodada):**
+- **Mesma mudança, em qualquer fluxo:** compare pela mudança (dono + nó, prompt ou artigo + gatilho ou regra), com o sentido e não o texto, contra o backlog INTEIRO (qualquer fluxo e rodada). Se já existir, não abra id novo: acrescente a `ocorrencia` com o `fluxo` desta rodada, inclua o fluxo em `fluxos` e atualize a descrição com a versão mais recente.
+- **Problema novo:** item `BK-NNN` sequencial, `aberta`, com a primeira ocorrência.
+- **Contatos:** por fluxo, na última janela semanal comparável; nunca some entre fluxos como se fosse um número só (as amostras podem repetir conversas).
+- **Entrada no backlog ativo (`situacao`):** `ativa` se a última janela de algum fluxo tem **10 ou mais contatos**, OU a mudança apareceu em **2 ou mais fluxos** (uma tarefa só), OU tem 2 ou mais ocorrências em períodos diferentes, OU a gravidade é alta (regulatório, fraude, segurança, perda financeira), OU a correção é trivial (texto, link, template). Senão `observacao`. Classe D não entra por volume: é risco ou handoff, priorizada por gravidade.
+- **Saída:** `observacao` ou `ativa` sem ocorrência há **4 semanas** vira `arquivada`; nunca se apaga nada. `arquivada` que reaparece volta a `observacao` ou `ativa` pela mesma regra.
+- **Status:** **nunca** mude `status`, `status_em` ou `nota`; item `concluida` ou `cancelada` que reaparece só ganha a data em `reapareceu_em`, e nunca é fundido com tarefa aberta.
+- **Dono e entrega:** uma equipe por tarefa; artigo (Help Design) e prompt ou fluxo (Produto CX) viram duas tarefas ligadas. Trecho repetido em 3 ou mais tarefas vira uma tarefa central.
+- **Política de transbordo (decidida):** pediu atendente, transfere; só não vale depois do CSAT, que é campo livre. Nenhuma tarefa propõe sondagem antes de transferir nesse caso.
