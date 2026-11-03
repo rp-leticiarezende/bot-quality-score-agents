@@ -239,3 +239,6 @@ O que quebrou e como ficou:
 
 ## 03/11/2026 — aba "Contatos sem artigo" removida do painel
 A aba (tag `chat-default-instead-form`) saiu de `artifact/painel.html` (botão, função e texto do "Como ler"); o assunto fica com os agentes `chat-default-*`. O campo opcional `metricas.sem_artigo_porta` do esquema deixou de ser lido pelo painel.
+
+## 03/11/2026 — semana parcial na aba Abandono
+`latest.json` do abandono ganha `semana_parcial` (consulta 2 de `sql/abandono.sql`): semana seg-dom mais recente, com volume completo e recontato em 7 dias ainda parcial, mais a leitura só dos abandonos com janela fechada. Fica fora de `history.json`, da tendência e do ranking; o painel mostra um bloco tracejado "Semana em andamento (parcial)". Primeira medição, 26/10 a 01/11: 11.101 abandonos, 8,8% de recontato parcial e 11,3% nos 3.137 com janela fechada. A rotina republica `latest.json` toda segunda.

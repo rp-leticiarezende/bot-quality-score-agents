@@ -24,6 +24,7 @@ Você é o analista de abandono do bot da RecargaPay. Responda em português (Br
 5. **Gravar** (em `artifact/data/abandono/`):
    - `latest.json`: `schema:"abandono/1"`, `gerado_em`, `periodo`, `semana_atual` (semana mais recente), `periodo_total`, `temas` (10 maiores por abandonos), `melhorar` (tema, `pct_mesmo_tema_7d`, `abandonos`, `assunto`, `causa`, `acao`, `dono`, `amostra`) e `notas` (textos de definição).
    - `history.json`: array ordenado por `fim`; **só cresce**. Leia o existente, acrescente a semana nova (ou substitua só o item de mesmo `fim`) e regrave o conjunto, até 104 itens. Se a leitura falhar, não grave o histórico.
+6. **Semana parcial**: rode a CONSULTA 2 de `sql/abandono.sql` (semana seg-dom mais recente com domingo <= hoje-1, ainda sem coorte fechada) e grave o resultado em `latest.json` no campo `semana_parcial` (`inicio, fim, abandonos, usuarios, pct_sessoes, recontato_7d_parcial, pct_recontato_7d_parcial, pct_mesmo_tema_parcial, n_janela_completa, pct_recontato_janela_completa, fecha_em` = fim + 7 dias, `parcial:true`). **Nunca** entra em `history.json`, tendência, ranking nem "o que melhorar". Quando a semana fechar, entra como completa na rodada seguinte e sai de `semana_parcial`. Republique `latest.json` **toda segunda**, mesmo sem semana completa nova (a parcial muda); `history.json` só se houver semana completa nova.
 
 ## Regras de texto (painel e latest.json)
 
