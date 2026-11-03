@@ -620,6 +620,9 @@ function opo(o){
 
 /* ---------- backlog ---------- */
 var BK_FLUXOS=[["cartao-hp","Agente de Cartão de Crédito"],["aleatorio","Aleatório"],["criticos","Casos críticos"]];
+var BK_EQUIPES=[["todas","Todas as equipes"],["Produto CX","Produto CX"],["Help Design","Help Design"],["compartilhadas","Tarefas compartilhadas"]];
+/* equipe da tarefa: uma só (Produto CX ou Help Design) ou "compartilhadas" quando o dono lista as duas (ex.: "Produto CX | Help Design"); assim as contagens somam o total */
+function bkEquipe(it){var d=String(it.dono||"").split("|").map(function(s){return s.trim()}).filter(Boolean);return d.length>1?"compartilhadas":(d[0]||"")}
 var BK_STATUS={aberta:["Não iniciado","warn"],em_andamento:["Em andamento","info"],concluida:["Concluído","good"],cancelada:["Cancelado",""]};
 var BK_ORDEM=["aberta","em_andamento","concluida","cancelada"];
 function hoje(){return new Date(Date.now()-3*3600000).toISOString().slice(0,10)}
@@ -670,22 +673,27 @@ function bkItem(it){
 }
 function abaBacklog(){
   var abertos={};Array.prototype.forEach.call(document.querySelectorAll("details.opo[open][data-id]"),function(d){abertos[d.getAttribute("data-id")]=1});
-  var todos=bkItens(),f=S.bkF||{fluxo:"todos",status:"abertas"};
+  var todos=bkItens(),f=S.bkF||{fluxo:"todos",status:"abertas",equipe:"todas"};
+  if(!f.equipe)f.equipe="todas";
   var cont={aberta:0,em_andamento:0,concluida:0,cancelada:0};
   todos.forEach(function(it){cont[it.status]=(cont[it.status]||0)+1});
   var h='<section class="block"><h2>Backlog de ações</h2><p class="sub">Tudo o que as rotinas já levantaram, em ordem de última aparição. O que é novo entra sozinho a cada rodada; quando o mesmo problema reaparece, ele ganha uma ocorrência em vez de virar item novo. O status (Não iniciado, Em andamento, Concluído ou Cancelado) é alterado aqui mesmo, na caixinha de cada tarefa, por quem pode editar o painel, com data automática e nota opcional; ao mudar, a tarefa passa sozinha para a subárea correspondente. Se um item concluído ou cancelado voltar a aparecer, o painel avisa.</p>';
   if(S.bkErro)h+='<div class="banner warn" role="alert"><span class="dot warn"></span><div>'+esc(S.bkErro)+'</div></div>';
   h+='<div class="kpis">'+kpi("Não iniciadas",int(cont.aberta),"aguardando ajuste")+kpi("Em andamento",int(cont.em_andamento),"em análise ou ajuste")+kpi("Concluídas",int(cont.concluida),"ajuste publicado")+kpi("Canceladas",int(cont.cancelada),"não serão feitas")+'</div>';
   h+='<div class="pills" role="group" aria-label="Fluxo">'+[["todos","Todos os fluxos"]].concat(BK_FLUXOS).map(function(x){return '<button class="pill" data-bkf="'+x[0]+'" aria-pressed="'+(f.fluxo===x[0])+'">'+esc(x[1])+'</button>'}).join("")+'</div>';
+  h+='<div class="pills" role="group" aria-label="Equipe">'+BK_EQUIPES.map(function(x){
+    var n=todos.filter(function(it){return (f.fluxo==="todos"||it.fluxo===f.fluxo)&&(x[0]==="todas"||bkEquipe(it)===x[0])&&(f.status==="todas"?true:f.status==="abertas"?(it.status==="aberta"||it.status==="em_andamento"):it.status===f.status)}).length;
+    return '<button class="pill" data-bke="'+esc(x[0])+'" aria-pressed="'+(f.equipe===x[0])+'">'+esc(x[1])+' ('+int(n)+')</button>'}).join("")+'</div>';
   h+='<div class="pills" role="group" aria-label="Status">'+[["abertas","Em aberto"],["aberta","Não iniciadas"],["em_andamento","Em andamento"],["concluida","Concluídas"],["cancelada","Canceladas"],["todas","Todas"]].map(function(x){return '<button class="pill" data-bks="'+x[0]+'" aria-pressed="'+(f.status===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>';
   var ra={alta:0,media:1,baixa:2};
   var lista=todos.filter(function(it){
     if(f.fluxo!=="todos"&&it.fluxo!==f.fluxo)return false;
+    if(f.equipe!=="todas"&&bkEquipe(it)!==f.equipe)return false;
     if(f.status==="todas")return true;
     if(f.status==="abertas")return it.status==="aberta"||it.status==="em_andamento";
     return it.status===f.status;
   }).sort(function(a,b){return (a.ultima_vez<b.ultima_vez?1:a.ultima_vez>b.ultima_vez?-1:0)||((ra[a.prioridade]==null?3:ra[a.prioridade])-(ra[b.prioridade]==null?3:ra[b.prioridade]))||(String(a.id)<String(b.id)?-1:1)});
-  h+=lista.length?'<div class="opos">'+lista.map(bkItem).join("")+'</div>':empty("Nenhum item neste filtro","Troque o fluxo ou o status para ver os demais.");
+  h+=lista.length?'<div class="opos">'+lista.map(bkItem).join("")+'</div>':empty("Nenhum item neste filtro","Troque o fluxo, a equipe ou o status para ver os demais.");
   main(h+'</section>');
   Array.prototype.forEach.call(document.querySelectorAll("details.opo[data-id]"),function(d){if(abertos[d.getAttribute("data-id")])d.open=true});
 }
@@ -725,11 +733,12 @@ function render(){
   $("#atualizado").textContent=ult?"Atualizado em "+dt(ult):"";
 }
 document.addEventListener("click",function(e){
-  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro],[data-metric],[data-lf],[data-gper],[data-fper],[data-lper],[data-bkf],[data-bks]");if(!el)return;
+  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro],[data-metric],[data-lf],[data-gper],[data-fper],[data-lper],[data-bkf],[data-bke],[data-bks]");if(!el)return;
   if(el.dataset.tab||el.dataset.go){S.tab=el.dataset.tab||el.dataset.go;if(el.dataset.go&&S.per!=="semanal")S.perFluxo[el.dataset.go]=S.per;else if(el.dataset.go)S.perFluxo[el.dataset.go]="semanal";store("bqs-tab",S.tab);window.scrollTo(0,0)}
   if(el.dataset.metric)S.metric=el.dataset.metric;
   if(el.dataset.bkf){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.fluxo=el.dataset.bkf}
   if(el.dataset.bks){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.status=el.dataset.bks}
+  if(el.dataset.bke){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.equipe=el.dataset.bke}
   if(el.dataset.lf)S.linhaFluxo=el.dataset.lf;
   if(el.dataset.gper)S.per=el.dataset.gper;
   if(el.dataset.lper)S.linhaPer=el.dataset.lper;
