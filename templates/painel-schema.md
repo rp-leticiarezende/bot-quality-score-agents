@@ -91,4 +91,6 @@ Um arquivo por fluxo: `cartao-hp`, `aleatorio` e `criticos` (alimentado pela rot
 }
 ```
 
+**Filtro por equipe (aba Backlog, 03/11/2026):** a página agrupa as tarefas pelo campo `dono`, em uma linha de botões entre o filtro de fluxo e o de status: **Todas as equipes**, **Produto CX**, **Help Design** e **Tarefas compartilhadas**. Cada tarefa cai em um só grupo, para os números somarem o total: `dono` igual a `Produto CX` ou `Help Design` vai para a equipe; `dono` que cita as duas (separadas por `|`, por exemplo `Produto CX | Help Design`) vai para "Tarefas compartilhadas". Por isso, as rotinas devem preencher `dono` com **uma** equipe sempre que um lado só resolve, e com as duas somente quando as duas equipes precisam agir. Valor vazio ou diferente aparece só em "Todas as equipes". O filtro é feito na página; não há campo novo nos JSON.
+
 **Regras de atualização (a cada rodada):** problema já existente (mesmo fluxo, causa e tema/nó, comparado pelo sentido) ganha uma `ocorrencia` e a descrição mais recente; problema novo vira item `aberta`; **nunca** mude `status`, `status_em` ou `nota`; item `concluida` ou `cancelada` que reaparece só ganha a data em `reapareceu_em`; nada é apagado.
