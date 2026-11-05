@@ -97,3 +97,37 @@ SELECT CAST(per.ini AS STRING) AS inicio, CAST(per.fim AS STRING) AS fim,
        ROUND(100.0 * SUM(CASE WHEN r.creation_ts <= current_timestamp() - INTERVAL 7 DAYS THEN r.voltou ELSE 0 END)
              / NULLIF(SUM(CASE WHEN r.creation_ts <= current_timestamp() - INTERVAL 7 DAYS THEN 1 ELSE 0 END), 0), 1) AS pct_recontato_janela_completa
 FROM rec r CROSS JOIN per CROSS JOIN tot GROUP BY per.ini, per.fim;
+
+
+-- ============================================================================
+-- CONSULTA 3 - DIARIO (alimenta latest.json > diario, usado pelo filtro de periodo/dia da tendencia)
+-- Ultimos 120 dias com a janela de 7 dias ja fechada: data entre hoje-127 e hoje-8.
+-- Mesmas regras da consulta 1: abandono ativo (flg_active_abandonment=1); recontato = nova sessao do mesmo user_id
+-- em ate 7 dias apos creation_ts; mesmo stage = mesmo stage NAO nulo; conta ABANDONOS, nao usuarios.
+-- Devolve 1 linha com o array JSON compacto [[ "AAAA-MM-DD", abandonos, recontato_7d, recontato_mesmo_stage_7d ], ...]
+-- (colar o texto em latest.json > diario). A soma dos dias de uma semana seg-dom deve bater com history.json.
+-- ============================================================================
+WITH per AS (SELECT date_sub(current_date(), 127) AS ini, date_sub(current_date(), 8) AS fim),
+sess AS (
+  SELECT user_id, session_id, creation_ts, stage
+  FROM prod.cx.fat_botmaker_metrics, per
+  WHERE creation_date BETWEEN per.ini AND date_add(per.fim, 8)
+),
+aband AS (
+  SELECT m.session_id, m.user_id, m.creation_ts, m.stage, m.creation_date AS dia
+  FROM prod.cx.fat_botmaker_metrics m, per
+  WHERE m.creation_date BETWEEN per.ini AND per.fim AND m.flg_active_abandonment = 1
+),
+rec AS (
+  SELECT a.session_id, a.dia,
+         MAX(CASE WHEN s.session_id IS NOT NULL THEN 1 ELSE 0 END) AS voltou,
+         MAX(CASE WHEN a.stage IS NOT NULL AND s.stage = a.stage THEN 1 ELSE 0 END) AS voltou_mesmo_stage
+  FROM aband a
+  LEFT JOIN sess s ON s.user_id = a.user_id AND s.session_id <> a.session_id
+       AND s.creation_ts > a.creation_ts AND s.creation_ts <= a.creation_ts + INTERVAL 7 DAYS
+  GROUP BY a.session_id, a.dia
+),
+d AS (SELECT dia, COUNT(*) AS ab, SUM(voltou) AS r7, SUM(voltou_mesmo_stage) AS ms FROM rec GROUP BY dia)
+SELECT COUNT(*) AS dias, MIN(dia) AS primeiro, MAX(dia) AS ultimo,
+       concat('[', concat_ws(',', collect_list(concat('["', CAST(dia AS STRING), '",', ab, ',', r7, ',', ms, ']'))), ']') AS diario
+FROM (SELECT * FROM d ORDER BY dia);
