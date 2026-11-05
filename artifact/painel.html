@@ -185,7 +185,7 @@ ul.plain li{display:flex;gap:10px;align-items:flex-start}
 .ab-ctl{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
 .ab-dt{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:13px}
 .ab-dt label{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
-.ab-dt input{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 6px;color-scheme:light dark}
+.ab-dt select,.ab-dt input{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 6px;color-scheme:light dark}
 .ab-ls{display:flex;flex-direction:column;gap:10px}
 .ab-tr{display:grid;grid-template-columns:minmax(150px,200px) 1fr 70px;align-items:center;gap:10px;font-size:13px}
 .ab-tr .l{display:flex;flex-direction:column;min-width:0}
@@ -501,6 +501,27 @@ function abAtalho(B,F,q){
   else{F.ate=B.U>B.E?B.U:B.E;F.de=B.ini}
 }
 function abEnsure(B){if(!S.abF){S.abF={modo:"sem"};abAtalho(B,S.abF,"8s")}return S.abF}
+var ABMES=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+function abMesLab(k){return ABMES[+k.slice(5,7)-1]+"/"+k.slice(0,4)}
+function abMesFim(k){return k+"-"+p2(new Date(Date.UTC(+k.slice(0,4),+k.slice(5,7),0)).getUTCDate())}
+function abMeses(B){var o=[],v={};B.dias.forEach(function(x){var k=x[0].slice(0,7);if(!v[k]){v[k]=1;o.push(k)}});return o}
+function abMes(B,F){
+  var m={},rows=[],pri={};
+  B.dias.forEach(function(x){
+    var k=x[0].slice(0,7);if(!pri[k])pri[k]=x[0];
+    if(x[0]<F.de||x[0]>F.ate||x[0]>B.U)return;
+    var o=m[k]||(m[k]={k:k,ab:0,r:0,m:0,a:x[0],z:x[0]});
+    o.ab+=x[1];o.r+=x[2]||0;o.m+=x[3]||0;o.z=x[0];
+  });
+  Object.keys(m).sort().forEach(function(k){
+    var o=m[k],ful=abMesFim(k);
+    o.rot=abMesLab(k);
+    if(ful>B.U)o.rot+=" (parcial: dados até "+ddmm(B.U)+")";
+    else if(o.a>pri[k]||o.z<ful)o.rot+=" (parcial do período)";
+    rows.push(o);
+  });
+  return rows;
+}
 function abSemanas(B,F){
   var m={},tem={},rows=[];
   B.dias.forEach(function(x){
@@ -526,13 +547,15 @@ function abTendHTML(d,h5){
   if(!temD)F.modo="sem";
   var mx=B.U>B.E?B.U:B.E;
   var h='<div class="panel"><div class="ab-ctl"><div class="pills" role="group" aria-label="Atalhos de período">'+ABQ.map(function(p){return '<button class="pill" data-abq="'+p[0]+'" aria-pressed="'+(F.q===p[0])+'">'+p[1]+'</button>'}).join("")+'</div>'+
-    '<div class="ab-dt"><label>De <input type="date" data-abd="de" value="'+esc(F.de)+'" min="'+esc(B.ini)+'" max="'+esc(mx)+'"></label><label>Até <input type="date" data-abd="ate" value="'+esc(F.ate)+'" min="'+esc(B.ini)+'" max="'+esc(mx)+'"></label></div>'+
-    '<div class="pills" role="group" aria-label="Agrupar por">'+[["sem","Semana"],["dia","Dia"]].map(function(p){return '<button class="pill" data-abm="'+p[0]+'" aria-pressed="'+(F.modo===p[0])+'"'+(p[0]==="dia"&&!temD?' disabled title="Sem dados diários nesta rodada"':'')+'>'+p[1]+'</button>'}).join("")+'</div></div>';
+    '<div class="ab-dt">'+(temD?'<label>Mês <select data-abmes aria-label="Filtrar por mês"><option value=""'+(!F.mes&&F.q!=="tudo"?' selected':'')+'>Escolher…</option>'+abMeses(B).map(function(k){return '<option value="'+k+'"'+(F.mes===k?' selected':'')+'>'+abMesLab(k)+'</option>'}).join("")+'<option value="todos"'+(!F.mes&&F.q==="tudo"?' selected':'')+'>Todos</option></select></label>':'')+'<label>De <input type="date" data-abd="de" value="'+esc(F.de)+'" min="'+esc(B.ini)+'" max="'+esc(mx)+'"></label><label>Até <input type="date" data-abd="ate" value="'+esc(F.ate)+'" min="'+esc(B.ini)+'" max="'+esc(mx)+'"></label></div>'+
+    '<div class="pills" role="group" aria-label="Agrupar por">'+[["sem","Semana"],["dia","Dia"],["mes","Mês"]].map(function(p){return '<button class="pill" data-abm="'+p[0]+'" aria-pressed="'+(F.modo===p[0])+'"'+(p[0]!=="sem"&&!temD?' disabled title="Sem dados diários nesta rodada"':'')+'>'+p[1]+'</button>'}).join("")+'</div></div>';
   var lin=[],ab=0,r=0,m=0,aviso='';
   if(F.modo==="dia"){
     var ds=B.dias.filter(function(x){return x[0]>=F.de&&x[0]<=F.ate});
     if(ds.length>31){aviso='<div class="sub" style="margin:0"><span class="chip warn">Intervalo longo</span> O período tem '+ds.length+' dias; mostrando os últimos 31 ('+esc(ddmm(ds[ds.length-31][0]))+' a '+esc(ddmm(ds[ds.length-1][0]))+').</div>';ds=ds.slice(-31)}
     ds.forEach(function(x){ab+=x[1];r+=x[2]||0;m+=x[3]||0;lin.push(abLinha(ABDS[isoD(x[0]).getUTCDay()]+" "+ddmm(x[0]),x[1],x[2]||0,x[3]||0))});
+  }else if(F.modo==="mes"){
+    abMes(B,F).forEach(function(o){ab+=o.ab;r+=o.r;m+=o.m;lin.push(abLinha(o.rot,o.ab,o.r,o.m))});
   }else{
     abSemanas(B,F).forEach(function(o){ab+=o.ab;r+=o.r;m+=o.m;lin.push(abLinha(wlab(o.ini,o.fim)+(o.nd<7?" (parcial do período)":""),o.ab,o.r,o.m))});
     if(B.pa&&F.ate>=B.E)lin.push(abLinhaParcial(B.pa));
@@ -547,13 +570,19 @@ function abTendRender(){var el=$("#ab-tend");if(el&&S.ab)el.innerHTML=abTendHTML
 document.addEventListener("click",function(e){
   var el=e.target.closest&&e.target.closest("[data-abq],[data-abm]");if(!el||!S.ab||el.disabled)return;
   var B=abBase(S.ab,arr(S.abHist)),F=abEnsure(B);
-  if(el.dataset.abq)abAtalho(B,F,el.dataset.abq);
+  if(el.dataset.abq){F.mes="";abAtalho(B,F,el.dataset.abq)}
   if(el.dataset.abm)F.modo=el.dataset.abm;
   abTendRender();
 });
 document.addEventListener("change",function(e){
-  var el=e.target;if(!el||!el.matches||!el.matches("input[data-abd]")||!S.ab)return;
+  var el=e.target;if(!el||!el.matches||!el.matches("input[data-abd],select[data-abmes]")||!S.ab)return;
   var B=abBase(S.ab,arr(S.abHist)),F=abEnsure(B),v=el.value;
+  if(el.matches("select")){
+    if(v==="todos"){F.mes="";abAtalho(B,F,"tudo")}
+    else if(/^\d{4}-\d{2}$/.test(v)){var mx=B.U>B.E?B.U:B.E,fm=abMesFim(v);F.mes=v;F.q="";F.de=v+"-01"<B.ini?B.ini:v+"-01";F.ate=fm>mx?mx:fm}
+    abTendRender();return;
+  }
+  F.mes="";
   if(/^\d{4}-\d{2}-\d{2}$/.test(v)){F[el.dataset.abd]=v;F.q="";if(F.de>F.ate){var t=F.de;F.de=F.ate;F.ate=t}}
   abTendRender();
 });
