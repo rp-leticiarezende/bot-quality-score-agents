@@ -1,8 +1,8 @@
-[{"inicio":"2026-08-31","fim":"2026-09-06","abandonos":8260,"usuarios":7752,"pct_sessoes":43.31,"pct_recontato_7d":15.9,"pct_mesmo_tema_7d":10.3,"nunca_voltam_pct":84.1},
-{"inicio":"2026-09-07","fim":"2026-09-13","abandonos":9137,"usuarios":8451,"pct_sessoes":44.54,"pct_recontato_7d":14.3,"pct_mesmo_tema_7d":9.1,"nunca_voltam_pct":85.7},
-{"inicio":"2026-09-14","fim":"2026-09-20","abandonos":9061,"usuarios":8594,"pct_sessoes":45.21,"pct_recontato_7d":13.8,"pct_mesmo_tema_7d":8.7,"nunca_voltam_pct":86.2},
-{"inicio":"2026-09-21","fim":"2026-09-27","abandonos":8592,"usuarios":8096,"pct_sessoes":46.93,"pct_recontato_7d":12.9,"pct_mesmo_tema_7d":8.0,"nunca_voltam_pct":87.1},
-{"inicio":"2026-09-28","fim":"2026-10-04","abandonos":9554,"usuarios":9035,"pct_sessoes":46.15,"pct_recontato_7d":13.5,"pct_mesmo_tema_7d":7.1,"nunca_voltam_pct":86.5},
-{"inicio":"2026-10-05","fim":"2026-10-11","abandonos":12115,"usuarios":11512,"pct_sessoes":48.09,"pct_recontato_7d":11.2,"pct_mesmo_tema_7d":6.2,"nunca_voltam_pct":88.8},
-{"inicio":"2026-10-12","fim":"2026-10-18","abandonos":11346,"usuarios":10804,"pct_sessoes":47.86,"pct_recontato_7d":11.1,"pct_mesmo_tema_7d":5.9,"nunca_voltam_pct":88.9},
-{"inicio":"2026-10-19","fim":"2026-10-25","abandonos":11641,"usuarios":11004,"pct_sessoes":47.56,"pct_recontato_7d":11.6,"pct_mesmo_tema_7d":6.3,"nunca_voltam_pct":88.4}]
+[{"inicio":"2026-08-31","fim":"2026-09-06","abandonos":8260,"usuarios":7752,"pct_sessoes":43.31,"pct_recontato_7d":15.9,"pct_mesmo_stage_7d":6.0,"nunca_voltam_pct":84.1},
+{"inicio":"2026-09-07","fim":"2026-09-13","abandonos":9137,"usuarios":8451,"pct_sessoes":44.54,"pct_recontato_7d":14.3,"pct_mesmo_stage_7d":4.8,"nunca_voltam_pct":85.7},
+{"inicio":"2026-09-14","fim":"2026-09-20","abandonos":9061,"usuarios":8594,"pct_sessoes":45.21,"pct_recontato_7d":13.8,"pct_mesmo_stage_7d":4.7,"nunca_voltam_pct":86.2},
+{"inicio":"2026-09-21","fim":"2026-09-27","abandonos":8592,"usuarios":8096,"pct_sessoes":46.93,"pct_recontato_7d":12.9,"pct_mesmo_stage_7d":4.0,"nunca_voltam_pct":87.1},
+{"inicio":"2026-09-28","fim":"2026-10-04","abandonos":9554,"usuarios":9035,"pct_sessoes":46.15,"pct_recontato_7d":13.5,"pct_mesmo_stage_7d":4.1,"nunca_voltam_pct":86.5},
+{"inicio":"2026-10-05","fim":"2026-10-11","abandonos":12115,"usuarios":11512,"pct_sessoes":48.09,"pct_recontato_7d":11.2,"pct_mesmo_stage_7d":3.6,"nunca_voltam_pct":88.8},
+{"inicio":"2026-10-12","fim":"2026-10-18","abandonos":11346,"usuarios":10804,"pct_sessoes":47.86,"pct_recontato_7d":11.1,"pct_mesmo_stage_7d":3.5,"nunca_voltam_pct":88.9},
+{"inicio":"2026-10-19","fim":"2026-10-25","abandonos":11641,"usuarios":11006,"pct_sessoes":47.56,"pct_recontato_7d":11.6,"pct_mesmo_stage_7d":3.6,"nunca_voltam_pct":88.4}]

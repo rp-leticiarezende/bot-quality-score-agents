@@ -437,15 +437,15 @@ function abDelta(c,p,goodDown,rel){
   return '<span class="delta '+(good?'up':'down')+'">'+(df>0?'▲':'▼')+' '+(d>0?'+':'−')+fmt(Math.abs(d),1)+(rel?'%':' p.p.')+' vs semana anterior</span>';
 }
 function abFunil(w){
-  var tot=w.abandonos||0;if(!tot||!num(w.recontato_7d)||!num(w.recontato_mesmo_tema_7d))return '';
-  var it=[{nome:"Nunca volta em 7 dias",n:tot-w.recontato_7d,cor:"var(--cR)"},{nome:"Volta em 7 dias em outro tema",n:w.recontato_7d-w.recontato_mesmo_tema_7d,cor:"var(--cB)"},{nome:"Volta no mesmo tema",n:w.recontato_mesmo_tema_7d,cor:"var(--crit)"}];
+  var tot=w.abandonos||0;if(!tot||!num(w.recontato_7d)||!num(w.recontato_mesmo_stage_7d))return '';
+  var it=[{nome:"Nunca volta em 7 dias",n:tot-w.recontato_7d,cor:"var(--cR)"},{nome:"Volta em 7 dias em outro stage",n:w.recontato_7d-w.recontato_mesmo_stage_7d,cor:"var(--cB)"},{nome:"Volta no mesmo stage",n:w.recontato_mesmo_stage_7d,cor:"var(--crit)"}];
   var b='<div class="ab-fn" role="img" aria-label="Funil dos abandonos da semana">',l='<div class="ab-fl">';
   it.forEach(function(x){
     var p=100*x.n/tot;
     b+='<span style="width:'+p+'%;background:'+x.cor+(x.cor==="var(--cB)"?';color:var(--brand-ink)':'')+'" data-tip="'+esc(x.nome+": "+int(x.n)+" ("+fmt(p,1)+"%)")+'">'+(p>=9?fmt(p,1)+'%':'')+'</span>';
     l+='<div><i style="background:'+x.cor+'"></i><span>'+esc(x.nome)+'</span><b class="mono">'+int(x.n)+'</b><span class="p">'+fmt(p,1)+'%</span></div>';
   });
-  return '<div class="panel"><div class="sub" style="margin:0"><b>Funil da semana:</b> 100% = '+int(tot)+' abandonos ativos</div>'+b+'</div>'+l+'</div></div>';
+  return '<div class="panel"><div class="sub" style="margin:0"><b>Funil da última semana completa'+(w.inicio&&w.fim?' ('+String(w.inicio).slice(8,10)+'/'+String(w.inicio).slice(5,7)+' a '+String(w.fim).slice(8,10)+'/'+String(w.fim).slice(5,7)+')':'')+':</b> 100% = '+int(tot)+' abandonos ativos</div>'+b+'</div>'+l+'</div></div>';
 }
 function abParcial(p){
   if(!p||!num(p.abandonos))return '';
@@ -453,7 +453,7 @@ function abParcial(p){
   return '<div class="panel" style="border:2px dashed var(--line);background:transparent;margin:0 0 12px"><div class="sub" style="margin:0 0 8px"><b>Semana em andamento (parcial)</b> · '+esc(ddmm(p.inicio))+' a '+esc(ddmm(p.fim))+'. O volume está completo; o recontato ainda não fechou.</div>'+
     '<div class="kpis" style="margin:0">'+
     kpi("Abandonos ativos (semana parcial)",int(p.abandonos),int(p.usuarios)+" usuários · "+fmt(p.pct_sessoes,1)+"% das sessões da semana")+
-    kpi("Voltam em 7 dias (parcial)",fmt(p.pct_recontato_7d_parcial,1)+"%",'<span class="chip warn">parcial — fecha em '+esc(fe)+'</span><br>'+int(p.recontato_7d_parcial)+' usuários até agora · mesmo tema '+fmt(p.pct_mesmo_tema_parcial,1)+'%<br>Nos abandonos com janela fechada: <b>'+fmt(p.pct_recontato_janela_completa,1)+'%</b> ('+int(p.n_janela_completa)+')')+
+    kpi("Voltam em 7 dias (parcial)",fmt(p.pct_recontato_7d_parcial,1)+"%",'<span class="chip warn">parcial — fecha em '+esc(fe)+'</span><br>'+int(p.recontato_7d_parcial)+' usuários até agora · no mesmo stage '+fmt(p.pct_mesmo_stage_parcial,1)+'%<br>Nos abandonos com janela fechada: <b>'+fmt(p.pct_recontato_janela_completa,1)+'%</b> ('+int(p.n_janela_completa)+')')+
     '</div></div>';
 }
 function abGrafico(h5,p){
@@ -464,11 +464,11 @@ function abGrafico(h5,p){
   var raw=mx/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),stp=mag;
   [1,2,2.5,5,10].some(function(k){stp=k*mag;return stp>=raw});
   var vmax=4*stp;
-  var mp=Math.max.apply(null,h5.map(function(x){return Math.max(x.pct_recontato_7d||0,x.pct_mesmo_tema_7d||0)}).concat([1]));
+  var mp=Math.max.apply(null,h5.map(function(x){return Math.max(x.pct_recontato_7d||0,x.pct_mesmo_stage_7d||0)}).concat([1]));
   var pmax=Math.ceil(mp/4)*4;
   function Y(v){return T+ih*(1-v/vmax)}
   function YP(p){return T+ih*(1-p/pmax)}
-  var s='<svg class="ab-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Abandonos ativos por semana, com recontato em 7 dias e mesmo tema">';
+  var s='<svg class="ab-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Abandonos ativos por semana, com recontato em 7 dias e mesmo stage">';
   for(var i=0;i<=4;i++){
     var y=T+ih*(1-i/4);
     s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>';
@@ -480,9 +480,9 @@ function abGrafico(h5,p){
     var cx=L+st*i+st/2,bw=st*0.5,yb=Y(x.abandonos||0);
     s+='<rect x="'+(cx-bw/2)+'" y="'+yb+'" width="'+bw+'" height="'+(T+ih-yb)+'" rx="2" fill="var(--blue)" opacity=".55"/>';
     s+='<text x="'+cx+'" y="'+(H-B+14)+'" text-anchor="middle">'+esc(ddmm(x.inicio))+'</text>';
-    lin1.push(cx+','+YP(x.pct_recontato_7d||0));lin2.push(cx+','+YP(x.pct_mesmo_tema_7d||0));
-    var tip=ddmm(x.inicio)+" a "+ddmm(x.fim)+": "+int(x.abandonos)+" abandonos · "+fmt(x.pct_recontato_7d,1)+"% voltam em 7d · "+fmt(x.pct_mesmo_tema_7d,1)+"% mesmo tema";
-    pts+='<circle cx="'+cx+'" cy="'+YP(x.pct_recontato_7d||0)+'" r="3.5" fill="var(--cC)"/><circle cx="'+cx+'" cy="'+YP(x.pct_mesmo_tema_7d||0)+'" r="3.5" fill="var(--cA)"/>';
+    lin1.push(cx+','+YP(x.pct_recontato_7d||0));lin2.push(cx+','+YP(x.pct_mesmo_stage_7d||0));
+    var tip=ddmm(x.inicio)+" a "+ddmm(x.fim)+": "+int(x.abandonos)+" abandonos · "+fmt(x.pct_recontato_7d,1)+"% voltam em 7d · "+fmt(x.pct_mesmo_stage_7d,1)+"% no mesmo stage";
+    pts+='<circle cx="'+cx+'" cy="'+YP(x.pct_recontato_7d||0)+'" r="3.5" fill="var(--cC)"/><circle cx="'+cx+'" cy="'+YP(x.pct_mesmo_stage_7d||0)+'" r="3.5" fill="var(--cA)"/>';
     pts+='<rect x="'+(L+st*i)+'" y="'+T+'" width="'+st+'" height="'+ih+'" fill="transparent" data-tip="'+esc(tip)+'"/>';
   });
   if(hp){
@@ -493,23 +493,23 @@ function abGrafico(h5,p){
   }
   s+='<polyline points="'+lin1.join(" ")+'" fill="none" stroke="var(--cC)" stroke-width="2.5" stroke-linejoin="round"/>';
   s+='<polyline points="'+lin2.join(" ")+'" fill="none" stroke="var(--cA)" stroke-width="2.5" stroke-linejoin="round"/>'+pts+'</svg>';
-  return '<div class="panel">'+s+'<div class="legend"><span><i style="background:var(--blue);opacity:.55"></i>Abandonos ativos (eixo esquerdo)</span><span><i style="background:var(--cC)"></i>% voltam em 7 dias (eixo direito)</span><span><i style="background:var(--cA)"></i>% voltam no mesmo tema (eixo direito)</span></div><div class="sub" style="margin:0">Eixo horizontal: início de cada semana (segunda-feira). Passe o mouse ou toque numa semana para ver os valores.'+(hp?' A barra tracejada (*) é a semana em andamento: só o volume, sem as linhas de %.':'')+'</div></div>';
+  return '<div class="panel">'+s+'<div class="legend"><span><i style="background:var(--blue);opacity:.55"></i>Abandonos ativos (eixo esquerdo)</span><span><i style="background:var(--cC)"></i>% voltam em 7 dias (eixo direito)</span><span><i style="background:var(--cA)"></i>% voltam no mesmo stage (eixo direito)</span></div><div class="sub" style="margin:0">Eixo horizontal: início de cada semana (segunda-feira). Passe o mouse ou toque numa semana para ver os valores.'+(hp?' A barra tracejada (*) é a semana em andamento: só o volume, sem as linhas de %.':'')+'</div></div>';
 }
-function abCor(p){return p>15?"var(--crit)":p>=8?"var(--cB)":"var(--cR)"}
+function abCor(p){return p>8?"var(--crit)":p>=4?"var(--cB)":"var(--cR)"}
 function abRanking(ms){
-  var r=ms.filter(function(o){return num(o.pct_mesmo_tema_7d)&&(o.abandonos||0)>=100}).sort(function(a,b){return b.pct_mesmo_tema_7d-a.pct_mesmo_tema_7d}).slice(0,10);
-  if(!r.length)return empty("Sem temas acima do mínimo","Nenhum tema teve 100 abandonos na janela.");
-  var mx=Math.max.apply(null,r.map(function(o){return o.pct_mesmo_tema_7d}).concat([1]));
+  var r=ms.filter(function(o){return num(o.pct_mesmo_stage_7d)&&(o.abandonos||0)>=100}).sort(function(a,b){return b.pct_mesmo_stage_7d-a.pct_mesmo_stage_7d}).slice(0,10);
+  if(!r.length)return empty("Sem stages acima do mínimo","Nenhum stage teve 100 abandonos na janela.");
+  var mx=Math.max.apply(null,r.map(function(o){return o.pct_mesmo_stage_7d}).concat([1]));
   return '<div class="panel"><div class="ab-rk">'+r.map(function(o){
-    var c=abCor(o.pct_mesmo_tema_7d);
-    return '<div><div class="ab-rk-h"><span class="lbl" title="'+esc(o.entry_theme)+'">'+esc(o.entry_theme)+'</span><span class="v" style="color:'+c+'">'+fmt(o.pct_mesmo_tema_7d,1)+'%</span></div><div class="bar"><span style="width:'+Math.max(1,100*o.pct_mesmo_tema_7d/mx)+'%;background:'+c+'" data-tip="'+esc(o.entry_theme+": "+fmt(o.pct_mesmo_tema_7d,1)+"% voltam no mesmo tema · "+int(o.abandonos)+" abandonos")+'"></span></div><div class="ab-rk-s">'+int(o.abandonos)+' abandonos no período</div></div>';
-  }).join("")+'</div><div class="legend"><span><i style="background:var(--crit)"></i>acima de 15%</span><span><i style="background:var(--cB)"></i>de 8% a 15%</span><span><i style="background:var(--cR)"></i>abaixo de 8%</span></div></div>';
+    var c=abCor(o.pct_mesmo_stage_7d);
+    return '<div><div class="ab-rk-h"><span class="lbl" title="'+esc(o.stage)+'">'+esc(o.stage)+'</span><span class="v" style="color:'+c+'">'+fmt(o.pct_mesmo_stage_7d,1)+'%</span></div><div class="bar"><span style="width:'+Math.max(1,100*o.pct_mesmo_stage_7d/mx)+'%;background:'+c+'" data-tip="'+esc(o.stage+": "+fmt(o.pct_mesmo_stage_7d,1)+"% voltam no mesmo stage · "+int(o.abandonos)+" abandonos")+'"></span></div><div class="ab-rk-s">'+int(o.abandonos)+' abandonos no período</div></div>';
+  }).join("")+'</div><div class="legend"><span><i style="background:var(--crit)"></i>acima de 8%</span><span><i style="background:var(--cB)"></i>de 4% a 8%</span><span><i style="background:var(--cR)"></i>abaixo de 4%</span></div></div>';
 }
 function abMelhorar(ms){
-  if(!ms.length)return empty("Sem temas acima do mínimo","Nenhum tema teve 100 abandonos na janela.");
+  if(!ms.length)return empty("Sem stages acima do mínimo","Nenhum stage teve 100 abandonos na janela.");
   return '<div class="ab-mel">'+ms.map(function(o){
-    var hd=o.dono==="Help Design",c=abCor(o.pct_mesmo_tema_7d),cz=String(o.causa||""),i=cz.search(/[.;] /);
-    return '<article class="ab-c" style="border-left-color:'+c+'"><div class="ab-c-h"><span class="ab-ic" aria-hidden="true">'+(hd?'✎':'⚙')+'</span><div style="min-width:0"><div class="ttl">'+esc(o.entry_theme)+'</div><div class="meta"><span class="chip '+(hd?'warn':'info')+'">'+esc(o.dono||"—")+'</span><span class="chip muted">'+fmt(o.pct_mesmo_tema_7d,1)+'% mesmo tema</span><span class="chip muted">'+int(o.abandonos)+' abandonos</span></div></div></div>'+
+    var hd=o.dono==="Help Design",c=abCor(o.pct_mesmo_stage_7d),cz=String(o.causa||""),i=cz.search(/[.;] /);
+    return '<article class="ab-c" style="border-left-color:'+c+'"><div class="ab-c-h"><span class="ab-ic" aria-hidden="true">'+(hd?'✎':'⚙')+'</span><div style="min-width:0"><div class="ttl">'+esc(o.stage)+'</div><div class="meta"><span class="chip '+(hd?'warn':'info')+'">'+esc(o.dono||"—")+'</span><span class="chip muted">'+fmt(o.pct_mesmo_stage_7d,1)+'% no mesmo stage</span><span class="chip muted">'+int(o.abandonos)+' abandonos</span></div></div></div>'+
       '<p title="'+esc(o.assunto)+'"><span class="k">Assunto</span>'+esc(o.assunto)+'</p>'+
       '<p title="'+esc(cz)+'"><span class="k">Causa provável</span>'+esc(i>0?cz.slice(0,i+1):cz)+'</p>'+
       '<p><span class="k">Ação sugerida</span><b>'+esc(o.acao)+'</b></p></article>';
@@ -526,7 +526,7 @@ function abaAbandono(){
   h+='<div class="kpis" style="margin-top:12px">'+
     kpi("Abandonos ativos na semana",int(w.abandonos),int(w.usuarios)+" usuários · "+fmt(w.pct_sessoes,1)+"% das sessões da semana<br>"+abDelta(w.abandonos,pv.abandonos,true,true))+
     kpi("Voltam em 7 dias",fmt(w.pct_recontato_7d,1)+"%",int(w.recontato_7d)+" usuários · Recontato em 7 dias (novo)<br>"+abDelta(w.pct_recontato_7d,pv.pct_recontato_7d,true,false))+
-    kpi("Voltam no mesmo tema",fmt(w.pct_mesmo_tema_7d,1)+"%",int(w.recontato_mesmo_tema_7d)+" usuários · sinal de \"não resolveu\"<br>"+abDelta(w.pct_mesmo_tema_7d,pv.pct_mesmo_tema_7d,true,false))+
+    kpi("Voltam no mesmo stage",fmt(w.pct_mesmo_stage_7d,1)+"%",int(w.recontato_mesmo_stage_7d)+" usuários · sinal de \"não resolveu\"<br>"+abDelta(w.pct_mesmo_stage_7d,pv.pct_mesmo_stage_7d,true,false))+
     kpi("Nunca voltam em 7 dias",fmt(w.nunca_voltam_pct,1)+"%","100% menos quem voltou em 7 dias<br>"+abDelta(w.nunca_voltam_pct,pv.nunca_voltam_pct,false,false))+'</div>';
   h+='<div class="banner info"><span class="dot info"></span><div><b>Não é o "recontato no dia".</b> O dashboard Bot &amp; IA Agent mede recontato como 100% menos FCR no mesmo dia. Esta aba mede em 7 dias, por isso o nome "Recontato em 7 dias (novo)" e os números não são comparáveis.</div></div></section>';
   // tendência
@@ -534,28 +534,29 @@ function abaAbandono(){
   h+='<section class="block"><h2>Tendência semanal</h2>';
   h+=abGrafico(h5,d.semana_parcial);
   if(h5.length){
-    h+='<details style="margin-top:10px"><summary class="linkbtn" style="cursor:pointer">Ver tabela semanal</summary><div class="panel scroll" style="margin-top:8px"><table><thead><tr><th>Semana</th><th>Abandonos ativos</th><th class="n">% das sessões</th><th class="n">Voltam em 7d</th><th class="n">Mesmo tema</th><th class="n">Nunca voltam</th></tr></thead><tbody>'+h5.slice().reverse().map(function(x){
-      return '<tr><td>'+esc(ddmm(x.inicio)+" a "+ddmm(x.fim))+'</td><td><div class="inbar"><span class="bar"><span style="width:'+(100*(x.abandonos||0)/mx)+'%"></span></span><span class="mono">'+int(x.abandonos)+'</span></div></td><td class="n">'+fmt(x.pct_sessoes,1)+'%</td><td class="n">'+fmt(x.pct_recontato_7d,1)+'%</td><td class="n">'+fmt(x.pct_mesmo_tema_7d,1)+'%</td><td class="n">'+fmt(x.nunca_voltam_pct,1)+'%</td></tr>';
+    h+='<details style="margin-top:10px"><summary class="linkbtn" style="cursor:pointer">Ver tabela semanal</summary><div class="panel scroll" style="margin-top:8px"><table><thead><tr><th>Semana</th><th>Abandonos ativos</th><th class="n">% das sessões</th><th class="n">Voltam em 7d</th><th class="n">No mesmo stage</th><th class="n">Nunca voltam</th></tr></thead><tbody>'+h5.slice().reverse().map(function(x){
+      return '<tr><td>'+esc(ddmm(x.inicio)+" a "+ddmm(x.fim))+'</td><td><div class="inbar"><span class="bar"><span style="width:'+(100*(x.abandonos||0)/mx)+'%"></span></span><span class="mono">'+int(x.abandonos)+'</span></div></td><td class="n">'+fmt(x.pct_sessoes,1)+'%</td><td class="n">'+fmt(x.pct_recontato_7d,1)+'%</td><td class="n">'+fmt(x.pct_mesmo_stage_7d,1)+'%</td><td class="n">'+fmt(x.nunca_voltam_pct,1)+'%</td></tr>';
     }).join("")+'</tbody></table></div></details>';
   }
   h+='</section>';
   // por tema
   var ts=arr(d.temas);
-  h+='<section class="block"><h2>Por tema de entrada · '+esc(ddmm(g(d,"periodo.inicio"))+" a "+ddmm(g(d,"periodo.fim")))+' ('+int(g(d,"periodo.semanas"))+' semanas)</h2><p class="sub">Os 10 temas com mais abandonos ativos. Total do período: '+int(tot.abandonos)+' abandonos, '+fmt(tot.pct_recontato_7d,1)+'% voltam em 7 dias e '+fmt(tot.pct_mesmo_tema_7d,1)+'% voltam no mesmo tema.</p>';
-  h+='<h3 style="font-size:14px;margin:6px 0">Ranking: quem mais volta no mesmo tema (mínimo de 100 abandonos)</h3>'+abRanking(arr(d.melhorar));
-  h+='<details style="margin-top:10px"><summary class="linkbtn" style="cursor:pointer">Ver tabela dos 10 temas com mais abandonos</summary><div class="panel scroll" style="margin-top:8px"><table><thead><tr><th>Tema (entry_theme)</th><th class="n">Abandonos</th><th class="n">Usuários</th><th class="n">Voltam em 7d</th><th class="n">Mesmo tema</th><th class="n">Nota na amostra</th></tr></thead><tbody>'+ts.map(function(t){
-    return '<tr><td>'+esc(t.entry_theme)+'</td><td class="n">'+int(t.abandonos)+'</td><td class="n">'+int(t.usuarios)+'</td><td class="n">'+fmt(t.pct_recontato_7d,1)+'%</td><td class="n">'+(t.pct_mesmo_tema_7d>=10?'<b>'+fmt(t.pct_mesmo_tema_7d,1)+'%</b>':fmt(t.pct_mesmo_tema_7d,1)+'%')+'</td><td class="n">'+(num(t.nota_amostra)?fmt(t.nota_amostra,1)+' (N='+int(t.n_amostra)+')':'—')+'</td></tr>';
+  h+='<section class="block"><h2>Por stage (fluxo do bot) · '+esc(ddmm(g(d,"periodo.inicio"))+" a "+ddmm(g(d,"periodo.fim")))+' ('+int(g(d,"periodo.semanas"))+' semanas)</h2><p class="sub">Top 10 stages por recontato no mesmo stage (mínimo de 100 abandonos). Total do período: '+int(tot.abandonos)+' abandonos, '+fmt(tot.pct_recontato_7d,1)+'% voltam em 7 dias e '+fmt(tot.pct_mesmo_stage_7d,1)+'% voltam no mesmo stage.</p>';
+  h+='<h3 style="font-size:14px;margin:6px 0">Ranking: quem mais volta no mesmo stage (mínimo de 100 abandonos)</h3>'+abRanking(arr(d.stages));
+  h+='<details style="margin-top:10px"><summary class="linkbtn" style="cursor:pointer">Ver tabela dos stages do ranking</summary><div class="panel scroll" style="margin-top:8px"><table><thead><tr><th>Stage</th><th class="n">Abandonos</th><th class="n">Usuários</th><th class="n">Voltam em 7d</th><th class="n">No mesmo stage</th><th class="n">Nota na amostra</th></tr></thead><tbody>'+ts.map(function(t){
+    return '<tr><td>'+esc(t.stage)+'</td><td class="n">'+int(t.abandonos)+'</td><td class="n">'+int(t.usuarios)+'</td><td class="n">'+fmt(t.pct_recontato_7d,1)+'%</td><td class="n">'+(t.pct_mesmo_stage_7d>=10?'<b>'+fmt(t.pct_mesmo_stage_7d,1)+'%</b>':fmt(t.pct_mesmo_stage_7d,1)+'%')+'</td><td class="n">'+(num(t.nota_amostra)?fmt(t.nota_amostra,1)+' (N='+int(t.n_amostra)+')':'—')+'</td></tr>';
   }).join("")+'</tbody></table></div></details></section>';
   // o que melhorar
   var ms=arr(d.melhorar);
-  h+='<section class="block"><h2>O que melhorar</h2><p class="sub">Temas com mais recontato no mesmo tema (mínimo de 100 abandonos). A leitura vem de até 3 conversas da amostra de qualidade por tema, então é uma pista e não um diagnóstico. Escopo: só o bot e só artigos externos da Central.</p>';
+  h+='<section class="block"><h2>O que melhorar</h2><p class="sub">Stages com mais recontato no mesmo stage (mínimo de 100 abandonos). A leitura vem de até 3 conversas da amostra de qualidade por stage, então é uma pista e não um diagnóstico. Escopo: só o bot e só artigos externos da Central.</p>';
   h+=abMelhorar(ms);
   h+='</section>';
   h+='<section class="block"><h2>Como ler</h2><div class="panel"><dl class="def">'+
     '<dt>Abandono ativo</dt><dd>'+esc(n.definicao||"")+'</dd>'+
     '<dt>Voltam em 7 dias</dt><dd>'+esc(n.recontato||"")+'</dd>'+
-    '<dt>Mesmo tema</dt><dd>'+esc(n.mesmo_tema||"")+'</dd>'+
+    '<dt>No mesmo stage</dt><dd>'+esc(n.mesmo_stage||"")+'</dd>'+
     '<dt>Nota na amostra</dt><dd>'+esc(n.nota||"")+'</dd>'+
+    "<dt>O que é stage</dt><dd>É o nome do fluxo ou agente do bot onde a sessão ocorreu (por exemplo, pix - fluxo generativo ou cartão de crédito - hiperpersonalização). Não é o assunto que o usuário escolheu e nem sempre é o assunto real: a amostra mostra cartão dentro do stage de Pix e de empréstimo. Sessões sem stage aparecem como (sem stage), sem cálculo de mesmo stage. Faixas de cor do ranking: vermelho acima de 8%, âmbar de 4% a 8%, verde abaixo de 4% (o mesmo stage é bem menor que o mesmo tema).</dd>"+
     '<dt>Semana em andamento</dt><dd>Bloco tracejado: o volume de abandonos da semana mais recente já está completo, mas o recontato em 7 dias ainda está abrindo. Por isso é parcial, não entra na tendência nem no ranking e não se compara com as semanas fechadas. A leitura "janela fechada" usa só os abandonos com 7 dias já passados e é a mais confiável até a semana fechar.</dd>'+
     '<dt>Período</dt><dd>'+esc(n.coorte||"")+' Gerado em '+esc(dt(d.gerado_em))+'.</dd></dl></div></section>';
   main(h);
