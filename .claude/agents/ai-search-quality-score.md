@@ -60,7 +60,7 @@ WHERE created_date >= ini_hoje - INTERVAL 14 DAYS AND created_date < ini_hoje
 GROUP BY 1, 2 ORDER BY 1
 ```
 
-Duas linhas: a semana de comparação (primeira) e a analisada (segunda). `% = otimas_boas / avaliadas`, com um decimal arredondado para inteiro na mensagem. Compare em linguagem direta: "subiu", "caiu" ou "ficou igual" (igual se a diferença for menor que 4 pontos percentuais; a amostra semanal oscila). Se `avaliadas` da semana analisada for 0, é `FALHA: sem avaliações na semana`. Se `pendentes > 0`, acrescente uma linha `⚠️ N avaliações ainda pendentes; o resultado pode mudar.`
+Duas linhas: a semana de comparação (primeira) e a analisada (segunda). `% = otimas_boas / avaliadas`, com um decimal arredondado para inteiro na mensagem. Compare em linguagem direta, sempre com a diferença em pontos percentuais calculada sobre os % já arredondados: "Subiu 3 pontos.", "Caiu 2 pontos." ou "Ficou igual." (igual só se a diferença for menor que 1 ponto). Se `avaliadas` da semana analisada for 0, é `FALHA: sem avaliações na semana`. Se `pendentes > 0`, acrescente uma linha `⚠️ N avaliações ainda pendentes; o resultado pode mudar.`
 
 ## PASSO 2 — TERMOS MAIS BUSCADOS COM RESPOSTA RUIM
 
@@ -81,8 +81,8 @@ WHERE av.ruins >= 1 ORDER BY av.ruins DESC, vol.buscas DESC LIMIT 60
 ```
 
 Como montar a lista:
-1. **Agrupe** variações e erros de digitação do mesmo termo ("emprestimo", "empréstimo", "quero empréstimo") e some `buscas`, `avaliadas` e `ruins` de cada grupo. No grupo, `buscas` é o total da semana (use "~" se somou variações).
-2. Mantenha só grupos com **pelo menos 2 avaliadas e 2 ruins**.
+1. **Agrupe** só variações de escrita e de intenção igual do mesmo termo ("emprestimo", "empréstimo", "quero empréstimo", "canc", "cancelar venda") e some `buscas`, `avaliadas` e `ruins` de cada grupo. Não agrupe termos de sentido diferente ("cancelar seguro" e "cancelar"). No grupo, `buscas` é o total da semana (use "~" se somou variações). **Um mesmo termo não aparece na lista de ruins e em "Funcionam bem":** se uma grafia tem quase tudo boa (ex.: "encerrar conta") e uma variante com erro de digitação tem tudo ruim (ex.: "encerra conta"), mantenha-as separadas e só cite a variante ruim na lista de ruins, sem repeti-la em "Funcionam bem".
+2. Aplique o limiar **depois de somar o grupo**: mantenha só grupos com **pelo menos 2 avaliadas e 2 ruins**. A consulta traz linhas com 1 ou mais ruins justamente para permitir somar variações. Ignore na lista de ruins buscas sem sentido (saudações, letras soltas).
 3. Ordene por `ruins` (decrescente) e, no empate, por `buscas`. Mostre de **6 a 8** termos.
 4. Para cada termo, diga em poucas palavras **sobre o que o artigo usado trata** (`artigo`), para o leitor ver o descasamento entre a busca e a resposta. Se o grupo usou vários artigos, cite o mais frequente.
 5. Escreva "N avaliadas, todas ruins" ou "N avaliadas, K ruins". **Nunca** escreva "K de N" nem uma fração solta.
@@ -118,7 +118,7 @@ Escreva a mensagem exatamente neste formato (troque os valores). O Slack do cone
 
 **Resultado:** **67%** das respostas Ótimas ou Boas
 _862 respostas Ótimas ou Boas, de 1.294 avaliadas_
-Semana anterior (W46): 64% (825 de 1.294). Subiu.
+Semana anterior (W46): 64% (825 de 1.294). Subiu 3 pontos.
 
 **Termos mais buscados com resposta ruim**
 _Ruim = resposta Regular ou Ruim. A IA avalia só uma amostra das buscas._
