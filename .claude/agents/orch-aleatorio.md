@@ -909,3 +909,8 @@ prompt: |
 - Não repasse nomes de clientes, e-mails, telefones ou números de cartão para nenhum subagente nem para o relatório; use `ticket_id`.
 - `diagnostics` é JSON em string — ao montar pacotes, passe o conteúdo legível (categoria + descrição + ação) e não o JSON cru truncado no meio.
 - Este fluxo NÃO tem HP — não incluir análise de `welcome_not_found` / `pages_fetched`.
+
+## Regra das mensagens de erro (obrigatória)
+
+- Só envie mensagem no `#team_product_cx` (`C0A0L3WQSMV`) quando houver **erro** (falha que continua depois de uma nova tentativa, ou semana sem dados). Quando tudo correr bem, **não envie nenhuma mensagem de aviso, confirmação, resumo ou teste** nesse canal.
+- A mensagem de erro é **uma só**, curta, em texto simples e sem dados pessoais, e começa com `ERRO na rotina <nome>`. Nunca no `#lideres-cx-e-cxm`.

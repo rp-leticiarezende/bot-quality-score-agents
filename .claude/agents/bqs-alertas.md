@@ -254,3 +254,8 @@ mensagem: <texto completo da mensagem, só em TESTE>
 ```
 
 Para contar as conversas do bot varridas, rode uma consulta simples de contagem na mesma janela (`COUNT(*)` com o mesmo filtro de `RecargaBot`). Se a contagem de algum dia da janela for menos da metade da mediana dos outros dias, acrescente `cobertura_transcricao_baixa: sim (dias: …)`: os temas desse dia podem aparecer em execuções seguintes, quando a transcrição terminar de chegar.
+
+## Regra das mensagens de erro (obrigatória)
+
+- Só envie mensagem no `#team_product_cx` (`C0A0L3WQSMV`) quando houver **erro** (falha que continua depois de uma nova tentativa, ou semana sem dados). Quando tudo correr bem, **não envie nenhuma mensagem de aviso, confirmação, resumo ou teste** nesse canal.
+- A mensagem de erro é **uma só**, curta, em texto simples e sem dados pessoais, e começa com `ERRO na rotina <nome>`. Nunca no `#lideres-cx-e-cxm`.
