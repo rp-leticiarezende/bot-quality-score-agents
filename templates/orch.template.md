@@ -72,7 +72,7 @@ Execute os Passos 1 a 7 normalmente para a semana anterior (segunda a domingo), 
 - **Os especialistas do Passo 5 (fluxo, base de conhecimento e, no cartão, variáveis HP) rodam só na segunda**, sobre a semana inteira, como descrito nos passos.
 - **Divergências do avaliador** e falhas de coleta: junte as dos arquivos diários.
 - Informe na cobertura quantos dias da semana tiveram análise diária (por exemplo, "7 de 7") e, se algum dia ficou sem análise, diga qual.
-- O relatório (Passo 7) publica o painel e envia **uma** mensagem em `#lideres-cx-e-cxm`.
+- O relatório (Passo 7) publica o painel e envia **uma** mensagem em `#lideres-cx-e-cxm`. Execute também o Passo 6.3 (distribuição BQS 3.0, que usa as mesmas saídas de auditoria e calibração do Passo 6.2) e passe `bqs3 {otimo, bom, regular, ruim, n, pct_otimo_bom, provisorio, motivo_provisorio}` ao `chatbot-relatorio-cx` (Passos 7.1 e 7.3).
 
 ### Se der erro: nada vai para os líderes (regra de 22/10/2026)
 
@@ -102,7 +102,7 @@ O BQS mede a **qualidade da condução** do bot. A taskforce quer saber, além d
 
 | Indicador | Pergunta que responde |
 |---|---|
-| **BQS** (estrito) | O bot conduziu bem a conversa? |
+| **BQS 3.0** (% de Ótimo + Bom, estrito) | O bot conduziu bem a conversa? E em que palavra cada conversa cai: Ótimo, Bom, Regular ou Ruim? |
 | **TFC** (taxa de falha de condução) | Quantas conversas o bot conduziu mal: loop, transbordo que o cliente não pediu ou abandono depois de uma resposta fraca? Abandono depois de resposta boa e transbordo pedido pelo cliente NÃO são falha. |
 | **CE** (contatos evitáveis) | Quantas conversas o bot poderia ter resolvido/retido — e por qual causa, com qual dono? |
 
@@ -136,16 +136,27 @@ desfecho_ok = retention_type = 'resolutiva'
               OR (retention_type = 'transbordo' AND customer_requested_transfer = true)      (transferiu porque o cliente pediu: fluxo esperado)
               OR (retention_type = 'abandono' AND score_resolution >= 7)                      (o cliente saiu depois de uma resposta boa)
               -- loop e transbordo SEM pedido do cliente nunca são desfecho ok
-BQS 2.0    = (n_ok_revisado − aprovados_nao_auditados × taxa_falso_aprovado) / nota_ok IS NOT NULL * 100      ("regular" NÃO tem crédito parcial: é reprovado)
+palavra     = faixa da nota geral: 9–10 Ótimo · 7–8 Bom · 5–6 Regular · 0–4 Ruim
+             TRAVAS: se score_resolution <= 2 OU score_escalation <= 2 OU desfecho_ok = false  →  no MÁXIMO Regular (mesmo com nota geral alta)
+             Logo: Ótimo + Bom = aprovado (nota_ok AND desfecho_ok) = o antigo BQS 2.0
+BQS 3.0    = % de Ótimo + Bom, calibrado pela auditoria   (campo interno `bqs`; igual ao antigo BQS 2.0)
+             = (n_ok_revisado − aprovados_nao_auditados × taxa_falso_aprovado + reprovados_so_nota_nao_auditados × taxa_falso_reprovado) / nota_ok IS NOT NULL * 100      ("Regular" NÃO tem crédito: não é aprovado)
              n_ok_revisado = aprovados (nota_ok AND desfecho_ok) com a nota revisada pelo bqs-auditor nos tickets auditados (Passos 5B e 5C)
              taxa_falso_aprovado = aprovações revertidas / tickets da auditoria de calibração (amostra aleatória dos aprovados, Passo 5C)
-             O BQS 2.0 é exibido SEMPRE como um número só; a faixa de incerteza fica apenas no JSON do painel (`calibracao.faixa`)
-Recontato 24h = % das conversas cujo cliente voltou a falar com o atendimento em até 24h (prod.cx.fat_botmaker_metrics.recontacts_24h > 0). INDICADOR de acompanhamento: NÃO entra no BQS 2.0.
+             taxa_falso_reprovado = reprovações revertidas / tickets da calibração dos reprovados (Passo 5C-2)
+             O BQS 3.0 é exibido SEMPRE como um número só (% de Ótimo + Bom); a faixa de incerteza fica apenas no JSON do painel (`calibracao.faixa`)
+Distribuição BQS 3.0 = contagens de Ótimo / Bom / Regular / Ruim, SEMPRE calibradas (Passo 6.3):
+             · auditados (Passos 5B, 5C e 5C-2): vale a nota revisada do auditor (palavra recalculada com res/esc revisados e o desfecho com a resolução revisada)
+             · aprovados não auditados (Ótimo ou Bom pela nota original) × distribuição das palavras finais dos tickets da amostra de calibração ('cal'); se n_cal < 5, não repondera
+             · reprovados só pela nota não auditados (nota_ok falso e desfecho_ok verdadeiro) × distribuição dos tickets da amostra 'calr'; se n_calr < 5, não repondera (ficam com a palavra original)
+             · o resto (reprovados por desfecho: loop, transbordo sem pedido, abandono depois de resposta fraca) mantém a palavra original
+             As contagens são ESPERADAS (podem ter decimais). provisorio = (n_cal < 5) OU (n_calr < 5)
+Recontato 24h = % das conversas cujo cliente voltou a falar com o atendimento em até 24h (prod.cx.fat_botmaker_metrics.recontacts_24h > 0). INDICADOR de acompanhamento: NÃO entra no BQS 3.0.
 TFC        = conversas com falha de condução / N_total * 100. Falha = loop; OU transbordo que o cliente NÃO pediu (também sinalizado); OU abandono depois de resposta fraca (score_resolution < 7). NÃO é falha: abandono depois de resposta boa, nem transbordo pedido pelo cliente (inclusive quando ele chega e pede humano sem perguntar nada)
 CE         = conversas classificadas A, B ou C pelo bqs-contencao / conversas classificadas   (e estimativa sobre o total — Passo 6)
 ```
 
-**Existe um único BQS: o BQS 2.0** — calibrado por auditoria — (regra nova a partir de 20/10/2026; dashboards e histórico recomeçam daí; nunca compare com números anteriores). Não exiba "BQS original", "BQS legado" nem comparações entre versões do cálculo. Por que a nota geral é **recalculada** em vez de usar `score_overall` ou `approved`: até 09/09 o pipeline gravava a média aritmética das 6 notas e desde 14/10 grava a média ponderada; recalcular sempre com a mesma fórmula mantém a série histórica comparável. `approved` não é usado: no Databricks é booleano, mas na origem é 1 / 0.5 / 0, e as conversas "regular" chegam como `NULL` e saem do denominador.
+**Existe um único BQS: o BQS 3.0** — calibrado por auditoria. **BQS 3.0 = % de Ótimo + Bom calibrado; é a mesma aprovação do antigo BQS 2.0 (o número não muda), agora exibida como distribuição em 4 palavras (Ótimo, Bom, Regular, Ruim), que passa a ser a informação mais importante.** O histórico em 4 palavras começa em 26/10/2026; o histórico anterior segue como BQS 2.0 (mesmo número principal, sem a distribuição). Em semanas sem as 4 palavras, compare só o número principal. Não exiba "BQS original", "BQS legado" nem comparações entre versões do cálculo. Por que a nota geral é **recalculada** em vez de usar `score_overall` ou `approved`: até 09/09 o pipeline gravava a média aritmética das 6 notas e desde 14/10 grava a média ponderada; recalcular sempre com a mesma fórmula mantém a série histórica comparável. `approved` não é usado: no Databricks é booleano, mas na origem é 1 / 0.5 / 0, e as conversas "regular" chegam como `NULL` e saem do denominador.
 
 Fatos do pipeline que você deve respeitar:
 - `diagnostics` é uma string JSON: array de `{category, description, suggested_action}`. Categorias: `resposta_generica`, `resposta_incorreta`, `resposta_incompleta`, `consulta_ausente`, `conteudo_inexistente`, `falha_de_interpretacao`, `falha_de_fluxo`, `limitacao_estrutural`.
@@ -269,7 +280,7 @@ Os limiares de TFC e de pedido de humano são **provisórios** — registre-os c
 
 ### 3.4 — Sinalizações para análise (transbordo sem pedido do cliente)
 
-No BQS 2.0, transbordo que o cliente **não pediu** reprova a conversa e deve ser **sinalizado**: pode ser erro do bot (regra de transbordo, falha de interpretação, integração) e precisa de análise.
+No BQS 3.0, transbordo que o cliente **não pediu** reprova a conversa e deve ser **sinalizado**: pode ser erro do bot (regra de transbordo, falha de interpretação, integração) e precisa de análise.
 
 ```sql
 [BASE]
@@ -409,7 +420,7 @@ prompt: |
 
 ## PASSO 5C — AUDITORIA DE CALIBRAÇÃO (amostra aleatória dos aprovados)
 
-O avaliador automático tende a **aprovar demais**. Para que o BQS 2.0 reflita a qualidade real, o `bqs-auditor` lê a transcrição de uma **amostra aleatória das conversas aprovadas** (que não foram auditadas no Passo 5B) e a taxa de aprovações que não se sustentam corrige o número (Passo 6.2). Tamanho da amostra neste fluxo: **no máximo {{N_CAL}} tickets** (se houver menos aprovados que isso, audite todos).
+O avaliador automático tende a **aprovar demais**. Para que o BQS 3.0 reflita a qualidade real, o `bqs-auditor` lê a transcrição de uma **amostra aleatória das conversas aprovadas** (que não foram auditadas no Passo 5B) e a taxa de aprovações que não se sustentam corrige o número (Passo 6.2). Tamanho da amostra neste fluxo: **no máximo {{N_CAL}} tickets** (se houver menos aprovados que isso, audite todos).
 
 1. **Sorteio (SQL, sem contas):** troque `[IDS_5B]` pelos `ticket_id` auditados no Passo 5B (ou `0` se nenhum).
 
@@ -434,7 +445,7 @@ prompt: |
   Estes tickets foram aprovados pelo avaliador automático e vieram de sorteio aleatório. Audite conforme o seu sistema (MODO CALIBRAÇÃO). Identifique-os só por ticket_id.
   [uma linha por ticket: ticket_id]
 ```
-3. Guarde as linhas `CONFIRMA` e `REVISA` como `output_calibracao` (as notas entram no SQL do Passo 6.2 com `origem = 'cal'`). Tickets `SEM_TRANSCRICAO` ou de auditor com `FALHA DE COLETA` saem da amostra (informe quantos). Se a amostra final tiver **menos de 5 tickets**, não calibre: use `n_cal = 0` e avise no relatório que o BQS 2.0 desta rodada não foi calibrado.
+3. Guarde as linhas `CONFIRMA` e `REVISA` como `output_calibracao` (as notas entram no SQL do Passo 6.2 com `origem = 'cal'`). Tickets `SEM_TRANSCRICAO` ou de auditor com `FALHA DE COLETA` saem da amostra (informe quantos). Se a amostra final tiver **menos de 5 tickets**, não calibre: use `n_cal = 0` e avise no relatório que o BQS 3.0 desta rodada não foi calibrado.
 
 ### 5C-2 — Calibração dos reprovados (falsos reprovados)
 
@@ -510,11 +521,11 @@ ORDER BY visao, n DESC
 
 Substitua `[n_elegiveis_contencao]` e `[n_total]` pelos números do item 3.1 (período `atual`). Guarde o resultado completo como `agregados_contencao` e repasse-o aos subagentes do Passo 7. Os agregados valem para as conversas **classificadas** (amostra aleatória das elegíveis, no máximo 150) — informe sempre `n_classificadas` de `n_elegiveis_contencao`.
 
-### 6.2 — BQS 2.0 (nota revisada nos tickets auditados e calibração pela auditoria aleatória)
+### 6.2 — BQS 3.0 (nota revisada nos tickets auditados e calibração pela auditoria aleatória)
 
 Monte a lista `VALUES` com as linhas de `output_auditoria` (Passo 5B, `origem = 'sel'`) de `output_calibracao` (Passo 5C, `origem = 'cal'`) e de `output_calibracao_rep` (Passo 5C-2, `origem = 'calr'`) cuja `decisao` seja `CONFIRMA` ou `REVISA`: `ticket_id`, `decisao`, as seis notas (`res, eff, esc, und, cla, ton`) e a `origem`. Tickets `SEM_TRANSCRICAO` ficam de fora. A nota geral revisada é calculada **aqui, em SQL**: `ROUND(0,30·res + 0,20·eff + 0,20·esc + 0,15·und + 0,10·cla + 0,05·ton)`, aprovada com `≥ 7` e piso (`res > 2` e `esc > 2`); o desfecho continua valendo (se a auditoria revisar a resolução, o abandono é reavaliado com a resolução revisada). Tickets `CONFIRMA` mantêm a nota original; só `REVISA` a substitui.
 
-O BQS 2.0 é calculado assim: parte-se do número de aprovados **já com as notas revisadas** (`n_ok_revisado`) e subtrai-se a parcela de aprovações indevidas **esperada entre os aprovados não auditados** (`m_nao_auditados × taxa`), onde `taxa` = aprovações revertidas ÷ tickets da amostra de calibração. Com menos de 5 tickets na amostra (`n_cal < 5`), a taxa é 0 e o relatório diz que o BQS 2.0 da rodada **não foi calibrado**. A correção também vale para o outro lado: soma-se a parcela de reprovações indevidas **esperada entre os reprovados só pela nota e não auditados** (`m_rep_nao_auditados × taxa_falso_reprovado`), onde `taxa_falso_reprovado` = reprovações revertidas para aprovado ÷ tickets da amostra do Passo 5C-2 (com menos de 5, a taxa é 0).
+O BQS 3.0 é calculado assim: parte-se do número de aprovados **já com as notas revisadas** (`n_ok_revisado`) e subtrai-se a parcela de aprovações indevidas **esperada entre os aprovados não auditados** (`m_nao_auditados × taxa`), onde `taxa` = aprovações revertidas ÷ tickets da amostra de calibração. Com menos de 5 tickets na amostra (`n_cal < 5`), a taxa é 0 e o relatório diz que o BQS 3.0 da rodada **não foi calibrado**. A correção também vale para o outro lado: soma-se a parcela de reprovações indevidas **esperada entre os reprovados só pela nota e não auditados** (`m_rep_nao_auditados × taxa_falso_reprovado`), onde `taxa_falso_reprovado` = reprovações revertidas para aprovado ÷ tickets da amostra do Passo 5C-2 (com menos de 5, a taxa é 0).
 
 ```sql
 WITH a(ticket_id, decisao, res, eff, esc, und, cla, ton, origem) AS (
@@ -586,7 +597,85 @@ SELECT n_avaliaveis, n_ok_original, n_ok_revisado, m_nao_auditados, m_rep_nao_au
 FROM w
 ```
 
-Guarde `bqs_final` (nome interno; no relatório, no Slack e no painel ele é sempre **BQS 2.0**, **um número só**). **O BQS do cabeçalho é o `bqs_final`.** `bqs_avaliador` (antes das auditorias), `bqs_faixa_min` e `bqs_faixa_max` **não são exibidos**: vão só para o JSON do painel (`metricas.bqs_avaliador` e `metricas.calibracao`). As tabelas por dimensão do Passo 3 usam as notas do avaliador automático, sem calibração (diga isso no relatório). Informe também o saldo das auditorias seletivas (`n_aprovado_para_reprovado_sel` × `n_reprovado_para_aprovado_sel`) e as "divergências do avaliador" do resumo dos auditores: elas mostram onde o avaliador automático erra.
+Guarde `bqs_final` (nome interno; no relatório, no Slack e no painel ele é sempre **BQS 3.0**, **um número só**). **O BQS do cabeçalho é o `bqs_final`.** `bqs_avaliador` (antes das auditorias), `bqs_faixa_min` e `bqs_faixa_max` **não são exibidos**: vão só para o JSON do painel (`metricas.bqs_avaliador` e `metricas.calibracao`). As tabelas por dimensão do Passo 3 usam as notas do avaliador automático, sem calibração (diga isso no relatório). Informe também o saldo das auditorias seletivas (`n_aprovado_para_reprovado_sel` × `n_reprovado_para_aprovado_sel`) e as "divergências do avaliador" do resumo dos auditores: elas mostram onde o avaliador automático erra.
+
+### 6.3 — Distribuição BQS 3.0 (Ótimo / Bom / Regular / Ruim, calibrada)
+
+O BQS 3.0 é o `bqs_final` (% de Ótimo + Bom). Este passo calcula a **distribuição** nas 4 palavras, com a mesma regra de calibração do 6.2. Reuse **a mesma lista `VALUES` `a(...)` do 6.2** (copie as mesmas tuplas, sem alterar). A palavra de cada conversa é calculada **aqui, em SQL**:
+
+- **Palavra original** (nota do avaliador): `Ótimo` se nota geral ≥ 9, resolução > 2, escalação > 2 e `desfecho_ok`; `Bom` se nota geral ≥ 7 com as mesmas travas; `Regular` se nota geral ≥ 5 (inclusive quando uma trava impede Ótimo/Bom); `Ruim` se nota geral ≤ 4.
+- **Palavra final dos auditados** (`REVISA`): a mesma regra com as notas revisadas (`res`, `esc` e a nota geral revisada) e o desfecho com a resolução revisada (abandono só é aceitável com resolução revisada ≥ 7). `CONFIRMA` mantém a palavra original.
+- **Não auditados:** os aprovados não auditados (Ótimo ou Bom pela nota original, em número `ua_ok`) são distribuídos conforme as palavras finais dos tickets da amostra `cal` (cada ticket da amostra carrega o peso extra `ua_ok / n_cal`); os reprovados só pela nota não auditados (`nota_ok` falso e `desfecho_ok` verdadeiro, em número `ua_rep`) são distribuídos do mesmo modo conforme a amostra `calr` (peso extra `ua_rep / n_calr`). Os demais (reprovados por desfecho) ficam com a palavra original.
+- **Mínimos:** se `n_cal < 5`, os aprovados não auditados **não** são reponderados (ficam com a palavra original); se `n_calr < 5`, os reprovados só pela nota não auditados **não** são reponderados. `provisorio` = `n_cal < 5` OU `n_calr < 5`.
+
+```sql
+WITH a(ticket_id, decisao, res, eff, esc, und, cla, ton, origem) AS (
+  VALUES
+    -- as mesmas tuplas do Passo 6.2
+    (46629316, 'REVISA', 3, 4, 4, 4, 5, 6, 'sel'),
+    (46629317, 'CONFIRMA', 8, 8, 8, 8, 8, 8, 'cal')
+),
+{{PAR}},
+{{BASE_CTE}},
+j AS (
+  SELECT b.ticket_id, b.retention_type, COALESCE(b.customer_requested_transfer, false) AS crt,
+         b.score_pond AS ng, b.score_resolution AS res, b.score_escalation AS esc,
+         b.desfecho_ok AS dok, b.nota_ok,
+         x.decisao, x.origem,
+         CAST(ROUND(0.30 * x.res + 0.20 * x.eff + 0.20 * x.esc + 0.15 * x.und + 0.10 * x.cla + 0.05 * x.ton, 0) AS INT) AS ng_r,
+         x.res AS res_r, x.esc AS esc_r
+  FROM base b LEFT JOIN a x ON x.ticket_id = b.ticket_id
+  WHERE b.periodo = 'atual' AND b.nota_ok IS NOT NULL
+),
+k AS (
+  SELECT *,
+    CASE WHEN ng >= 9 AND res > 2 AND esc > 2 AND dok THEN 'Otimo'
+         WHEN ng >= 7 AND res > 2 AND esc > 2 AND dok THEN 'Bom'
+         WHEN ng >= 5 THEN 'Regular' ELSE 'Ruim' END AS cat_o,
+    CASE WHEN decisao = 'REVISA' THEN
+      (CASE WHEN ng_r >= 9 AND res_r > 2 AND esc_r > 2 AND (retention_type = 'resolutiva' OR (retention_type = 'transbordo' AND crt) OR (retention_type = 'abandono' AND res_r >= 7)) THEN 'Otimo'
+            WHEN ng_r >= 7 AND res_r > 2 AND esc_r > 2 AND (retention_type = 'resolutiva' OR (retention_type = 'transbordo' AND crt) OR (retention_type = 'abandono' AND res_r >= 7)) THEN 'Bom'
+            WHEN ng_r >= 5 THEN 'Regular' ELSE 'Ruim' END)
+    END AS cat_r
+  FROM j
+),
+m AS (
+  SELECT *, COALESCE(cat_r, cat_o) AS cat_f, (origem IS NOT NULL) AS aud,
+         CASE WHEN origem IS NULL AND cat_o IN ('Otimo', 'Bom') THEN 'ua_ok'
+              WHEN origem IS NULL AND nota_ok = false AND dok THEN 'ua_rep'
+              ELSE 'outro' END AS grupo
+  FROM k
+),
+tot AS (
+  SELECT COUNT(*) AS n_aval,
+         SUM(CASE WHEN grupo = 'ua_ok' THEN 1 ELSE 0 END) AS ua_ok,
+         SUM(CASE WHEN grupo = 'ua_rep' THEN 1 ELSE 0 END) AS ua_rep,
+         SUM(CASE WHEN origem = 'cal' THEN 1 ELSE 0 END) AS ncal,
+         SUM(CASE WHEN origem = 'calr' THEN 1 ELSE 0 END) AS ncalr
+  FROM m
+),
+pesos AS (
+  SELECT m.cat_f AS cat, 1.0 AS w FROM m CROSS JOIN tot t
+    WHERE m.aud OR m.grupo = 'outro' OR (m.grupo = 'ua_rep' AND t.ncalr < 5) OR (m.grupo = 'ua_ok' AND t.ncal < 5)
+  UNION ALL
+  SELECT m.cat_f, t.ua_ok * 1.0 / t.ncal FROM m CROSS JOIN tot t WHERE m.origem = 'cal' AND t.ncal >= 5
+  UNION ALL
+  SELECT m.cat_f, t.ua_rep * 1.0 / t.ncalr FROM m CROSS JOIN tot t WHERE m.origem = 'calr' AND t.ncalr >= 5
+),
+cal AS (SELECT cat, SUM(w) AS calibrado FROM pesos GROUP BY cat),
+sem AS (SELECT cat_o AS cat, COUNT(*) AS n FROM m GROUP BY cat_o),
+pal AS (SELECT 'Otimo' AS cat, 1 AS ord UNION ALL SELECT 'Bom', 2 UNION ALL SELECT 'Regular', 3 UNION ALL SELECT 'Ruim', 4)
+SELECT p.cat, COALESCE(s.n, 0) AS sem_auditoria, ROUND(COALESCE(c.calibrado, 0), 1) AS calibrado,
+       ROUND(100.0 * COALESCE(c.calibrado, 0) / t.n_aval, 1) AS pct,
+       ROUND(100.0 * SUM(CASE WHEN p.cat IN ('Otimo', 'Bom') THEN COALESCE(c.calibrado, 0) ELSE 0 END) OVER () / t.n_aval, 1) AS pct_otimo_bom,
+       t.n_aval, t.ncal AS n_cal, t.ncalr AS n_calr, (t.ncal < 5 OR t.ncalr < 5) AS provisorio
+FROM pal p CROSS JOIN tot t LEFT JOIN sem s ON s.cat = p.cat LEFT JOIN cal c ON c.cat = p.cat
+ORDER BY p.ord
+```
+
+**Saída esperada:** 4 linhas (`Otimo`, `Bom`, `Regular`, `Ruim`) com `calibrado` (contagem esperada, pode ter decimais), `pct`, `pct_otimo_bom` (igual em todas as linhas), `n_aval`, `n_cal`, `n_calr` e `provisorio`. `sem_auditoria` é a contagem pela nota original (só para conferência; não é exibida). **Confira:** `pct_otimo_bom` deve ser igual ao `bqs_final` do 6.2 (diferença de até 0,2 pp por arredondamento); se divergir, refaça a lista `VALUES` uma vez; se persistir, trate como erro desta execução (regra "Se der erro").
+
+Guarde como `bqs3` (nomes internos → contrato do painel): `otimo`, `bom`, `regular`, `ruim` = `calibrado` de cada linha; `n` = `n_aval`; `pct_otimo_bom`; `provisorio`; e, quando `provisorio = true`, `motivo_provisorio` = frase curta escrita por você a partir de `n_cal` e `n_calr` (ex.: "calibração dos reprovados com 2 tickets"; "calibração dos aprovados com 3 tickets"). Os percentuais por palavra (`pct`) são os do SQL; no Slack o relatório os arredonda para inteiros somando 100. As tabelas por dimensão do Passo 3 continuam com as notas do avaliador (sem as 4 palavras).
 
 ---
 
@@ -601,7 +690,8 @@ prompt: |
   Fluxo: {{ROTINA}} | Período: [data_inicio] a [data_fim]
 
   MÉTRICAS BASE (SQL):
-  - Total: [n_total] | Avaliáveis: [n_avaliaveis] | BQS 2.0: [bqs_final]% (período anterior: [bqs_anterior]% ou "sem base de comparação")
+  - Total: [n_total] | Avaliáveis: [n_avaliaveis] | BQS 3.0 (Ótimo + Bom): [bqs_final]% (período anterior: [bqs_anterior]% ou "sem base de comparação")
+  - Distribuição BQS 3.0 (calibrada, Passo 6.3): Ótimo [otimo] · Bom [bom] · Regular [regular] · Ruim [ruim] de [n] avaliáveis
   - Auditoria: [n_auditados] tickets auditados, [n_revisados] revisados (aprovado→reprovado: [n]; reprovado→aprovado: [n]) — amostra seletiva de casos duvidosos
   - TFC: [tfc]% | Pediram humano: [pct_pediu_humano]% | Transbordos com nota_ok: [n_transbordo_nota_ok]
   - Por quality_label: [distribuição] | Por retention_type: [distribuição]
@@ -667,17 +757,18 @@ prompt: |
 
   MÉTRICAS BASE (todas vindas de SQL — não recalcule):
   - Total: [n_total] | Avaliáveis: [n_avaliaveis]
-  - **BQS 2.0: [bqs_final]%** ([n_ok_final]/[n_avaliaveis]) | período anterior: [bqs_anterior]% ou "sem base de comparação" | último ponto da série antes de um hiato (se houver): [ultimo_ponto_anterior]
+  - **BQS 3.0 (Ótimo + Bom): [bqs_final]%** ([n_ok_final]/[n_avaliaveis]) | período anterior: [bqs_anterior]% ou "sem base de comparação" | último ponto da série antes de um hiato (se houver): [ultimo_ponto_anterior]
+  - **bqs3** (Passo 6.3, calibrada pela auditoria; contagens esperadas, podem ter decimais): `{otimo: [otimo], bom: [bom], regular: [regular], ruim: [ruim], n: [n], pct_otimo_bom: [pct_otimo_bom], provisorio: [provisorio], motivo_provisorio: [motivo_provisorio ou null]}`. O `pct_otimo_bom` é o mesmo número do BQS 3.0 acima. Semana anterior: use `bqs3_*` do `history.json` da rotina; se a anterior não tiver `bqs3`, compare só o BQS 3.0 (número).
   - Versão de prompt do bot no período (Pacote V): [bot_prompt_version dominante] — compare com a do item anterior do history.json para registrar evento de mudança
   - Auditoria (transcrição real): [n_auditados] tickets auditados, [n_revisados] com nota revisada; aprovado→reprovado: [n]; reprovado→aprovado: [n]. As tabelas por dimensão e o BQS por período são **originais** (a auditoria cobre só casos duvidosos).
   - **Calibração** (auditoria aleatória dos aprovados): [n_cal] tickets lidos, [n_cal_revertidos] aprovações revertidas (taxa [taxa_falso_aprovado_pct]%) · calibrado: [calibrado]
-  - **Calibração dos reprovados** (auditoria aleatória dos reprovados só pela nota): [n_calr] tickets lidos, [n_calr_revertidos] reprovações revertidas para aprovado (taxa [taxa_falso_reprovado_pct]%) · calibrado: [calibrado_r] · BQS do avaliador antes das auditorias: [bqs_avaliador]% · faixa: [bqs_faixa_min]–[bqs_faixa_max]% — **a faixa e o BQS do avaliador vão só para o JSON do painel; no relatório e no Slack exiba apenas o BQS 2.0 (um número)**
+  - **Calibração dos reprovados** (auditoria aleatória dos reprovados só pela nota): [n_calr] tickets lidos, [n_calr_revertidos] reprovações revertidas para aprovado (taxa [taxa_falso_reprovado_pct]%) · calibrado: [calibrado_r] · BQS do avaliador antes das auditorias: [bqs_avaliador]% · faixa: [bqs_faixa_min]–[bqs_faixa_max]% — **a faixa e o BQS do avaliador vão só para o JSON do painel; no relatório e no Slack exiba apenas o BQS 3.0 (um número) e a distribuição `bqs3`**
   - Divergências do avaliador automático (do resumo dos auditores): [lista curta, sem dados pessoais]
   - TFC: [tfc]% ([n_falha_conducao]/[n_total]) | anterior: [tfc_anterior]%
   - CE: [pct_evitavel]% das classificadas ([n_classificadas] de [n_elegiveis_contencao] elegíveis) | estimativa sobre o total: [ce_pct_do_total]%
   - Por quality_label: [distribuição] | Por retention_type: [distribuição]
   - Pediram humano: [pct_pediu_humano]% | Transbordos com nota_ok: [n_transbordo_nota_ok]
-  - Recontato em 24h (indicador, fora do BQS 2.0): [pct_recontato_24h]% (medido em [n_com_recontato_medido] conversas)
+  - Recontato em 24h (indicador, fora do BQS 3.0): [pct_recontato_24h]% (medido em [n_com_recontato_medido] conversas)
   - SINALIZADOS: transbordos sem pedido do cliente: [n_transbordo_sem_pedido] ([pct_transbordo_sem_pedido]%) — tickets: [sinalizados_transbordo]
   - Médias dos 6 critérios: [m_*] | critério mais baixo: [nome (média)]
   - Tabelas por dimensão (top 12): [tabela_dimensoes]
@@ -709,11 +800,12 @@ prompt: |
 
 ## REGRAS DO ORQUESTRADOR
 
-- Ordem: Passos 1 a 4; Passo 5 (subagentes em paralelo); Passo 5B (auditoria); Passo 6 (6.1 e 6.2); Passo 7 (7.1, 7.2 e 7.3 em sequência).
+- Ordem: Passos 1 a 4; Passo 5 (subagentes em paralelo); Passo 5B (auditoria); Passo 6 (6.1, 6.2 e 6.3); Passo 7 (7.1, 7.2 e 7.3 em sequência).
 - Nunca passe transcrições para o relatório, para o artefato ou para o Slack: só `ticket_id`, notas e paráfrases curtas sem dados pessoais.
 - Se um subagente falhar, registre o erro, continue com os demais e inclua a nota de falha no relatório final. Nunca invente a saída de um subagente.
 - Nenhum número é calculado por você: copie das consultas. Percentuais com 1 casa decimal.
-- `approved` não é critério de aprovação. Use sempre o BQS 2.0 (`nota_ok` e `desfecho_ok`).
+- `approved` não é critério de aprovação. Use sempre o BQS 3.0 (`nota_ok` e `desfecho_ok`; Ótimo + Bom). O campo interno continua se chamando `bqs`.
+- A distribuição Ótimo/Bom/Regular/Ruim (`bqs3`) vem só do SQL do Passo 6.3, sempre calibrada; nunca a estime de cabeça nem a derive de `quality_label`.
 - Deduplicação (`QUALIFY`) já está no bloco base — não filtre manualmente.
 - Não repasse nomes de clientes, e-mails, telefones ou números de cartão para nenhum subagente nem para o relatório; use `ticket_id`.
 - `diagnostics` é JSON em string — ao montar pacotes, passe o conteúdo legível (categoria + descrição + ação) e não o JSON cru truncado no meio.

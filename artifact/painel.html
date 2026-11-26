@@ -1,4 +1,4 @@
-<title>BQS 2.0 RecargaBot</title>
+<title>BQS 3.0 RecargaBot</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +16,7 @@
   --crit:#F0605D; --crit-bg:rgba(240,96,93,.15);
   --info:#5BA7F5; --info-bg:rgba(91,167,245,.14);
   --cA:#E8683A; --cB:#D9A100; --cC:#9085E9; --cD:#3987E5; --cR:#19A774; --cE:#7A93AB;
+  --d1:#1F7A38;--d1t:#fff;--d2:#86D294;--d2t:#0A2540;--d3:#F5B731;--d3t:#3A2A00;--d4:#C62828;--d4t:#fff;
   --track:#173049; --gap:#0F2D4A;
   --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
@@ -243,12 +244,31 @@ nav.tabs{margin-top:0}
 .dots{display:inline-flex;gap:6px;align-items:center;margin-right:12px;vertical-align:middle}
 .dots i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .dots i:nth-child(1){background:#5BA7F5}.dots i:nth-child(2){background:#1A73E8}.dots i:nth-child(3){background:#F5A623}.dots i:nth-child(4){background:#F5C842}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.dcard .dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.dseg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:2px}
+.dseg button{font:inherit;font-size:12px;font-weight:600;color:var(--ink-2);background:transparent;border:0;border-radius:999px;padding:5px 14px;cursor:pointer}
+.dseg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.dbar{display:flex;height:56px;border-radius:6px;overflow:hidden;font-weight:600;font-size:18px;margin-top:8px}
+.dbar span{display:flex;align-items:center;justify-content:center;min-width:0;overflow:hidden}
+.dbar-s{height:28px;font-size:12px;margin-top:0}
+.dnote{text-align:center;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
+.dnote b{color:var(--ink-2)}
+.dleg{border-top:1px solid var(--line-soft);padding-top:10px}
+.dregra{font-size:12px;color:var(--muted);max-width:90ch}
+.dcols{display:flex;gap:10px;align-items:flex-end}
+.dcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:stretch}
+.dstar{height:16px;text-align:center;color:var(--warn);font-weight:700;line-height:16px}
+.dstack{display:flex;flex-direction:column;height:200px;border-radius:4px;overflow:hidden}
+.dstack.prov{outline:2px dashed var(--warn);outline-offset:2px}
+.dstack span{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;min-height:0;overflow:hidden}
+.dx{text-align:center;font-size:12px;color:var(--muted)}.dlinha{display:flex;flex-direction:column;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--line-soft)}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.dg{display:flex;flex-direction:column;gap:6px;min-width:0}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div class="brandbar"><div class="wrap"><span><span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>RecargaPay · Bot Quality Score</span><span id="atualizado"></span></div></div>
 <header class="top"><div class="wrap">
-  <h1>BQS 2.0 · Qualidade do RecargaBot</h1>
+  <h1>BQS 3.0 · Qualidade do RecargaBot</h1>
   <p>Quanto o bot conduziu bem cada conversa e quantos contatos humanos ele poderia ter evitado. Só conversas do bot; só conteúdo externo da Central de Ajuda.</p>
 </div></header>
 <nav class="tabs" aria-label="Seções"><div class="wrap" role="tablist" id="tabs"></div></nav>
@@ -259,9 +279,9 @@ nav.tabs{margin-top:0}
 (function(){
 "use strict";
 var FLUXOS=[
-  {id:"cartao-hp",nome:"Agente de Cartão de Crédito",aba:"Detalhe - Agente CC RP",sobre:"Conversas atendidas pelos agentes de cartão de crédito do RecargaBot no fluxo de hiperpersonalização (HP): o bot responde já com o contexto do cliente carregado (status do cartão, limite, fatura). São dois agentes: o <b>Agente Geral</b>, que cuida da maior parte do fluxo (fatura, limite, bloqueio, contestação, entrega do cartão), e o <b>Agente de Anuidade</b>, que trata das dúvidas e do cancelamento ligados à anuidade. Entram todas as conversas do período que passaram por esse fluxo; o BQS 2.0 mede como o bot conduziu cada uma até resolver, transferir ou o cliente sair.",desc:"Agentes de cartão de crédito com hiperpersonalização (Agente Geral e Agente de Anuidade)",keys:{semanal:"cartao-hp",mensal:"cartao-hp-mensal"}},
-  {id:"aleatorio",nome:"Aleatório",aba:"Detalhe - Amostra Aleatória",sobre:"Amostra aleatória de conversas do bot, de todos os produtos, sorteada por um filtro do Zendesk. Serve para ter uma visão do bot fora dos casos críticos. Quase toda a amostra termina em transbordo pedido pelo cliente, então aqui o BQS 2.0 mede a <b>conduta do bot até o transbordo</b>, e não a qualidade geral do atendimento.",desc:"Amostra aleatória de conversas (filtro do Zendesk)",keys:{semanal:"aleatorio",mensal:"aleatorio-mensal"}},
-  {id:"criticos",nome:"Casos críticos",aba:"Detalhe - Casos Críticos",sobre:"Conversas do bot em que o cliente deu <b>nota 1 ou 2</b> na pesquisa de satisfação (CSAT), de todos os produtos. É onde o bot mais decepcionou na percepção do cliente, por isso o BQS 2.0 costuma ser baixo e o foco é entender o que o bot fez e o que teria evitado a nota ruim.",desc:"Conversas com CSAT 1 e 2",keys:{semanal:"criticos-semanal",mensal:"criticos-mensal"}}
+  {id:"cartao-hp",nome:"Agente de Cartão de Crédito",aba:"Detalhe - Agente CC RP",sobre:"Conversas atendidas pelos agentes de cartão de crédito do RecargaBot no fluxo de hiperpersonalização (HP): o bot responde já com o contexto do cliente carregado (status do cartão, limite, fatura). São dois agentes: o <b>Agente Geral</b>, que cuida da maior parte do fluxo (fatura, limite, bloqueio, contestação, entrega do cartão), e o <b>Agente de Anuidade</b>, que trata das dúvidas e do cancelamento ligados à anuidade. Entram todas as conversas do período que passaram por esse fluxo; o BQS 3.0 mede como o bot conduziu cada uma até resolver, transferir ou o cliente sair.",desc:"Agentes de cartão de crédito com hiperpersonalização (Agente Geral e Agente de Anuidade)",keys:{semanal:"cartao-hp",mensal:"cartao-hp-mensal"}},
+  {id:"aleatorio",nome:"Aleatório",aba:"Detalhe - Amostra Aleatória",sobre:"Amostra aleatória de conversas do bot, de todos os produtos, sorteada por um filtro do Zendesk. Serve para ter uma visão do bot fora dos casos críticos. Quase toda a amostra termina em transbordo pedido pelo cliente, então aqui o BQS 3.0 mede a <b>conduta do bot até o transbordo</b>, e não a qualidade geral do atendimento.",desc:"Amostra aleatória de conversas (filtro do Zendesk)",keys:{semanal:"aleatorio",mensal:"aleatorio-mensal"}},
+  {id:"criticos",nome:"Casos críticos",aba:"Detalhe - Casos Críticos",sobre:"Conversas do bot em que o cliente deu <b>nota 1 ou 2</b> na pesquisa de satisfação (CSAT), de todos os produtos. É onde o bot mais decepcionou na percepção do cliente, por isso o BQS 3.0 costuma ser baixo e o foco é entender o que o bot fez e o que teria evitado a nota ruim.",desc:"Conversas com CSAT 1 e 2",keys:{semanal:"criticos-semanal",mensal:"criticos-mensal"}}
 ];
 var PERS=[["semanal","Semanal"],["mensal","Mensal"]];
 function pers(f){return PERS.filter(function(p){return f.keys[p[0]]})}
@@ -276,7 +296,7 @@ var CLASSES={
 };
 var FRENTES={artigo:"Artigos",variavel_hp:"Variáveis e prompts",prompt:"Variáveis e prompts",fluxo:"Fluxo e regras",politica:"Fluxo e regras",capacidade:"Capacidades novas",handoff:"Handoff"};
 var GRUPOS=["Todos","Artigos","Variáveis e prompts","Fluxo e regras","Capacidades novas","Handoff"];
-var S={data:{},hist:{},bk:{},bkDb:{},bkQ:{},bkErro:"",canEdit:false,db:null,meId:null,eventos:[],tab:"visao",per:"semanal",perFluxo:{},filtro:{},metric:"bqs",linhaFluxo:"cartao-hp",linhaPer:"semanal"};
+var S={dist:{},data:{},hist:{},bk:{},bkDb:{},bkQ:{},bkErro:"",canEdit:false,db:null,meId:null,eventos:[],tab:"visao",per:"semanal",perFluxo:{},filtro:{},metric:"ob",linhaSub:"geral",linhaFluxo:"cartao-hp",linhaPer:"semanal"};
 var $=function(s){return document.querySelector(s)};
 
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -303,7 +323,7 @@ function normRun(d){
   if(/^cartao-hp/.test(d.chave||"")&&d.dimensoes)arr(d.dimensoes.effective_vertical).forEach(function(r){if(ROT[r.valor])r.rotulo=ROT[r.valor]});
   return d;
 }
-function normHist(h){return arr(h).map(function(x){if(x.bqs==null&&x.bqs_final!=null)x.bqs=x.bqs_final;return x}).filter(function(x){return x&&x.fim}).sort(function(a,b){return a.fim<b.fim?-1:1})}
+function normHist(h){return arr(h).map(function(x){if(x.bqs==null&&x.bqs_final!=null)x.bqs=x.bqs_final;if(num(x.bqs3_n)&&x.bqs3_n>0&&num(x.bqs3_otimo)&&num(x.bqs3_bom))if(x.bqs3_ob==null)x.bqs3_ob=num(x.bqs)?x.bqs:Math.round(1000*(x.bqs3_otimo+x.bqs3_bom)/x.bqs3_n)/10;return x}).filter(function(x){return x&&x.fim}).sort(function(a,b){return a.fim<b.fim?-1:1})}
 function dia(s){return Date.parse(s+"T12:00:00Z")}
 function ddmm(s){return s?String(s).slice(8,10)+"/"+String(s).slice(5,7):""}
 
@@ -380,7 +400,8 @@ function cardRotina(f){
   var d=fluxoDados(f),m=g(d,"metricas",{});
   var h='<div class="card"><header><div><div class="name">'+esc(f.nome)+'</div><div class="per">'+(d?esc(g(d,"periodo.label","")):"sem rodada")+'</div></div>'+(d?statusBqs(m.bqs):chip("Aguardando"))+'</header>';
   if(!d)return h+'<div class="sub">Esta rotina ainda não publicou dados aqui. A primeira execução preenche este cartão.</div></div>';
-  h+='<div><div class="big mono">'+fmt(m.bqs,1)+'<small>%</small></div>'+deltaRun(fluxoKey(f),d)+'</div>';
+  if(distTemDado(m))h+='<div><div class="big mono">'+fmt(m.bqs3.pct_otimo_bom,1)+'<small>% Ótimo + Bom</small></div><div class="delta">BQS 3.0 · '+int(m.bqs3.n)+' avaliações'+(m.bqs3.periodo_texto?' ('+esc(m.bqs3.periodo_texto)+')':'')+' '+(m.bqs3.provisorio?distProv(m.bqs3.motivo_provisorio):'')+'</div></div>'+distBarra(m.bqs3,true)+distLegenda(m.bqs3)+'<div class="delta" style="font-size:11px">BQS 2.0 (série anterior): '+fmt(m.bqs,1)+'% · '+deltaRun(fluxoKey(f),d)+'</div>';
+  else h+='<div><div class="big mono">'+fmt(m.bqs,1)+'<small>%</small></div>'+deltaRun(fluxoKey(f),d)+'</div>';
   h+='<div class="mini"><div><span>TFC</span><b>'+fmt(m.tfc,1)+'%</b></div><div><span>Evitáveis</span><b>'+(num(g(d,"contencao.ce_pct_total"))?fmt(g(d,"contencao.ce_pct_total"),0)+'%':"—")+'</b></div><div><span>Conversas</span><b>'+int(m.n_total)+'</b></div></div>';
   h+=retSeg(m);
   h+='<div class="delta">Recontato 24h: <b class="mono">'+(num(m.pct_recontato_24h)?fmt(m.pct_recontato_24h,1)+'%':'—')+'</b> · Sinalizados: <b class="mono">'+int(g(m,"sinalizados.transbordo_sem_pedido.n",0))+'</b></div>';
@@ -435,7 +456,7 @@ function visao(){
   h+='</section>';
   // sinalizados
   var sinal=FLUXOS.map(function(f){var d=fluxoDados(f);var s=g(d,"metricas.sinalizados.transbordo_sem_pedido",null);return s&&s.n>0?{f:f,s:s}:null}).filter(Boolean);
-  h+='<section class="block"><h2>Sinalizados para análise</h2><p class="sub">Transbordo que o cliente não pediu reprova a conversa no BQS 2.0 e é reportado aqui: pode ser erro do bot. <b>Exige análise humana:</b> o sinal é automático e não confirma falha; só a leitura da conversa por uma pessoa define se houve erro.</p>';
+  h+='<section class="block"><h2>Sinalizados para análise</h2><p class="sub">Transbordo que o cliente não pediu reprova a conversa no BQS 3.0 e é reportado aqui: pode ser erro do bot. <b>Exige análise humana:</b> o sinal é automático e não confirma falha; só a leitura da conversa por uma pessoa define se houve erro.</p>';
   h+=sinal.length?'<div class="panel">'+sinal.map(function(x){return '<div class="exrow"><span class="lbl"><b>'+esc(x.f.nome)+'</b> · '+int(x.s.n)+' transbordos sem pedido ('+fmt(x.s.pct,1)+'%)</span>'+tix(x.s.tickets,3)+'</div>'}).join("")+'</div>':empty("Nenhum transbordo sem pedido","Neste período não houve transferência que o cliente não tenha pedido.");
   h+='</section>';
   main(h);
@@ -691,11 +712,11 @@ function abaAbandono(){
 /* ---------- linha do tempo ---------- */
 var CORES={"cartao-hp":"var(--cD)","aleatorio":"var(--cA)","criticos-semanal":"var(--cR)","criticos-diario":"var(--cC)","cartao-hp-mensal":"var(--cD)","aleatorio-mensal":"var(--cA)","criticos-mensal":"var(--cR)"};
 var NOMES={"cartao-hp":"Agente de Cartão de Crédito (semanal)","aleatorio":"Aleatório (semanal)","criticos-semanal":"Casos críticos (semanal)","criticos-diario":"Casos críticos (diário)","cartao-hp-mensal":"Agente de Cartão de Crédito (mensal)","aleatorio-mensal":"Aleatório (mensal)","criticos-mensal":"Casos críticos (mensal)"};
-var METRICAS={bqs:{n:"BQS 2.0",f:"bqs"},tfc:{n:"TFC",f:"tfc"},ce:{n:"Contatos evitáveis",f:"ce_pct_total"},rec:{n:"Recontato 24h",f:"pct_recontato_24h"}};
+var METRICAS={ob:{n:"Ótimo + Bom (BQS 3.0)",f:"bqs3_ob"},bqs:{n:"BQS 2.0 (série anterior)",f:"bqs"},tfc:{n:"TFC",f:"tfc"},ce:{n:"Contatos evitáveis",f:"ce_pct_total"},rec:{n:"Recontato 24h",f:"pct_recontato_24h"}};
 var MESES=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 var DIA=86400000;
-function metricPills(){
-  return '<div class="pills" role="group" aria-label="Métrica">'+Object.keys(METRICAS).map(function(k){return '<button class="pill" data-metric="'+k+'" aria-pressed="'+(S.metric===k)+'">'+METRICAS[k].n+'</button>'}).join("")+'</div>';
+function metricPills(so){
+  return '<div class="pills" role="group" aria-label="Métrica">'+Object.keys(METRICAS).filter(function(k){return !so||so.indexOf(k)>=0}).map(function(k){return '<button class="pill" data-metric="'+k+'" aria-pressed="'+(S.metric===k)+'">'+METRICAS[k].n+'</button>'}).join("")+'</div>';
 }
 function eventosTodos(keys){
   var ev=arr(S.eventos).slice(),seen={};
@@ -711,8 +732,18 @@ function eventosTodos(keys){
   });
   return ev.filter(function(e){return e&&(e.tipo==="hiato"?(e.inicio&&e.fim):e.data)}).sort(function(a,b){return (a.inicio||a.data)<(b.inicio||b.data)?-1:1});
 }
+function distColunas(hist,alto){
+  return '<div class="dcols">'+hist.map(function(x){
+    var n=x.bqs3_n;
+    return '<div class="dcol"><div class="dstar">'+(x.bqs3_provisorio?'<span data-tip="'+esc("Provisório: "+(x.bqs3_motivo_provisorio||""))+'" tabindex="0">*</span>':'')+'</div><div class="dstack'+(x.bqs3_provisorio?' prov':'')+'" style="height:'+alto+'px" data-tip="'+esc((x.periodo_label||"")+" · "+int(n)+" avaliações · Ótimo + Bom "+fmt(x.bqs3_ob,1)+"%"+(x.bqs3_nota?" · "+x.bqs3_nota:""))+'">'+
+      DIST.slice().reverse().map(function(k){var v=x["bqs3_"+k[0]]||0,p=100*v/n;return '<span style="height:'+p+'%;background:'+k[2]+';color:'+k[3]+'" data-tip="'+esc(k[1]+": "+int(Math.round(v))+" ("+fmt(p,1)+"%)")+'">'+(p>=7?Math.round(p)+'%':'')+'</span>'}).join("")+'</div><div class="dx">'+esc(x.bqs3_rotulo||ddmm(x.inicio))+'</div></div>';
+  }).join("")+'</div>';
+}
 function linhaTempo(keys,opt){
-  var mt=METRICAS[S.metric]||METRICAS.bqs;
+  var mt=METRICAS[S.metric]||METRICAS.ob,nota="";if(keys.length===1&&/^geral/.test(keys[0]))mt=METRICAS.ob;
+  var comDado=function(f){return keys.some(function(k){return arr(S.hist[k]).some(function(x){return num(x[f])})})};
+  if(mt.f==="bqs3_ob"&&!comDado("bqs3_ob")){mt=METRICAS.bqs;nota='<p class="sub">Este período ainda não tem BQS 3.0; mostrando o BQS 2.0 (série anterior).</p>'}
+  var pct=mt.f==="bqs"||mt.f==="bqs3_ob";
   var series=keys.map(function(k){return {k:k,p:arr(S.hist[k]).filter(function(x){return num(x[mt.f])})}}).filter(function(s){return s.p.length});
   if(!series.length)return empty("A série começa na primeira rodada","Cada rodada acrescenta um ponto à linha do tempo.");
   var ev=eventosTodos(keys),ts=[];
@@ -720,13 +751,13 @@ function linhaTempo(keys,opt){
   ev.forEach(function(e){if(e.tipo==="hiato"){ts.push(dia(e.inicio));ts.push(dia(e.fim))}else ts.push(dia(e.data))});
   var t0=Math.min.apply(null,ts)-6*DIA,t1=Math.max.apply(null,ts)+6*DIA;
   var maxv=100;
-  if(mt.f!=="bqs"){maxv=20;series.forEach(function(s){s.p.forEach(function(x){maxv=Math.max(maxv,Math.ceil(x[mt.f]/10)*10)})})}
+  if(!pct){maxv=20;series.forEach(function(s){s.p.forEach(function(x){maxv=Math.max(maxv,Math.ceil(x[mt.f]/10)*10)})})}
   var W=760,H=250,L=36,R=14,T=26,B=28;
   var X=function(t){return L+(W-L-R)*(t-t0)/(t1-t0)},Y=function(v){return T+(H-T-B)*(1-v/maxv)};
   var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Evolução de '+esc(mt.n)+' ao longo do tempo" style="max-width:100%;height:auto">';
   var passo=maxv>50?20:10;
   for(var t=0;t<=maxv;t+=passo){
-    var ref=mt.f==="bqs"&&(t===60||t===80);
+    var ref=pct&&(t===60||t===80);
     svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(t)+'" y2="'+Y(t)+'" stroke="var(--line)" stroke-width="'+(ref?1.2:.6)+'" '+(ref?'stroke-dasharray="4 3"':'')+'/><text x="'+(L-6)+'" y="'+(Y(t)+4)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">'+t+'</text>';
   }
   // meses
@@ -761,48 +792,111 @@ function linhaTempo(keys,opt){
     });
   });
   svg+='</svg>';
-  var lg='<div class="legend">'+series.map(function(s){return '<span><i style="background:'+CORES[s.k]+'"></i>'+esc(NOMES[s.k])+'</span>'}).join("")+'<span class="muted">Círculo vazado: cobertura baixa · linha pontilhada: pausa na série'+(mt.f==="bqs"?' · tracejados: 60% e 80% (limiares provisórios)':'')+'</span></div>';
+  var lg='<div class="legend">'+series.map(function(s){return '<span><i style="background:'+CORES[s.k]+'"></i>'+esc(NOMES[s.k])+'</span>'}).join("")+'<span class="muted">Círculo vazado: cobertura baixa · linha pontilhada: pausa na série'+(pct?' · tracejados: 60% e 80% (limiares provisórios)':'')+'</span></div>';
   var lista=ev.length?'<ol class="evlist">'+ev.map(function(e){return '<li><b>'+(e.tipo==="hiato"?ddmm(e.inicio)+" a "+ddmm(e.fim):ddmm(e.data))+'</b> · '+esc(e.titulo||"")+(e.detalhe?' <span class="muted">— '+esc(e.detalhe)+'</span>':'')+'</li>'}).join("")+'</ol>':'';
-  return '<div class="panel">'+metricPills()+svg+lg+lista+'</div>';
+  return '<div class="panel">'+metricPills(keys.length===1&&/^geral/.test(keys[0])?['ob']:null)+nota+svg+lg+lista+'</div>';
 }
 function dcell(cur,prev,f,gapOk){
   if(!prev||!num(cur[f])||!num(prev[f]))return '<td class="n muted">—</td>';
   if(!gapOk)return '<td class="n muted" data-tip="Há uma pausa na série entre os dois pontos">pausa</td>';
-  var d=cur[f]-prev[f],bom=f==="bqs"?d>0:d<0,cls=Math.abs(d)<0.05?"":(bom?"up":"down");
+  var d=cur[f]-prev[f],bom=(f==="bqs"||f==="bqs3_ob")?d>0:d<0,cls=Math.abs(d)<0.05?"":(bom?"up":"down");
   return '<td class="n"><span class="delta '+cls+'">'+(d>0?"▲ ":d<0?"▼ ":"")+fmt(Math.abs(d),1)+'</span></td>';
 }
 function tabelaPeriodos(k,limite){
   var h=arr(S.hist[k]);
   if(!h.length)return empty("Sem histórico","Esta rotina ainda não tem pontos na linha do tempo.");
+  var pc=function(x,c){return '<td class="n">'+(num(x.bqs3_n)&&x.bqs3_n>0&&num(x[c])?fmt(100*x[c]/x.bqs3_n,1)+'%':'—')+'</td>'};
   var linhas=h.map(function(x,i){
     var p=i?h[i-1]:null,ok=p?(dia(x.fim)-dia(p.fim))<=lim(k):false;
-    return '<tr><td>'+esc(x.periodo_label||x.fim)+(x.cobertura_baixa?' '+chip("cobertura baixa","warn"):'')+'</td><td class="n">'+int(x.n_total)+'</td><td class="n"><b>'+fmt(x.bqs,1)+'%</b></td>'+dcell(x,p,"bqs",ok)+'<td class="n">'+fmt(x.tfc,1)+'%</td>'+dcell(x,p,"tfc",ok)+'<td class="n">'+(num(x.ce_pct_total)?fmt(x.ce_pct_total,0)+'%':'—')+'</td><td class="n">'+esc(x.prompt_version||"—")+'</td></tr>';
+    return '<tr><td>'+esc(x.periodo_label||x.fim)+(x.cobertura_baixa?' '+chip("cobertura baixa","warn"):'')+(x.bqs3_provisorio?' '+distProv(x.bqs3_motivo_provisorio):'')+'</td><td class="n">'+int(x.n_total)+'</td><td class="n">'+(num(x.bqs3_ob)?'<b>'+fmt(x.bqs3_ob,1)+'%</b>':'—')+'</td>'+dcell(x,p,"bqs3_ob",ok)+pc(x,"bqs3_otimo")+pc(x,"bqs3_bom")+pc(x,"bqs3_regular")+pc(x,"bqs3_ruim")+'<td class="n">'+(num(x.bqs3_n)?int(x.bqs3_n):'—')+'</td><td class="n muted" style="font-size:12px">'+(num(x.bqs)?fmt(x.bqs,1)+'%':'—')+'</td><td class="n">'+(num(x.tfc)?fmt(x.tfc,1)+'%':'—')+'</td>'+dcell(x,p,"tfc",ok)+'<td class="n">'+(num(x.ce_pct_total)?fmt(x.ce_pct_total,0)+'%':'—')+'</td><td class="n">'+esc(x.prompt_version||"—")+'</td></tr>';
   }).reverse().slice(0,limite||30);
-  return '<div class="panel scroll"><table><thead><tr><th>Período</th><th class="n">Conversas</th><th class="n">BQS 2.0</th><th class="n">Δ pp</th><th class="n">TFC</th><th class="n">Δ pp</th><th class="n">Evitáveis</th><th class="n">Prompt</th></tr></thead><tbody>'+linhas.join("")+'</tbody></table></div>';
+  return '<div class="panel scroll"><table><thead><tr><th>Período</th><th class="n">Conversas</th><th class="n">Ótimo + Bom (BQS 3.0)</th><th class="n">Δ pp</th><th class="n">Ótimo</th><th class="n">Bom</th><th class="n">Regular</th><th class="n">Ruim</th><th class="n">n</th><th class="n" data-tip="Série anterior; igual ao Ótimo + Bom nas semanas calibradas">BQS 2.0 (anterior)</th><th class="n">TFC</th><th class="n">Δ pp</th><th class="n">Evitáveis</th><th class="n">Prompt</th></tr></thead><tbody>'+linhas.join("")+'</tbody></table></div>';
+}/* Geral: soma por semana das contagens calibradas dos 3 fluxos semanais (os % saem da soma) */
+function geralHist(mensal){
+  var ks=FLUXOS.map(function(f){return f.keys[mensal?"mensal":"semanal"]}).filter(Boolean),map={};
+  ks.forEach(function(k){arr(S.hist[k]).forEach(function(x){if(!num(x.bqs3_n)||!(x.bqs3_n>0)||!num(x.bqs3_otimo))return;
+    var m=map[x.inicio]||(map[x.inicio]={inicio:x.inicio,fim:x.fim,periodo_label:x.periodo_label,n_total:0,bqs3_otimo:0,bqs3_bom:0,bqs3_regular:0,bqs3_ruim:0,bqs3_n:0,bqs3_provisorio:false,mot:[],fluxos:0});
+    m.n_total+=x.n_total||0;if(x.bqs3_rotulo)m.bqs3_rotulo=x.bqs3_rotulo;if(x.bqs3_nota)m.bqs3_nota=x.bqs3_nota;m.bqs3_otimo+=x.bqs3_otimo;m.bqs3_bom+=x.bqs3_bom;m.bqs3_regular+=x.bqs3_regular;m.bqs3_ruim+=x.bqs3_ruim;m.bqs3_n+=x.bqs3_n;m.fluxos++;
+    if(x.bqs3_provisorio){m.bqs3_provisorio=true;m.mot.push(NOMES[k].replace(/ \((semanal|mensal)\)$/,"")+": "+(x.bqs3_motivo_provisorio||"provisório"))}}) });
+  var h=Object.keys(map).sort().map(function(i){var m=map[i];m.bqs3_ob=Math.round(1000*(m.bqs3_otimo+m.bqs3_bom)/m.bqs3_n)/10;if(m.mot.length)m.bqs3_motivo_provisorio=m.mot.join("; ");return m});
+  S.hist[mensal?"geral-mensal":"geral"]=h;return h;
+}
+NOMES.geral="Geral (compilado dos fluxos)";CORES.geral="var(--blue)";NOMES["geral-mensal"]="Geral mensal (compilado dos fluxos)";CORES["geral-mensal"]="var(--blue)";
+function quadroDist(hist,geral,mensal){
+  if(!hist.length)return empty("Sem BQS 3.0 neste conjunto","A distribuição aparece quando houver contagens bqs3 no histórico.");
+  var cont={otimo:0,bom:0,regular:0,ruim:0};
+  hist.forEach(function(x){DIST.forEach(function(k){cont[k[0]]+=x["bqs3_"+k[0]]||0})});
+  var prov=hist.some(function(x){return x.bqs3_provisorio});
+  return '<div class="panel dcard"><div><h3>Distribuição das avaliações</h3><div class="sub">% de avaliações por nota final, calibrado pela auditoria. Uma coluna por semana, com o início da semana embaixo.</div></div>'+
+    distColunas(hist,200)+distLegenda(cont)+'<div class="dnote" style="margin-top:-6px">Contagens: soma das semanas exibidas.'+(prov?' * semana provisória (passe o mouse para ver o motivo).':'')+'</div>'+
+    (mensal?'<p class="dregra">No mensal, cada coluna é a soma das semanas fechadas do mês (novembro: 02 a 22/11, sem a semana de 26/10 a 01/11). A calibração pela auditoria é feita em cada semana, e as contagens do mês são a soma das semanas.</p>':'')+(geral?'<p class="dregra">Compilado pelas conversas avaliadas de cada fluxo; o Cartão HP pesa mais porque tem muito mais conversas avaliadas, e Aleatório e Críticos são amostras. Os percentuais saem da soma das contagens calibradas dos fluxos; uma semana é provisória se qualquer fluxo for provisório.</p>':'')+
+    '<p class="dregra">Regra do BQS 3.0: nota geral de 0 a 10 (média ponderada das 6 notas, arredondada). 9–10 Ótimo, 7–8 Bom, 5–6 Regular, 0–4 Ruim. Se resolução ≤ 2, escalação ≤ 2 ou desfecho não aceitável (loop, transbordo sem pedido do cliente, abandono depois de resposta fraca), a conversa fica no máximo Regular. A divisão entre Ótimo e Bom é estimada por amostra pequena.</p></div>';
 }
 function abaLinha(){
-  var m=S.linhaPer==="mensal",ks=FLUXOS.map(function(f){return f.keys[m?"mensal":"semanal"]});
+  var m=S.linhaPer==="mensal";
   var h='<div class="pills" role="group" aria-label="Período">'+[["semanal","Semanal"],["mensal","Mensal"]].map(function(p){return '<button class="pill" data-lper="'+p[0]+'" aria-pressed="'+(S.linhaPer===p[0])+'">'+p[1]+'</button>'}).join("")+'</div>';
-  h+='<section class="block"><h2>Linha do tempo</h2><p class="sub">Uma linha por rotina, uma bolinha por '+(m?"mês":"semana")+'. A faixa amarela marca períodos sem BQS; os círculos numerados são marcos (mudança de regra, de prompt do bot, hiatos). Cada rodada das rotinas acrescenta um ponto.</p>'+linhaTempo(ks)+'</section>';
-  var todas=Object.keys(NOMES),k=todas.indexOf(S.linhaFluxo)>=0?S.linhaFluxo:"cartao-hp";
-  h+='<section class="block"><h2>Períodos, um a um</h2><div class="pills" role="group" aria-label="Rotina">'+todas.map(function(x){return '<button class="pill" data-lf="'+x+'" aria-pressed="'+(k===x)+'">'+esc(NOMES[x])+'</button>'}).join("")+'</div>'+tabelaPeriodos(k)+'<p class="sub">Δ pp = variação em pontos percentuais frente ao ponto anterior. Para TFC, queda é melhora. "pausa" = não há ponto anterior comparável (mais de 10 dias na visão semanal e diária, mais de 45 na mensal).</p></section>';
+  var subs=[["geral","Geral"]].concat(FLUXOS.map(function(f){return [f.id,f.nome]}));
+  var sub=subs.some(function(s){return s[0]===S.linhaSub})?S.linhaSub:"geral";
+  h+='<div class="pills" role="group" aria-label="Conjunto">'+subs.map(function(s){return '<button class="pill" data-lsub="'+s[0]+'" aria-pressed="'+(sub===s[0])+'">'+esc(s[1])+'</button>'}).join("")+'</div>';
+  var nome=sub==="geral"?"Geral":g(FLUXOS.filter(function(f){return f.id===sub})[0],"nome",sub);
+  h+='<section class="block"><h2>Linha do tempo · '+esc(nome)+'</h2><p class="sub">'+(sub==="geral"?'Resultado geral do bot, somando as conversas avaliadas dos três fluxos. ':'')+'Colunas: distribuição Ótimo, Bom, Regular e Ruim de cada '+(m?'mês':'semana')+' (BQS 3.0). Linha: a métrica escolhida, por padrão Ótimo + Bom (BQS 3.0). A faixa amarela marca períodos sem a métrica; os círculos numerados são marcos (mudança de regra, de prompt do bot, hiatos).</p>';
+  if(sub==="geral"){
+    var gk=m?"geral-mensal":"geral",gh=geralHist(m);
+    h+=quadroDist(gh,true,m)+(gh.length?linhaTempo([gk]):"")+'<h2>Períodos, um a um</h2>'+(gh.length?tabelaPeriodos(gk):empty("Sem BQS 3.0 neste período","Ainda não há contagens bqs3 para somar."))+'<p class="sub">Δ pp = variação em pontos percentuais frente ao ponto anterior. BQS 2.0 (série anterior), TFC e Evitáveis não são somados entre fluxos e ficam em "—" no Geral.</p>';
+  }else{
+    var f=FLUXOS.filter(function(x){return x.id===sub})[0],k=f.keys[m?"mensal":"semanal"];
+    if(!k)h+=empty("Sem rotina "+(m?"mensal":"semanal")+" para este fluxo","");
+    else{var hh=arr(S.hist[k]).filter(function(x){return num(x.bqs3_ob)});
+      h+=(hh.length?quadroDist(hh,false,m):'')+linhaTempo([k])+'<h2>Períodos, um a um</h2>'+tabelaPeriodos(k)+'<p class="sub">Δ pp = variação em pontos percentuais frente ao ponto anterior. Para TFC, queda é melhora. "pausa" = não há ponto anterior comparável (mais de 10 dias na visão semanal e diária, mais de 45 na mensal).'+(m?' No mensal, o BQS 3.0 de novembro é a soma das semanas de 02/11 a 22/11; o BQS 2.0 (série anterior) e os demais indicadores da linha de novembro incluem também a semana de 26/10 a 01/11.':'')+'</p>'}
+  }  h+='</section>';
   main(h);
 }
-
 /* ---------- aba de fluxo ---------- */
-function fluxo(f){
+/* BQS 3.0: distribuição Ótimo/Bom/Regular/Ruim calibrada pela auditoria. Só desenha se houver bqs3 no latest (e no histórico, para o modo Histórico). */
+var DIST=[["otimo","Ótimo","var(--d1)","var(--d1t)"],["bom","Bom","var(--d2)","var(--d2t)"],["regular","Regular","var(--d3)","var(--d3t)"],["ruim","Ruim","var(--d4)","var(--d4t)"]];
+function distProv(motivo){return '<span class="chip warn" data-tip="'+esc(motivo||"provisório")+'" tabindex="0"><i></i>provisório</span>'}
+function distBarra(b,alto){
+  var h='<div class="dbar'+(alto?' dbar-s':'')+'" role="img" aria-label="Distribuição das avaliações">';
+  DIST.forEach(function(x){var n=b[x[0]];if(!n)return;var p=100*n/b.n;h+='<span style="width:'+p+'%;background:'+x[2]+';color:'+x[3]+'" data-tip="'+esc(x[1]+": "+int(Math.round(n))+" ("+fmt(p,1)+"%)")+'">'+(p>=5?Math.round(p)+'%':'')+'</span>'});
+  return h+'</div>';
+}
+function distLegenda(c){return '<div class="legend dleg">'+DIST.map(function(x){return '<span><i style="background:'+x[2]+'"></i>'+x[1]+' · '+int(Math.round(c[x[0]]||0))+'</span>'}).join("")+'</div>'}
+function distTemDado(m){var b=g(m,"bqs3",null);return !!(b&&num(b.n)&&b.n>0)}
+function distCard(f,kf,d,m){
+  if(!distTemDado(m))return "";
+  var b=m.bqs3,modo=S.dist[f.id]||"snap",hist=arr(S.hist[kf]).filter(function(x){return num(x.bqs3_n)&&x.bqs3_n>0&&num(x.bqs3_otimo)}).slice(-4);
+  if(modo==="hist"&&!hist.length)modo="snap";
+  var h='<div class="panel dcard"><div class="dhead"><div><h3>Distribuição das avaliações</h3><div class="sub">% de avaliações por nota final, calibrado pela auditoria</div></div>'+
+    '<div class="dseg" role="group" aria-label="Modo">'+[["snap","Snap"],["hist","Histórico"]].map(function(p){return '<button data-dist="'+p[0]+'" data-df="'+f.id+'" aria-pressed="'+(modo===p[0])+'">'+p[1]+'</button>'}).join("")+'</div></div>';
+  var cont;
+  if(modo==="snap"){
+    h+=distBarra(b)+'<div class="dnote">Ótimo + Bom = <b>'+fmt(b.pct_otimo_bom,1)+'%</b> (BQS 3.0) · '+int(b.n)+' avaliações · '+esc(b.periodo_texto||g(d,"periodo.label",""))+(b.provisorio?' '+distProv(b.motivo_provisorio):'')+'</div>';
+    cont=b;
+  }else{
+    cont={otimo:0,bom:0,regular:0,ruim:0};
+    h+='<div class="dcols">'+hist.map(function(x){
+      var n=x.bqs3_n;DIST.forEach(function(k){cont[k[0]]+=x["bqs3_"+k[0]]||0});
+      return '<div class="dcol"><div class="dstar">'+(x.bqs3_provisorio?'<span data-tip="'+esc("Provisório: "+(x.bqs3_motivo_provisorio||""))+'" tabindex="0">*</span>':'')+'</div><div class="dstack'+(x.bqs3_provisorio?' prov':'')+'" data-tip="'+esc((x.periodo_label||"")+" · "+int(n)+" avaliações · Ótimo + Bom "+fmt(num(x.bqs)?x.bqs:100*(x.bqs3_otimo+x.bqs3_bom)/n,1)+"%")+'">'+
+        DIST.slice().reverse().map(function(k){var v=x["bqs3_"+k[0]]||0,p=100*v/n;return '<span style="height:'+p+'%;background:'+k[2]+';color:'+k[3]+'" data-tip="'+esc(k[1]+": "+int(Math.round(v))+" ("+fmt(p,1)+"%)")+'">'+(p>=7?Math.round(p)+'%':'')+'</span>'}).join("")+'</div><div class="dx">'+esc(x.bqs3_rotulo||ddmm(x.inicio))+'</div></div>';
+    }).join("")+'</div>';
+    if(hist.some(function(x){return x.bqs3_provisorio}))h+='<div class="dnote">* semana provisória (passe o mouse para ver o motivo)</div>';
+  }
+  h+=distLegenda(cont)+(modo==="hist"?'<div class="dnote" style="margin-top:-6px">Contagens: soma das semanas exibidas.</div>':'');
+  h+='<p class="dregra">Regra do BQS 3.0: nota geral de 0 a 10 (média ponderada das 6 notas, arredondada). 9–10 Ótimo, 7–8 Bom, 5–6 Regular, 0–4 Ruim. Se resolução ≤ 2, escalação ≤ 2 ou desfecho não aceitável (loop, transbordo sem pedido do cliente, abandono depois de resposta fraca), a conversa fica no máximo Regular. Ótimo + Bom é igual ao antigo BQS 2.0 (a aprovação não mudou), já calibrada pela auditoria. A divisão entre Ótimo e Bom é estimada por amostra pequena; as contagens são esperadas.</p></div>';
+  return h;
+}function fluxo(f){
   var per=fluxoPer(f,S.perFluxo[f.id]||"semanal"),d=fluxoDados(f,per),h=pers(f).length>1?perPills(f,per,"fper"):"";
   if(!d){main(h+'<section class="block"><h2>'+esc(f.nome)+'</h2><p class="sub">'+esc(f.desc)+'</p>'+empty("Esta rotina ainda não publicou dados","Quando rodar, esta aba mostra as métricas, os contatos evitáveis e o que mudar.")+'</section>');return}
   var m=g(d,"metricas",{}),c=g(d,"contencao",{}),a=g(d,"auditoria",{});
-  h+='<section class="block"><div class="muted" style="font-size:12px;letter-spacing:.04em;text-transform:uppercase">Detalhe do fluxo</div><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div><div class="panel"><dl class="pesa-d"><dt>O que é este fluxo</dt><dd>'+f.sobre+'</dd></dl></div>';
+  h+='<section class="block"><div class="muted" style="font-size:12px;letter-spacing:.04em;text-transform:uppercase">Detalhe do fluxo</div><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><h2>'+esc(g(d,"rotina",f.nome))+'</h2><span class="muted">'+esc(g(d,"periodo.label",""))+' · gerado em '+esc(dt(g(d,"gerado_em")))+'</span></div>'+distCard(f,fluxoKey(f,per),d,m)+'<div class="panel"><dl class="pesa-d"><dt>O que é este fluxo</dt><dd>'+f.sobre+'</dd></dl></div>';
   if(g(d,"meta.origem")==="teste")h+='<div class="banner info"><span class="dot info"></span><div><b>Rodada de teste.</b> '+esc(g(d,"meta.nota","Dados de validação."))+'</div></div>';
   h+='<div class="kpis">'+
-    kpi("BQS 2.0",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f,per),d))+
+    (distTemDado(m)?kpi("BQS 3.0 · Ótimo + Bom",fmt(m.bqs3.pct_otimo_bom,1)+'%',m.bqs3.periodo_texto?esc(m.bqs3.periodo_texto):deltaRun(fluxoKey(f,per),d)):kpi("BQS 2.0 (série anterior)",fmt(m.bqs,1)+'%',deltaRun(fluxoKey(f,per),d)))+
     kpi("TFC",fmt(m.tfc,1)+'%','loop, transbordo sem pedido ou abandono após resposta fraca')+
     kpi("Contatos evitáveis",num(c.ce_pct_total)?'≈ '+fmt(c.ce_pct_total,0)+'%':'—',num(c.pct_evitavel)?fmt(c.pct_evitavel,0)+'% das classificadas'+(c.ic95?' (IC '+esc(c.ic95.join("–"))+'%)':''):'sem classificação')+
     kpi("Pediram humano",fmt(m.pct_pediu_humano,1)+'%',int(m.n_total)+' conversas · '+int(m.n_avaliaveis)+' avaliáveis')+
     kpi("Auditados",int(a.auditados),int(a.revisados)+' notas revisadas')+
-    (num(m.pct_recontato_24h)?kpi("Recontato 24h",fmt(m.pct_recontato_24h,1)+'%','indicador de acompanhamento, fora do BQS 2.0'):'')+
+    (num(m.pct_recontato_24h)?kpi("Recontato 24h",fmt(m.pct_recontato_24h,1)+'%','indicador de acompanhamento, fora do BQS 3.0'):'')+
   '</div></section>';
   // alertas
   var pa=arr(d.pontos_atencao);
@@ -810,7 +904,7 @@ function fluxo(f){
   else pa=pa.map(function(x){return typeof x==="string"?{tipo:"warn",texto:x}:x});
   if(pa.length)h+='<section class="block"><h2>Pontos de atenção</h2><div class="panel"><ul class="plain">'+pa.map(function(x){return '<li><span class="dot '+esc(x.tipo||"warn")+'"></span><span>'+esc(x.texto)+(arr(x.tickets).length?' '+tix(x.tickets,3):'')+'</span></li>'}).join("")+'</ul></div></section>';
   var sn=g(m,"sinalizados.transbordo_sem_pedido",null);
-  if(sn&&sn.n>0)h+='<section class="block"><h2>Sinalizados para análise</h2><div class="panel"><p><b>'+int(sn.n)+' transbordos sem pedido do cliente</b> ('+fmt(sn.pct,1)+'% das conversas). Reprovam o BQS 2.0 e podem ser erro do bot (regra de transbordo, interpretação, integração). <b>Análise humana necessária:</b> este número é só um sinal automático, não uma confirmação de falha. Uma pessoa precisa ler cada conversa para decidir se foi erro do bot. Tickets para conferir:</p>'+tix(sn.tickets,3)+'</div></section>';
+  if(sn&&sn.n>0)h+='<section class="block"><h2>Sinalizados para análise</h2><div class="panel"><p><b>'+int(sn.n)+' transbordos sem pedido do cliente</b> ('+fmt(sn.pct,1)+'% das conversas). Reprovam o BQS 3.0 e podem ser erro do bot (regra de transbordo, interpretação, integração). <b>Análise humana necessária:</b> este número é só um sinal automático, não uma confirmação de falha. Uma pessoa precisa ler cada conversa para decidir se foi erro do bot. Tickets para conferir:</p>'+tix(sn.tickets,3)+'</div></section>';
   // evolução
   var kf=fluxoKey(f,per);
   h+='<section class="block"><h2>Evolução desta rotina</h2>'+linhaTempo([kf])+tabelaPeriodos(kf,8)+'</section>';
@@ -843,7 +937,7 @@ function qualDado(q){
 }
 function tabelaDim(k,rows){
   var nome={effective_vertical:"Agente / vertical",topic:"Tema",product:"Produto"}[k]||k;
-  return '<div class="panel scroll"><h3>'+esc(nome)+'</h3><table><thead><tr><th>'+esc(nome)+'</th><th class="n">Conversas</th><th>BQS 2.0</th><th class="n">TFC</th><th class="n">Pediu humano</th>'+'</tr></thead><tbody>'+rows.map(function(r){
+  return '<div class="panel scroll"><h3>'+esc(nome)+'</h3><table><thead><tr><th>'+esc(nome)+'</th><th class="n">Conversas</th><th data-tip="Série anterior, valor original do avaliador">BQS 2.0 (série anterior)</th><th class="n">TFC</th><th class="n">Pediu humano</th>'+'</tr></thead><tbody>'+rows.map(function(r){
     var peq=(r.n||0)<30;
     return '<tr><td>'+esc(r.rotulo||r.valor)+(peq?' '+chip("amostra pequena"):'')+'</td><td class="n">'+int(r.n)+' <span class="muted">('+fmt(r.pct_volume,0)+'%)</span></td><td><div class="inbar"><span class="bar"><span style="width:'+(r.bqs||0)+'%;'+(peq?'opacity:.45;':'')+(r.bqs<60?'background:var(--crit)':r.bqs<80?'background:var(--warn)':'background:var(--good)')+'"></span></span><b class="mono">'+fmt(r.bqs,1)+'%</b></div></td><td class="n">'+fmt(r.tfc,1)+'%</td><td class="n">'+fmt(r.pct_pediu_humano,1)+'%</td>'+'</tr>';
   }).join("")+'</tbody></table></div>';
@@ -989,19 +1083,19 @@ function abaBacklog(){
 /* ---------- como ler ---------- */
 function comoLer(){
   main('<section class="block"><h2>Como ler este painel</h2><div class="panel"><dl class="def">'+
-  '<dt>BQS 2.0</dt><dd>É o resultado final da qualidade do atendimento do bot, igual em todos os fluxos. Uma conversa conta como boa quando passa em duas verificações. <b>1. Conduta:</b> a nota geral (resolução 30%, eficiência 20%, transbordo 20%, entendimento 15%, clareza 10%, tom 5%) é 7 ou mais e resolução e transbordo ficam acima de 2; conversas "regular" reprovam. <b>2. Desfecho:</b> resolvida pelo bot; transferida porque o cliente pediu (fluxo esperado, desde que bem conduzida); ou abandonada depois de uma resposta boa (resolução 7 ou mais), porque o cliente pode sair satisfeito. Loop e transbordo que o cliente não pediu reprovam e são sinalizados para análise. O BQS 2.0 é <b>calibrado por auditoria</b>: a cada rodada o auditor lê a transcrição de uma amostra aleatória das conversas aprovadas, e a parcela de aprovações que não se sustenta é descontada do número. Nos tickets auditados vale a nota revisada. O BQS 2.0 é sempre um número só, igual em todos os fluxos. O histórico do BQS 2.0 começa em 20/10/2026.</dd>'+
-  '<dt>Recontato em 24h</dt><dd>Percentual de conversas cujo cliente voltou a falar com o atendimento em até 24 horas. É um indicador de acompanhamento e não entra no BQS 2.0.</dd>'+
-  '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 2.0 e vão para análise humana, porque podem ser erro do bot: o sinal é automático e só a leitura da conversa por uma pessoa confirma a falha.</dd>'+
+  '<dt>BQS 3.0</dt><dd>BQS 3.0 = distribuição Ótimo/Bom/Regular/Ruim calibrada pela auditoria; Ótimo + Bom é igual ao antigo BQS 2.0. O histórico em 4 palavras começa em 26/10/2026; antes disso valem os números do BQS 2.0. Ótimo + Bom é o resultado final da qualidade do atendimento do bot, igual em todos os fluxos. Uma conversa conta como boa quando passa em duas verificações. <b>1. Conduta:</b> a nota geral (resolução 30%, eficiência 20%, transbordo 20%, entendimento 15%, clareza 10%, tom 5%) é 7 ou mais e resolução e transbordo ficam acima de 2; conversas "regular" reprovam. <b>2. Desfecho:</b> resolvida pelo bot; transferida porque o cliente pediu (fluxo esperado, desde que bem conduzida); ou abandonada depois de uma resposta boa (resolução 7 ou mais), porque o cliente pode sair satisfeito. Loop e transbordo que o cliente não pediu reprovam e são sinalizados para análise. O BQS 3.0 é <b>calibrado por auditoria</b>: a cada rodada o auditor lê a transcrição de uma amostra aleatória das conversas aprovadas, e a parcela de aprovações que não se sustenta é descontada do número. Nos tickets auditados vale a nota revisada. O Ótimo + Bom é sempre um número só, igual em todos os fluxos. A série do BQS 2.0 (série anterior) começa em 20/10/2026 e a do BQS 3.0 em 26/10/2026.</dd>'+
+  '<dt>Recontato em 24h</dt><dd>Percentual de conversas cujo cliente voltou a falar com o atendimento em até 24 horas. É um indicador de acompanhamento e não entra no BQS 3.0.</dd>'+
+  '<dt>Sinalizados</dt><dd>Transbordos sem pedido do cliente. Reprovam o BQS 3.0 e vão para análise humana, porque podem ser erro do bot: o sinal é automático e só a leitura da conversa por uma pessoa confirma a falha.</dd>'+
   '<dt>Abas "Detalhe"</dt><dd>Cada aba que começa com "Detalhe -" mostra um fluxo por inteiro: os números, os contatos evitáveis, o que mudar e a qualidade por agente e por tema. A Visão geral resume todos os fluxos; a aba do fluxo aprofunda.</dd>'+
   '<dt>Backlog</dt><dd>Lista de tudo o que as rotinas levantaram para ajustar. Quem pode editar o painel muda o status de cada tarefa na caixinha ao lado dela (Não iniciado, Em andamento, Concluído ou Cancelado) e pode deixar uma nota; a tarefa passa sozinha para a subárea correspondente. As rotinas só acrescentam itens e ocorrências, nunca mudam o status.</dd>'+
-  '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem BQS 2.0 (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
+  '<dt>Linha do tempo</dt><dd>Cada rodada semanal acrescenta um ponto. A faixa amarela marca períodos sem a métrica (hiatos) e os círculos numerados são marcos: mudanças de regra, de prompt do bot e pausas. A variação só é calculada contra a semana imediatamente anterior; depois de uma pausa o painel mostra o último ponto conhecido.</dd>'+
   '<dt>TFC</dt><dd>Taxa de falha de condução: conversas em loop, em transbordo que o cliente não pediu ou em abandono depois de uma resposta fraca (resolução abaixo de 7). Abandonar não é falha, e pedir atendente também não: o cliente pode sair ou chamar um humano a qualquer momento. Só conta quando o bot errou.</dd>'+
   '<dt>Contatos evitáveis</dt><dd>Entre as conversas classificadas, as que o bot poderia ter resolvido hoje (A), resolveria com ajuste de conteúdo, variável ou roteamento (B) ou exigiria uma capacidade nova (C). A estimativa para o período vem de uma amostra aleatória e traz intervalo de confiança.</dd>'+
   '<dt>Classes</dt><dd>A bot resolvia hoje · B resolveria com ajuste · C exigiria capacidade nova · D só humano resolve (mede o handoff do bot) · R retido provável · E indeterminado.</dd>'+
-  '<dt>Auditoria</dt><dd>Um segundo agente lê a transcrição de casos duvidosos e de uma amostra aleatória, refaz as notas e o resultado entra no BQS 2.0.</dd>'+
+  '<dt>Auditoria</dt><dd>Um segundo agente lê a transcrição de casos duvidosos e de uma amostra aleatória, refaz as notas e o resultado entra no BQS 3.0.</dd>'+
   '<dt>Cobertura</dt><dd>Quando há poucos dias com dados, a semana é uma amostra reduzida. O painel avisa e não calcula variação sem período anterior.</dd>'+
   '<dt>Escopo</dt><dd>Só conversas do bot, até a primeira fala de um atendente. Só artigos públicos da Central de Ajuda: o que começa com cadeado ou lupa é interno e o bot não consulta.</dd>'+
-  '<dt>Limiares</dt><dd>BQS 2.0 abaixo de 60% é crítico e 80% ou mais é saudável. Os limiares de TFC e de pedido de atendente são provisórios até haver 4 períodos de série.</dd>'+
+  '<dt>Limiares</dt><dd>Ótimo + Bom (BQS 3.0) abaixo de 60% é crítico e 80% ou mais é saudável. Os limiares de TFC e de pedido de atendente são provisórios até haver 4 períodos de série.</dd>'+
   '<dt>Atualização</dt><dd>As rotinas rodam de segunda a sábado (Agente de Cartão de Crédito 10h, Aleatório 14h, Casos críticos 15h). De terça a sábado analisam o dia anterior e guardam o resultado; na segunda consolidam a semana e atualizam os números do painel. Os alertas de casos críticos vão para o Slack, não para o painel.</dd>'+
   '</dl></div></section>');
 }
@@ -1020,12 +1114,14 @@ function render(){
   $("#atualizado").textContent=ult?"Atualizado em "+dt(ult):"";
 }
 document.addEventListener("click",function(e){
-  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro],[data-metric],[data-lf],[data-gper],[data-fper],[data-lper],[data-bkf],[data-bke],[data-bks]");if(!el)return;
+  var el=e.target.closest("[data-tab],[data-go],[data-crit],[data-filtro],[data-metric],[data-lf],[data-gper],[data-fper],[data-lper],[data-bkf],[data-bke],[data-bks],[data-dist],[data-lsub]");if(!el)return;
   if(el.dataset.tab||el.dataset.go){S.tab=el.dataset.tab||el.dataset.go;if(el.dataset.go&&S.per!=="semanal")S.perFluxo[el.dataset.go]=S.per;else if(el.dataset.go)S.perFluxo[el.dataset.go]="semanal";store("bqs-tab",S.tab);window.scrollTo(0,0)}
   if(el.dataset.metric)S.metric=el.dataset.metric;
   if(el.dataset.bkf){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.fluxo=el.dataset.bkf}
   if(el.dataset.bks){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.status=el.dataset.bks}
   if(el.dataset.bke){S.bkF=S.bkF||{fluxo:"todos",status:"abertas"};S.bkF.equipe=el.dataset.bke}
+  if(el.dataset.lsub)S.linhaSub=el.dataset.lsub;
+  if(el.dataset.dist)S.dist[el.dataset.df]=el.dataset.dist;
   if(el.dataset.lf)S.linhaFluxo=el.dataset.lf;
   if(el.dataset.gper)S.per=el.dataset.gper;
   if(el.dataset.lper)S.linhaPer=el.dataset.lper;
