@@ -84,7 +84,7 @@ Execute os Passos 1 a 7 normalmente para a semana anterior (segunda a domingo), 
 **Erro** é qualquer etapa que falhou **mesmo depois de uma nova tentativa**: consulta SQL, lote de contenção, auditor (`FALHA DE COLETA`), leitura ou gravação de arquivo diário, publicação do painel ou do arquivo diário, relatório. Quando houver erro **nesta execução** (em qualquer modo):
 
 1. **Não envie nada para o `#lideres-cx-e-cxm`** e não acione o relatório de envio (`MODO CURADORIA`) se ainda não o fez. Se o relatório já foi acionado e falhou na publicação do painel, ele mesmo envia o alerta (regra dele).
-2. **Envie um alerta para o `#tarefas-let`** (channel_id `C0C99GEGDUJ`) acionando o `chatbot-relatorio-cx` com este prompt (texto simples, sem dados pessoais):
+2. **Envie um alerta para o `#team_product_cx`** (channel_id `C0A0L3WQSMV`) acionando o `chatbot-relatorio-cx` com este prompt (texto simples, sem dados pessoais):
 
 ```
 subagent_type: chatbot-relatorio-cx
@@ -96,8 +96,8 @@ prompt: |
   Para reenviar: peça para rodar a rotina de novo (orch-cartao-hp).
 ```
 
-3. No **MODO DIA**, grave mesmo assim o arquivo do dia com o que foi concluído (campo `falhas` preenchido) e avise no `#tarefas-let`. Falhas parciais **já alertadas num dia anterior** (campo `falhas` dos arquivos diários) **não bloqueiam** o relatório semanal de segunda; só erros desta execução bloqueiam.
-4. Se o Databricks não responder ou não houver dado na semana (`n_atual = 0`), isso também é erro: alerta no `#tarefas-let`, nunca no canal dos líderes.
+3. No **MODO DIA**, grave mesmo assim o arquivo do dia com o que foi concluído (campo `falhas` preenchido) e avise no `#team_product_cx`. Falhas parciais **já alertadas num dia anterior** (campo `falhas` dos arquivos diários) **não bloqueiam** o relatório semanal de segunda; só erros desta execução bloqueiam.
+4. Se o Databricks não responder ou não houver dado na semana (`n_atual = 0`), isso também é erro: alerta no `#team_product_cx`, nunca no canal dos líderes.
 
 ---
 
@@ -256,7 +256,7 @@ Regras (aplique com os números retornados):
 
 Registre `cobertura_baixa` (sim/não), `comparacao_indisponivel` (sim/não) e a lista de buracos/atrasos, em texto curto. Esses itens são repassados ao relatório **como o primeiro ponto de atenção** quando forem "sim".
 
-**Se `n_atual = 0`:** acione `chatbot-relatorio-cx` com o prompt `MODO SEM DADOS — Agente de Cartão de Crédito (semanal) — [período]: sem dados na tabela. Nenhuma análise gerada.` (ele posta o texto só no `#tarefas-let`, nunca no canal dos líderes, e não publica artefato) e encerre.
+**Se `n_atual = 0`:** acione `chatbot-relatorio-cx` com o prompt `MODO SEM DADOS — Agente de Cartão de Crédito (semanal) — [período]: sem dados na tabela. Nenhuma análise gerada.` (ele posta o texto só no `#team_product_cx`, nunca no canal dos líderes, e não publica artefato) e encerre.
 
 ---
 

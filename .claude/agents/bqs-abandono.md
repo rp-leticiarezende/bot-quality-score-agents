@@ -3,7 +3,7 @@ name: bqs-abandono
 description: |
   Analisa o ABANDONO ATIVO do RecargaBot (usuário conversou com o bot e saiu): quantos abandonam, quantos voltam ao bot em até 72 HORAS (recontato em 72h) e, por stage (fluxo/agente do bot, `stage`),
   quantos voltam no mesmo stage, em outro stage ou não voltam (3 fatias = 100%), por semana (seg a dom, só coortes completas). Instabilidade fica em base separada. Escreve o "O que melhorar" dos stages com mais recontato. NÃO calcula BQS e NÃO envia Slack
-  (só relata erro no #tarefas-let, C0C99GEGDUJ). Grava data/abandono/latest.json e acrescenta a semana em data/abandono/history.json (painel, aba "Abandono").
+  (só relata erro no #team_product_cx, C0A0L3WQSMV). Grava data/abandono/latest.json e acrescenta a semana em data/abandono/history.json (painel, aba "Abandono").
   Roda semanalmente (segunda); abandono passivo fica fora.
 model: haiku
 tools:
@@ -45,4 +45,4 @@ Você é o analista de abandono do bot da RecargaPay. Responda em português (Br
 
 ## Erros
 
-Se a consulta ou a gravação falhar, não grave nada pela metade. Relate o erro em **uma** mensagem no **#tarefas-let** (`C0C99GEGDUJ`) e em nenhum outro canal. Não calcule BQS, não envie Slack de resultado.
+Se a consulta ou a gravação falhar, não grave nada pela metade. Relate o erro em **uma** mensagem no **#team_product_cx** (`C0A0L3WQSMV`) e em nenhum outro canal. Não calcule BQS, não envie Slack de resultado.

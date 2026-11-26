@@ -2,7 +2,7 @@
 
 Agentes Claude para análise automatizada de qualidade do chatbot de CX da RecargaPay (**BQS 2.0**).
 
-Escopo: **somente conversas do bot** e **somente conteúdo externo da Central de Ajuda** (títulos com 🔒 ou 🔍 são internos e ficam fora). Relatórios semanais em `#lideres-cx-e-cxm`; alertas de casos críticos em `#team_product_cx`; erros de rotina só em `#tarefas-let`. O n8n não é alterado.
+Escopo: **somente conversas do bot** e **somente conteúdo externo da Central de Ajuda** (títulos com 🔒 ou 🔍 são internos e ficam fora). Relatórios semanais em `#lideres-cx-e-cxm`; alertas de casos críticos em `#team_product_cx`; erros de rotina também em `#team_product_cx` (nunca em `#lideres-cx-e-cxm`). O n8n não é alterado.
 
 ## BQS 2.0 em uma frase
 
@@ -41,7 +41,7 @@ Cada rotina clona este repositório e executa o orquestrador correspondente.
 
 ## Alertas de casos críticos (`bqs-alertas`)
 
-Uma vez por dia (segunda a sábado, 11:00 BRT, 14:00 UTC), numa **rotina própria** ("Bot Quality — Alertas", independente das rotinas de cada fluxo), o detector varre os últimos 7 dias da transcrição de **todas as conversas do bot** (Cartão, Casos Críticos, Aleatório e qualquer outro fluxo; a transcrição chega com atraso, por isso a janela). Se houver ticket novo em algum dos 5 temas, envia **uma** mensagem em `#team_product_cx`; se não houver, não envia nada. Os `ticket_id` já avisados e o histórico ficam num artefato privado só de alertas (`artifact/alertas.html`, https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM, arquivo `data/enviados.json`), **fora do painel do BQS**, e nunca são repetidos. Palavras de risco só contam quando ditas pelo cliente e quando o bot não encaminhou para humano. Modo `TESTE`: não posta nem grava. Falha do detector vai só para o `#tarefas-let` e não bloqueia o relatório semanal.
+Uma vez por dia (segunda a sábado, 11:00 BRT, 14:00 UTC), numa **rotina própria** ("Bot Quality — Alertas", independente das rotinas de cada fluxo), o detector varre os últimos 7 dias da transcrição de **todas as conversas do bot** (Cartão, Casos Críticos, Aleatório e qualquer outro fluxo; a transcrição chega com atraso, por isso a janela). Se houver ticket novo em algum dos 5 temas, envia **uma** mensagem em `#team_product_cx`; se não houver, não envia nada. Os `ticket_id` já avisados e o histórico ficam num artefato privado só de alertas (`artifact/alertas.html`, https://claude.ai/artifact/UmFJ3rmQCerkx1aq2LFcnM, arquivo `data/enviados.json`), **fora do painel do BQS**, e nunca são repetidos. Palavras de risco só contam quando ditas pelo cliente e quando o bot não encaminhou para humano. Modo `TESTE`: não posta nem grava. Falha do detector vai só para o `#team_product_cx` e não bloqueia o relatório semanal.
 
 ## Fluxo de cada rotina
 
