@@ -61,3 +61,5 @@ Uma vez por dia (segunda a sábado, 11:00 BRT, 14:00 UTC), numa **rotina própri
 2. Subagentes em levas de até 3: fluxo, KB, HP (cartão) e contenção por lotes.
 3. Auditoria pela transcrição dos casos duvidosos; consolidação em SQL (contenção e BQS 3.0).
 4. Oportunidades → propostas → relatório: dados no painel (artefato) e **uma mensagem curta, só texto** no Slack, com o link do painel uma vez.
+
+Cada rodada diária salva uma cópia do JSON do dia, com o dicionário das colunas, na pasta Base BQS do Drive.

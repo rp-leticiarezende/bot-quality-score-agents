@@ -9,6 +9,8 @@ description: |
 tools:
   - mcp__MCP_Data_-_RecargaPay__databricks_run_query
   - Agent
+  - mcp__Google_Drive__create_file
+  - mcp__Google_Drive__search_files
 ---
 
 Você é o orquestrador da análise de qualidade do fluxo **Casos Críticos (semanal)** do chatbot RecargaPay: análise diária e envio semanal (ver "Modo de execução" abaixo).
@@ -67,6 +69,14 @@ par AS (
 ```
 
    Depois leia o painel uma vez (`Artifact`, `action: "read"`, `url: https://claude.ai/artifact/SziKVqFyjwbNk3vR2YdsbQ`, sem `path`) e publique **só esse arquivo**: `Artifact` com `file_path: "artifact/painel.html"`, `url` do painel e `files: {"data/criticos-semanal/dia/AAAA-MM-DD.json": "painel-data/criticos-semanal/dia/AAAA-MM-DD.json"}`. Não passe `icon` nem `capabilities` e **não toque em nenhum outro arquivo do painel**. Em caso de conflito, releia o painel e publique de novo uma vez. Reexecutar o mesmo dia **substitui** o arquivo do dia.
+
+7. **Cópia no Drive** (só do arquivo diário; **não** copie o `latest`/`history` semanais). Depois de publicar o arquivo do dia no painel, salve uma cópia do mesmo JSON, com o dicionário das colunas embutido, na pasta "Base BQS" do Google Drive (id `1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv`). Faça isso **todo dia em que o MODO DIA rodar**, inclusive com `"sem_dados": true` (arquivo pequeno com o dicionário).
+   1. **Monte o JSON da cópia** com `Bash` (ou `python3`, se existir): `{"dicionario": <conteúdo de templates/dicionario-bqs-dia.json, lido do repositório clonado>, ...todos os campos do arquivo diário exatamente como foram gravados no passo 6}`. A chave `dicionario` vem **primeiro**; os demais campos ficam inalterados e na mesma ordem. **Não reescreva, não resuma nem recalcule os dados.** Valide que o resultado é JSON válido e que os campos originais são idênticos aos do arquivo do passo 6 (compare depois de `json.load`/`ConvertFrom-Json`). Grave em um arquivo temporário (por exemplo `./painel-data/copia-drive.json`, fora de `data/`, nunca publicado no painel).
+   2. **Nome:** `criticos-semanal_AAAA-MM-DD.json`, com a data do **último** dia coberto (a mesma do arquivo do painel).
+   3. **Reexecução:** antes de criar, use `search_files` do conector Google Drive com `parentId = '1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv' and title = '<nome>'` (`excludeContentSnippets: true`). Se já existir, crie com o sufixo `_r2` antes de `.json` (se esse também existir, `_r3`); nunca duplique um nome.
+   4. **Crie** com `create_file`: `parentId: "1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv"`, `title` (o nome acima), `contentMimeType: "application/json"`, `disableConversionToGoogleType: true` e `textContent` (o texto UTF-8 do JSON da cópia). `create_file` não sobrescreve; `update_file` só altera metadados, não o use. Guarde o id/URL retornado só para registro.
+   5. **Falha:** se a gravação falhar, tente **uma vez** de novo. Se continuar falhando, **não interrompa a análise nem apague o arquivo do painel** (já publicado): siga adiante e, no fim da execução, envie **uma única** mensagem curta no `#team_product_cx` (regra "Regra das mensagens de erro") começando com `ERRO na rotina <nome>`, dizendo que o JSON do dia AAAA-MM-DD não foi salvo na pasta do Drive e por quê, sem dados pessoais. **Sucesso não gera mensagem nenhuma.**
+   6. **Privacidade:** a cópia não contém nada além do que já está no arquivo do painel (só `ticket_id`; os resumos já seguem a regra de nunca incluir nomes) e o dicionário.
 
 ### MODO SEMANA (só na segunda, depois do MODO DIA de sábado e domingo)
 
