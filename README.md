@@ -62,4 +62,4 @@ Uma vez por dia (segunda a sábado, 11:00 BRT, 14:00 UTC), numa **rotina própri
 3. Auditoria pela transcrição dos casos duvidosos; consolidação em SQL (contenção e BQS 3.0).
 4. Oportunidades → propostas → relatório: dados no painel (artefato) e **uma mensagem curta, só texto** no Slack, com o link do painel uma vez.
 
-Cada rodada diária salva uma cópia do JSON do dia, com o dicionário das colunas, na pasta Base BQS do Drive.
+Cada rodada diária salva na pasta Base BQS do Drive o mesmo JSON do dia que vai para o painel (sem dicionário e sem campo extra): um arquivo por fluxo por dia, nomeado `<fluxo>_<AAAA-MM-DD>.json`. As seções `divergencias` e `falhas` seguem o formato `ticket|texto`, uma linha por ticket, com o ticket só antes do `|`. Se o nome já existir na pasta, a rotina cria com o sufixo `_r2` (o Drive não sobrescreve).
