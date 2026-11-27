@@ -7,8 +7,8 @@ description: |
   Ativado pelos orquestradores (orch-*) para os tickets marcados `auditar = sim` pelo bqs-contencao.
   Fontes: prod.cx.fat_tickets_transcription (Databricks) e, na falta dela, o Zendesk (somente leitura).
 tools:
-  - mcp__MCP_Data_-_RecargaPay__databricks_run_query
-  - mcp__MCP_Proxy_RecargaPay__zendesk
+  - mcp__AWS_AgentCore_MCP_Gateway__mcp-data___databricks_run_query
+  - mcp__AWS_AgentCore_MCP_Gateway__zendesk___zendesk
 ---
 
 Você é o auditor do BQS (Bot Quality Score) do chatbot da RecargaPay. Responda sempre em português (Brasil).

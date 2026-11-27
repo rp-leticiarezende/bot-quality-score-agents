@@ -11,14 +11,14 @@ description: |
   - Fechar o loop: dados → oportunidades → propostas → owners → próximos passos
   Trigger: "relatório do chatbot", "análise completa", "quero o fechamento", "gera o report", "análise da vertical X", "relatório mensal do bot".
 tools:
-  - mcp__MCP_Proxy_RecargaPay__zendesk
-  - mcp__Atlassian__getConfluencePage
-  - mcp__Atlassian__searchConfluenceUsingCql
+  - mcp__AWS_AgentCore_MCP_Gateway__zendesk___zendesk
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___getConfluencePage
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___searchConfluenceUsingCql
   - mcp__Amplitude__get_amplitude_charts
   - mcp__Amplitude__query_amplitude_data
   - mcp__Amplitude__get_amplitude_context
-  - mcp__Slack__slack_send_message
-  - mcp__Slack__slack_search_channels
+  - mcp__AWS_AgentCore_MCP_Gateway__slack___slack_send_message
+  - mcp__AWS_AgentCore_MCP_Gateway__slack___slack_search_channels
   - Artifact
   - Read
   - Glob
@@ -425,9 +425,9 @@ Quando o prompt começar com `MODO CURADORIA ativo`, você foi ativado por um or
 
 ### MODO SEM DADOS
 
-Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados no período: isso é um problema da rotina, não um relatório. Poste o texto recebido **somente** no `#team_product_cx` (channel_id `C0A0L3WQSMV`, via `slack_send_message`), **nunca** no `#lideres-cx-e-cxm`, **não publique artefato** e encerre.
+Se o prompt começar com `MODO SEM DADOS`, o orquestrador não encontrou dados no período: isso é um problema da rotina, não um relatório. Poste o texto recebido **somente** no `#team_product_cx` (channel_id `C0A0L3WQSMV`, via `slack___slack_send_message`), **nunca** no `#lideres-cx-e-cxm`, **não publique artefato** e encerre.
 
-Se o prompt começar com `MODO ALERTA DE ERRO`, o orquestrador (ou uma etapa) falhou e **nada deve ir para os líderes**. Poste o texto recebido como **uma** mensagem no Slack `#team_product_cx` (channel_id `C0A0L3WQSMV`, via `slack_send_message`), sem formatação elaborada, **não publique artefato**, **não poste em `#lideres-cx-e-cxm`** e encerre.
+Se o prompt começar com `MODO ALERTA DE ERRO`, o orquestrador (ou uma etapa) falhou e **nada deve ir para os líderes**. Poste o texto recebido como **uma** mensagem no Slack `#team_product_cx` (channel_id `C0A0L3WQSMV`, via `slack___slack_send_message`), sem formatação elaborada, **não publique artefato**, **não poste em `#lideres-cx-e-cxm`** e encerre.
 
 ### O que muda no MODO CURADORIA
 
@@ -615,7 +615,7 @@ Chave fora do contrato `bqs-run/1`: não tem BQS. O agente `bqs-abandono` grava 
 
 #### PASSO B — Mensagem única no Slack (curta, profissional, quase sem emojis)
 
-**Antes de postar, o painel (Passo A) já deve estar publicado**: se a publicação falhar de verdade depois de uma nova tentativa, **não poste para os líderes**: siga a regra de erro do passo A.5 (para publicar o painel você precisa da ferramenta `Read` para ler `artifact/painel.html` inteiro; ela está na sua lista). Poste **uma única mensagem** com `slack_send_message` em `#lideres-cx-e-cxm` (`channel_id: C052R2X2DEE`; se o ID falhar, `slack_search_channels` com `bot-quality-score`). **Não há mensagem na thread**: o plano completo, os tickets e o antes/depois ficam no painel. O Slack só renderiza texto: use **negrito com DOIS asteriscos** (`**assim**`; um asterisco só vira itálico neste conector), listas e links; **sem tabelas, sem barras de emoji, sem citações e sem títulos `#`**. A mensagem inteira cabe em cerca de 10 linhas e deve soar profissional, para analistas e lideranças.
+**Antes de postar, o painel (Passo A) já deve estar publicado**: se a publicação falhar de verdade depois de uma nova tentativa, **não poste para os líderes**: siga a regra de erro do passo A.5 (para publicar o painel você precisa da ferramenta `Read` para ler `artifact/painel.html` inteiro; ela está na sua lista). Poste **uma única mensagem** com `slack___slack_send_message` em `#lideres-cx-e-cxm` (`channel_id: C052R2X2DEE`; se o ID falhar, `slack___slack_search_channels` com `bot-quality-score`). **Não há mensagem na thread**: o plano completo, os tickets e o antes/depois ficam no painel. O Slack só renderiza texto: use **negrito com DOIS asteriscos** (`**assim**`; um asterisco só vira itálico neste conector), listas e links; **sem tabelas, sem barras de emoji, sem citações e sem títulos `#`**. A mensagem inteira cabe em cerca de 10 linhas e deve soar profissional, para analistas e lideranças.
 
 **Emojis: apenas o status do BQS 3.0 (e a sirene nas urgências).** Nada de emoji em títulos de seção, numeração, pontos de atenção ou rodapé. O status usa os mesmos limiares de antes, agora sobre **Ótimo + Bom**.
 

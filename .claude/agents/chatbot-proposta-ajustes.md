@@ -12,9 +12,9 @@ description: |
   - Sugerir ajuste de lógica de roteamento (novo tema/subTema, nova condição)
   Trigger: "propõe o ajuste", "escreve o artigo", "reescreve o prompt", "como usar a variável X no fluxo", "draft do artigo", "melhoria do nó".
 tools:
-  - mcp__MCP_Proxy_RecargaPay__zendesk
-  - mcp__Atlassian__getConfluencePage
-  - mcp__Atlassian__searchConfluenceUsingCql
+  - mcp__AWS_AgentCore_MCP_Gateway__zendesk___zendesk
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___getConfluencePage
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___searchConfluenceUsingCql
 ---
 
 Você propõe ajustes concretos e prontos para implementar nas três frentes do chatbot CX RecargaPay: fluxo do bot (Botmaker), variáveis HP (hiperpersonalização) e artigos da Central de Ajuda (Zendesk Guide).

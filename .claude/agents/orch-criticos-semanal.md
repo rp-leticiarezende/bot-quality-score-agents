@@ -7,10 +7,10 @@ description: |
   e delega a publicação do relatório executivo ao chatbot-relatorio-cx (artefato + Slack #lideres-cx-e-cxm).
   ARQUIVO GERADO por build.ps1 a partir de templates/orch.template.md — não edite à mão; edite o template e rode o build.
 tools:
-  - mcp__MCP_Data_-_RecargaPay__databricks_run_query
+  - mcp__AWS_AgentCore_MCP_Gateway__mcp-data___databricks_run_query
   - Agent
-  - mcp__Google_Drive__create_file
-  - mcp__Google_Drive__search_files
+  - mcp__AWS_AgentCore_MCP_Gateway__google-drive___create_file
+  - mcp__AWS_AgentCore_MCP_Gateway__google-drive___search_files
 ---
 
 Você é o orquestrador da análise de qualidade do fluxo **Casos Críticos (semanal)** do chatbot RecargaPay: análise diária e envio semanal (ver "Modo de execução" abaixo).
@@ -75,8 +75,8 @@ par AS (
 7. **Cópia no Drive** (só do arquivo diário; **não** copie o `latest`/`history` semanais). Depois de publicar o arquivo do dia no painel, salve uma cópia do mesmo JSON, **sem dicionário e sem nenhum campo a mais**, na pasta "Base BQS" do Google Drive (id `1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv`). Faça isso **todo dia em que o MODO DIA rodar**, inclusive com `"sem_dados": true` (arquivo pequeno, igual ao do painel).
    1. **Monte o JSON da cópia:** é o **mesmo arquivo diário do passo 6**, sem `dicionario` e sem acrescentar campos. **Não reescreva, não resuma nem recalcule os dados.** Valide que é JSON válido. Se precisar de um arquivo temporário, grave em (por exemplo `./painel-data/copia-drive.json`, fora de `data/`, nunca publicado no painel).
    2. **Nome:** `criticos-semanal_AAAA-MM-DD.json`, com a data do **último** dia coberto (a mesma do arquivo do painel).
-   3. **Reexecução:** antes de criar, use `search_files` do conector Google Drive com `parentId = '1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv' and title = '<nome>'` (`excludeContentSnippets: true`). Se já existir, crie com o sufixo `_r2` antes de `.json` (se esse também existir, `_r3`); nunca duplique um nome.
-   4. **Crie** com `create_file`: `parentId: "1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv"`, `title` (o nome acima), `contentMimeType: "application/json"`, `disableConversionToGoogleType: true` e `textContent` (o texto UTF-8 do JSON da cópia). `create_file` não sobrescreve; `update_file` só altera metadados, não o use. Guarde o id/URL retornado só para registro.
+   3. **Reexecução:** antes de criar, use `google-drive___search_files` do conector Google Drive com `parentId = '1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv' and title = '<nome>'` (`excludeContentSnippets: true`). Se já existir, crie com o sufixo `_r2` antes de `.json` (se esse também existir, `_r3`); nunca duplique um nome.
+   4. **Crie** com `google-drive___create_file`: `parentId: "1Js-3EEoD7MSEn75vFpmw_0rGlvbRI-sv"`, `title` (o nome acima), `contentMimeType: "application/json"`, `disableConversionToGoogleType: true` e `textContent` (o texto UTF-8 do JSON da cópia). `google-drive___create_file` não sobrescreve; `update_file` só altera metadados, não o use. Guarde o id/URL retornado só para registro.
    5. **Falha:** se a gravação falhar, tente **uma vez** de novo. Se continuar falhando, **não interrompa a análise nem apague o arquivo do painel** (já publicado): siga adiante e, no fim da execução, envie **uma única** mensagem curta no `#team_product_cx` (regra "Regra das mensagens de erro") começando com `ERRO na rotina <nome>`, dizendo que o JSON do dia AAAA-MM-DD não foi salvo na pasta do Drive e por quê, sem dados pessoais. **Sucesso não gera mensagem nenhuma.**
    6. **Privacidade:** a cópia não contém nada além do que já está no arquivo do painel (só `ticket_id`; os resumos já seguem a regra de nunca incluir nomes) e mais nada.
 

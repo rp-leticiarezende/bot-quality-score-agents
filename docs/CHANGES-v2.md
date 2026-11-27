@@ -94,7 +94,7 @@ Reteste do `bqs-contencao` nas mesmas 30 conversas: `o_que_reteria` passou a cit
 - **Evidência:** 99% das notas já seguem a média ponderada arredondada (820 de 830), e 12 conversas violam o piso na origem — por isso o BQS final recalcula a regra em SQL.
 - **Teste real (4 tickets do HP, 12–18/10):** o auditor revisou os 4; em todos a nota original estava **alta demais** (o avaliador premia o transbordo mesmo quando a resposta anterior falhou); um mudou de aprovado para reprovado (nota 8 → 4). SQL do 6.2 validada: BQS 72,4% → 72,2%. A amostra é seletiva e pequena — não generalizar.
 - **Ajustes após o teste:** fim do trecho do bot (falas `RecargaPay:`/`RecargaPay Ajuda:` e "você será conectado…"), transferência anunciada e não executada, pergunta SIM/NÃO do fluxo ≠ CSAT, regra para conversa em fases, `REVISA` só quando muda aprovação, `resolution`/`escalation` ≥ 2 pontos ou a classe.
-- **Não testado:** a reserva via Zendesk (todas as transcrições do teste estavam na tabela; cobertura da tabela 66–78% nos tickets avaliados) e a execução dentro da rotina em nuvem (nome do conector Zendesk `mcp__MCP_Proxy_RecargaPay__zendesk` e limite de consultas simultâneas ao Databricks).
+- **Não testado:** a reserva via Zendesk (todas as transcrições do teste estavam na tabela; cobertura da tabela 66–78% nos tickets avaliados) e a execução dentro da rotina em nuvem (nome do conector Zendesk `mcp__AWS_AgentCore_MCP_Gateway__zendesk___zendesk` e limite de consultas simultâneas ao Databricks).
 
 ## Passo 5 — Painel (artefato) e Slack visual
 
@@ -144,7 +144,7 @@ Achados do teste e o que foi feito ou fica pendente:
 - **Régua do avaliador:** não distingue "transferência anunciada e nunca conectada" de "executada tarde" (tickets 46605356, 46610432). Pendente: ajustar a rubrica do bqs-auditor.
 - **Distribuição por desfecho soma 394, não 398** (4 conversas sem `retention_type`): o relatório já trata, mas vale uma linha "sem classificação" no contrato.
 - **Contrato:** oportunidades com 0 observados ficam com estimado 0; falta o valor "n/c". Pendente.
-- **Ferramentas:** o agente de relatório cita nomes de conector que não existem neste ambiente (`mcp__Slack__*`); na rotina em nuvem os nomes são os do ambiente dela. Conferir no modo sombra.
+- **Ferramentas:** todas as ferramentas MCP usam o AWS AgentCore MCP Gateway (prefixo `mcp__AWS_AgentCore_MCP_Gateway__`; ex.: `slack___slack_send_message`).
 - **Conflito de regras para o Produto CX decidir:** guardrails do bot proíbem orientar caminho no app, mas as propostas citam caminho; variável de desambiguação com dois nomes (`agcc_desambiguacao` × `cc_desambiguacao`).
 
 ## Primeira execução real na nuvem — Casos Críticos (diário), 20/10/2026

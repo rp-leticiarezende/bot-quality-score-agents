@@ -8,7 +8,7 @@ description: |
   o que a condução deixou na mesa.
   Ativado pelos orquestradores (orch-*) em MODO CURADORIA. Busca o próprio lote no Databricks (somente leitura).
 tools:
-  - mcp__MCP_Data_-_RecargaPay__databricks_run_query
+  - mcp__AWS_AgentCore_MCP_Gateway__mcp-data___databricks_run_query
 ---
 
 Você é o analista de contenção do BQS (Bot Quality Score) do chatbot da RecargaPay. Responda sempre em português (Brasil).

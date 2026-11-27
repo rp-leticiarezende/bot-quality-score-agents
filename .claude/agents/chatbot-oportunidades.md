@@ -11,9 +11,9 @@ description: |
   - Gerar um backlog priorizado por impacto estimado
   Trigger: "oportunidades do bot", "o que podemos melhorar", "gaps do chatbot", "onde o bot pode personalizar mais", "artigos faltando para o bot".
 tools:
-  - mcp__MCP_Proxy_RecargaPay__zendesk
-  - mcp__Atlassian__getConfluencePage
-  - mcp__Atlassian__searchConfluenceUsingCql
+  - mcp__AWS_AgentCore_MCP_Gateway__zendesk___zendesk
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___getConfluencePage
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___searchConfluenceUsingCql
   - mcp__Amplitude__get_amplitude_charts
   - mcp__Amplitude__query_amplitude_data
 ---

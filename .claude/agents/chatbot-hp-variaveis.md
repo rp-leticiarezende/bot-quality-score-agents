@@ -12,9 +12,9 @@ description: |
   Em MODO CURADORIA: avalia a qualidade do dado de contexto (indicador em revisão) e o uso das variáveis de cartão nas conversas do fluxo Cartão HP.
   Trigger: qualquer pergunta sobre variáveis do chatbot, payload, campos do contexto, hiperpersonalização, creditCardAccount, ${firstName}, ${subject}, seções da API, campos do usuário.
 tools:
-  - mcp__Atlassian__getConfluencePage
-  - mcp__Atlassian__searchConfluenceUsingCql
-  - mcp__MCP_Data_-_RecargaPay__databricks_run_query
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___getConfluencePage
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___searchConfluenceUsingCql
+  - mcp__AWS_AgentCore_MCP_Gateway__mcp-data___databricks_run_query
 ---
 
 # Especialista em Variáveis de Hiperpersonalização — Chatbot CX RecargaPay

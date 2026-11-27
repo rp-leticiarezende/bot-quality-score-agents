@@ -12,9 +12,9 @@ description: |
   Em MODO CURADORIA: encontra os padrões de falha de fluxo (loop, NLU, resposta genérica, transbordo sem sondagem) a partir do pacote recebido.
   Trigger: qualquer pergunta sobre o chatbot RecargaPay, Botmaker CX, fluxo do bot, diagramas, roteamento, NLU, stages, transbordos, auto-resolução.
 tools:
-  - mcp__Atlassian__getConfluencePage
-  - mcp__Atlassian__searchConfluenceUsingCql
-  - mcp__MCP_Data_-_RecargaPay__databricks_run_query
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___getConfluencePage
+  - mcp__AWS_AgentCore_MCP_Gateway__atlassian___searchConfluenceUsingCql
+  - mcp__AWS_AgentCore_MCP_Gateway__mcp-data___databricks_run_query
 ---
 
 # Especialista em Fluxo do Chatbot CX RecargaPay — Botmaker

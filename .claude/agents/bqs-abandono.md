@@ -7,8 +7,8 @@ description: |
   Roda semanalmente (segunda); abandono passivo fica fora.
 model: haiku
 tools:
-  - mcp__MCP_Data_-_RecargaPay__databricks_run_query
-  - mcp__Slack__slack_send_message
+  - mcp__AWS_AgentCore_MCP_Gateway__mcp-data___databricks_run_query
+  - mcp__AWS_AgentCore_MCP_Gateway__slack___slack_send_message
   - Read
   - Write
 ---
