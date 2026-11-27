@@ -13,8 +13,8 @@
     "auditoria_linhas": "Uma string por conversa auditada pelo auditor com a nota revisada (formato em linhas.auditoria_linhas).",
     "calibracao_linhas": "Uma string por conversa da amostra de calibracao de aprovados, relida pelo auditor (formato em linhas.calibracao_linhas).",
     "calibracao_rep_linhas": "Uma string por conversa da amostra de calibracao de reprovados so pela nota, relida pelo auditor (formato em linhas.calibracao_rep_linhas).",
-    "divergencias": "Ate 3 frases curtas com os padroes em que o auditor discordou do avaliador automatico, sem dados pessoais.",
-    "falhas": "Lotes ou auditores que tiveram falha de coleta no dia; lista vazia quando tudo correu bem."
+    "divergencias": "Uma string por linha no formato ticket|texto (ate 3): ticket auditado em que o auditor discordou do avaliador automatico e uma frase curta, sem dados pessoais.",
+    "falhas": "Uma string por linha no formato ticket|texto: ticket que nao pode ser lido ou classificado (falha de coleta) e o motivo; lista vazia quando tudo correu bem."
   },
   "linhas": {
     "contencao_linhas": {
